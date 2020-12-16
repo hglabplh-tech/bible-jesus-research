@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.harry.jesus.MainController">
+   <children>
+      <SplitPane dividerPositions="0.005649717514124294" orientation="VERTICAL" prefHeight="734.0" prefWidth="1002.0">
+        <items>
+          <AnchorPane minHeight="40.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+               <children>
+                  <MenuBar layoutY="14.0" prefHeight="32.0" prefWidth="991.0">
+                    <menus>
+                      <Menu mnemonicParsing="false" text="Datei">
+                        <items>
+                          <MenuItem fx:id="open_plan" mnemonicParsing="false" onAction="#openPlan" text="Open Plan" />
+                              <MenuItem fx:id="save_plan" mnemonicParsing="false" onAction="#savePlan" text="Save 'Plan" />
+                              <MenuItem fx:id="new_plan" mnemonicParsing="false" onAction="#newPlan" text="New Plan" />
+                        </items>
+                      </Menu>
+                      <Menu mnemonicParsing="false" text="Study" />
+                      <Menu mnemonicParsing="false" text="Help">
+                        <items>
+                          <MenuItem mnemonicParsing="false" text="About" />
+                        </items>
+                      </Menu>
+                        <Menu mnemonicParsing="false" text="Unspecified Menu">
+                          <items>
+                            <MenuItem mnemonicParsing="false" text="Action 1" />
+                          </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Unspecified Menu">
+                          <items>
+                            <MenuItem mnemonicParsing="false" text="Action 1" />
+                          </items>
+                        </Menu>
+                    </menus>
+                  </MenuBar>
+               </children>
+            </AnchorPane>
+          <AnchorPane maxHeight="1.7976931348623157E308" minHeight="700.0" minWidth="1000.0" prefHeight="700.0" prefWidth="1000.0">
+               <children>
+                  <BorderPane prefHeight="650.0" prefWidth="900.0">
+                     <left>
+                        <TreeView fx:id="booksTree" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                     </left>
+
+                     <right>
+                        <ListView fx:id="bibles" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                     </right>
+                     <bottom>
+                        <ListView fx:id="footNotes" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                     </bottom>
+                  </BorderPane>
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </children>
+</VBox>

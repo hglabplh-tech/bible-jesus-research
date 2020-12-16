@@ -1,0 +1,148 @@
+package org.harry.jesus;
+
+import generated.BIBLEBOOK;
+import generated.CHAPTER;
+import generated.XMLBIBLE;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.Parent;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
+import javafx.scene.layout.BorderPane;
+
+import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.GenericStyledArea;
+import org.fxmisc.richtext.model.*;
+import org.harry.jesus.jesajautils.BibleTextUtils;
+import org.harry.jesus.jesajautils.TextRendering;
+import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
+import org.harry.jesus.jesajautils.browse.LinkedImage;
+import org.harry.jesus.jesajautils.browse.ParStyle;
+import org.harry.jesus.jesajautils.browse.TextStyle;
+import org.jetbrains.annotations.NotNull;
+import org.reactfx.util.Either;
+
+import javax.xml.bind.JAXBElement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+public class MainController {
+
+    @FXML
+    ListView<String> bibles;
+
+    @FXML
+    TreeView<String> booksTree;
+
+    @FXML
+    VirtualizedScrollPane<GenericStyledArea<ParStyle, Either<String, LinkedImage>, TextStyle>> chapterReader;
+
+
+    BorderPane borderPane = null;
+
+    BibleTextUtils utils;
+
+    List<BIBLEBOOK> theBooks = new ArrayList<>();
+
+    FoldableStyledArea area;
+
+    XMLBIBLE selected = null;
+
+    @FXML
+    public void initialize() {
+        Parent parent = booksTree.getParent();
+        this.borderPane = (BorderPane) parent;
+
+
+        booksTree.getSelectionModel().selectedItemProperty()
+                .addListener(new ChangeListener<TreeItem<String>>() {
+
+                    @Override
+                    public void changed(ObservableValue<? extends TreeItem<String>> observableValue, TreeItem<String> old_val, TreeItem<String> new_val) {
+                        String value = new_val.getValue();
+                        String regex = "[0-9]+";
+                        TextRendering rendering = new TextRendering(utils, area);
+                        String bookName = "";
+                        int chapter = 1;
+                        if (value.matches(regex)) {
+                            bookName = new_val.getParent().getValue();
+                            chapter = Integer.valueOf(value, 10);
+                        } else {
+                            bookName = value;
+                        }
+                        Optional<BIBLEBOOK> book = utils.getBookByName(selected, bookName);
+                        if (book.isPresent()) {
+                            rendering.render(selected, book.get().getBname(), chapter);
+                        }
+                    }
+                });
+        bibles.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                selected = utils.getBibles().get(t1.intValue());
+                TreeItem<String> root = buildBooksTree();
+                TextRendering rendering = new TextRendering(utils, area);
+                String chapter = rendering.render(selected, theBooks.get(0).getBname(), 1);
+            }
+        });
+        area = new FoldableStyledArea();
+        TextOps<String, TextStyle> styledTextOps = SegmentOps.styledTextOps();
+        chapterReader = new VirtualizedScrollPane(area);
+        chapterReader.setMinSize(1000, 700);
+        this.borderPane.setCenter(chapterReader);
+        utils = new BibleTextUtils();
+        List<String> bibleNames = utils.getBibleInfos();
+
+        for (String name: bibleNames) {
+            bibles.getItems().add(name);
+        }
+        bibles.getSelectionModel().selectFirst();
+
+        TreeItem<String> root = buildBooksTree();
+        TextRendering rendering = new TextRendering(utils, this.area);
+        String chapter = rendering.render(selected, theBooks.get(0).getBname(), 1);
+        root.getChildren().addAll();
+        System.out.println("second");
+    }
+
+    @NotNull
+    private TreeItem<String> buildBooksTree() {
+        TreeItem<String> root = new TreeItem<>();
+        root.setValue("The books");
+        booksTree.setRoot(root);
+        theBooks.clear();
+        List<JAXBElement<BIBLEBOOK>> books = selected.getBIBLEBOOK();
+        for (JAXBElement<BIBLEBOOK> book: books) {
+            theBooks.add(book.getValue());
+        }
+        for(BIBLEBOOK theBook: theBooks) {
+            TreeItem item = new TreeItem(theBook.getBname());
+            root.getChildren().add(item);
+            for (JAXBElement<CHAPTER> chapter : theBook.getCHAPTER()) {
+                TreeItem<String> cItem = new TreeItem<>(chapter.getValue().getCnumber().toString());
+                item.getChildren().add(cItem);
+            }
+        }
+        booksTree.refresh();
+        return root;
+    }
+
+    @FXML
+    public void openPlan(ActionEvent event) {
+
+    }
+
+    @FXML
+    public void savePlan(ActionEvent event) {
+
+    }
+
+    @FXML
+    public void newPlan(ActionEvent event) {
+
+    }
+}
