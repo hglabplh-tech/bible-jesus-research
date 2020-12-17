@@ -3,6 +3,7 @@ package org.harry.jesus.jesajautils;
 import generated.*;
 import javafx.scene.control.IndexRange;
 import javafx.scene.paint.Color;
+import org.harry.jesus.jesajautils.BibleTextUtils.BookLink;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.TextStyle;
 
@@ -37,8 +38,24 @@ public class TextRendering {
         return notes;
     }
 
-    public String render(XMLBIBLE bible, String xmlBookName, Integer chapterNo) {
-        Optional<BIBLEBOOK> book = this.bibleUtils.getBookByName(bible, xmlBookName);
+    public String render(XMLBIBLE bible, List<BookLink> links) {
+        StringBuffer strContent = new StringBuffer();
+        Integer start = 0;
+        for (BookLink link:links) {
+            Optional<BIBLEBOOK> book = this.bibleUtils.getBookByLabel(bible, link.getBookLabel());
+            if (book.isPresent()) {
+                Map<Integer, List<Integer>> linkMap = new LinkedHashMap<>();
+                linkMap.put(link.getChapter(), link.getVerses());
+                renderLink(bible, start, link, strContent, linkMap);
+            }
+        }
+        setAreaText(strContent);
+        return strContent.toString();
+
+    }
+
+    public String render(XMLBIBLE bible, String bookLabel, Integer chapterNo) {
+        Optional<BIBLEBOOK> book = this.bibleUtils.getBookByLabel(bible, bookLabel);
         Integer start = 0;
         StringBuffer strContent = new StringBuffer();
         if (book.isPresent()) {
@@ -47,13 +64,62 @@ public class TextRendering {
                 renderChapter(start, strContent, chapter);
             }
         }
+        setAreaText(strContent);
+        return strContent.toString();
+    }
+
+    private void setAreaText(StringBuffer strContent) {
         area.replaceText(strContent.toString());
-        for (Map.Entry<IndexRange, TextStyle> entry:renderMap.entrySet()) {
+        area.setStyle(0, strContent.toString().length(), TextStyle.bold(false)
+                .updateTextColor(Color.BLACK)
+                .updateItalic(false)
+                .updateBackgroundColor(Color.WHITE)
+        );
+        for (Map.Entry<IndexRange, TextStyle> entry : renderMap.entrySet()) {
             IndexRange range = entry.getKey();
             TextStyle style = entry.getValue();
             area.setStyle(range.getStart(), range.getEnd(), style);
         }
-        return strContent.toString();
+    }
+
+    private void renderLink(XMLBIBLE bible, Integer start, BookLink link, StringBuffer strContent, Map<Integer, List<Integer>> chapterVerses) {
+        Optional<BIBLEBOOK> book = this.bibleUtils.getBookByLabel(bible, link.getBookLabel());
+        strContent.append("Link for link: " + link.getBookLabel() + " chapter: " + link.getChapter() + " Verses: ");
+        for (Integer verse : link.getVerses()) {
+            strContent.append(verse.toString() + ",");
+        }
+        IndexRange range = new IndexRange(start, start + strContent.toString().length() - 1);
+        start = start + strContent.toString().length();
+        this.renderMap.put(range, TextStyle.bold(true).updateItalic(true).updateUnderline(true));
+        strContent.append("\n");
+
+        if (book.isPresent()) {
+        for (Map.Entry<Integer, List<Integer>> entry : chapterVerses.entrySet()) {
+                Optional<CHAPTER> chapter = this.bibleUtils.getChapter(book.get(), entry.getKey());
+                if (chapter.isPresent()) {
+                    CHAPTER realChapter = chapter.get();
+                    int index = 0;
+
+                    for (JAXBElement verseOr : realChapter.getPROLOGOrCAPTIONOrVERS()) {
+                        Object thing = verseOr.getValue();
+                        if (thing instanceof VERS) {
+                            if (entry.getValue().size() > index) {
+                                if (((VERS) thing).getVnumber().intValue() == entry.getValue().get(index)) {
+                                    renderVers(strContent, (VERS) thing);
+                                    range = new IndexRange(start, start + strContent.toString().length() - 1);
+                                    start = start + strContent.toString().length();
+                                    this.chapterMap.put(realChapter.getCnumber().intValue(), range);
+                                    index++;
+                                }
+                            }
+                        }
+                        strContent.append("\n");
+                    }
+
+              }
+
+            }
+        }
     }
 
     private void renderChapter(Integer start, StringBuffer strContent, Optional<CHAPTER> chapter) {
@@ -204,4 +270,5 @@ public class TextRendering {
         strContent.append(lineBuffer.toString());
         return lineBuffer.toString().length();
     }
+
 }

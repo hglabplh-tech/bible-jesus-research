@@ -10,10 +10,7 @@ import javax.xml.bind.JAXBElement;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class BibleTextUtils {
     List<String> bibleFnames = Arrays.asList(
@@ -76,7 +73,7 @@ public class BibleTextUtils {
         return this.bookLabels;
     }
 
-    public Optional<BIBLEBOOK> getBookByName(XMLBIBLE bible, String bookLabel) {
+    public Optional<BIBLEBOOK> getBookByLabel(XMLBIBLE bible, String bookLabel) {
         String [] labArr = bookLabel.split(",");
         Integer bookNo = Integer.valueOf(labArr[0]);
         Optional<BIBLEBOOK> result = Optional.empty();
@@ -99,4 +96,140 @@ public class BibleTextUtils {
         }
         return result;
     }
+
+    public List<BookLink> parseLinks(String text) {
+        List<BookLink> links = new ArrayList<>();
+        int start = 0;
+        int startLink = 0;
+        while (startLink != -1) {
+            startLink = text.indexOf("[", start);
+            if (startLink != -1) {
+                int endLink = text.indexOf("]", startLink);
+                if (endLink != -1) {
+                    String linkString = text.substring(startLink + 1, endLink);
+                    Optional<BookLink> link = buildLink(linkString);
+                    if (link.isPresent()) {
+                        links.add(link.get());
+                    }
+                    start = endLink + 1;
+                } else {
+                    startLink = -1;
+                }
+            }
+        }
+        return links;
+    }
+
+    private Optional<BookLink> buildLink(String linkString) {
+        int start = 0;
+        int endIndex = linkString.indexOf(" ", start);
+        if (endIndex > -1) {
+            String bookStr = linkString.substring(start, endIndex);
+            Optional<String> label = this.getBookLabels().stream().filter(e ->
+                    e.contains(bookStrMapping(bookStr))).findFirst();
+            String temp = linkString.substring(endIndex + 1);
+            endIndex = temp.indexOf(",");
+            if (endIndex > -1) {
+                String chapStr = temp.substring(0, endIndex).trim();
+                start = endIndex + 1;
+                boolean matches = chapStr.matches("[0-9]+");
+                boolean processed = false;
+                if (matches) {
+                    Integer chapter = Integer.parseInt(chapStr);
+                    String versesStr = temp.substring(start);
+                    String[] single = versesStr.split(".");
+                    String[] range = versesStr.split("-");
+                    List<Integer> verses = new ArrayList<>();
+                    if (single.length == 1 || range.length == 1) {
+                        String numtemp = "";
+                        if (single.length == 1) {
+                            numtemp = single[0];
+                        } else {
+                            numtemp = range[0];
+                        }
+
+                        if (numtemp.matches("[0-9]+")) {
+                            verses.add(Integer.parseInt(numtemp));
+                            processed = true;
+                        }
+                    }
+                    else if (range.length == 2) {
+                        String startStr = range[0];
+                        String endStr = range[1];
+                        int sRange = Integer.parseInt(startStr);
+                        int eRange = Integer.parseInt(endStr);
+                        for (Integer vers = sRange; vers <= eRange; vers++) {
+                            verses.add(vers);
+                        }
+                        processed = true;
+                    } else if (single.length >1) {
+                        for (String verseStr: single) {
+                            int vers = Integer.parseInt(versesStr);
+                            verses.add(vers);
+                        }
+                        processed = true;
+                    }
+                    if (processed) {
+                        if (label.isPresent()) {
+                            return Optional.of(new BookLink(label.get(), chapter, verses));
+                        }
+                    }
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    private String bookStrMapping(String book) {
+        Map<String, String> map = new HashMap<>();
+        map.put("1.Mo", "1. Mose");
+        map.put("1.Mose", "1. Mose");
+        map.put("2.Mo", "2. Mose");
+        map.put("2.Mose", "2. Mose");
+        map.put("3.Mo", "3. Mose");
+        map.put("3.Mose", "3. Mose");
+        map.put("4.Mo", "4. Mose");
+        map.put("4.Mose", "4. Mose");
+        map.put("5.Mo", "5. Mose");
+        map.put("5.Mose", "5. Mose");
+        map.put("1.Ch", "1. Chr");
+        map.put("2.Ch", "2. Chr");
+        map.put("1.Chr", "1. Chr");
+        map.put("2.Chr", "2. Chr");
+        if (map.get(book) != null) {
+            return map.get(book);
+        } else {
+            return book;
+        }
+
+    }
+
+    public static class BookLink {
+
+        private final String bookLabel;
+
+        private final Integer chapter;
+
+        private final List<Integer> verses;
+
+        public BookLink(String bookLabel, Integer chapter, List<Integer> verses) {
+            this.bookLabel = bookLabel;
+            this.chapter = chapter;
+            this.verses = verses;
+        }
+
+        public String getBookLabel() {
+            return bookLabel;
+        }
+
+        public Integer getChapter() {
+            return chapter;
+        }
+
+        public List<Integer> getVerses() {
+            return verses;
+        }
+    }
+
+
 }

@@ -75,7 +75,7 @@ public class MainController {
                         } else {
                             bookLabel = value;
                         }
-                        Optional<BIBLEBOOK> book = utils.getBookByName(selected, bookLabel);
+                        Optional<BIBLEBOOK> book = utils.getBookByLabel(selected, bookLabel);
                         if (book.isPresent()) {
                             rendering.render(selected, bookLabel, chapter);
                             footerNotes.getItems().clear();
@@ -94,6 +94,22 @@ public class MainController {
                 footerNotes.getItems().addAll(rendering.getNotes());
             }
         });
+        footerNotes.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                String note = footerNotes.getItems().get(t1.intValue());
+                List<BibleTextUtils.BookLink> links = utils.parseLinks(note);
+                if (links.size() > 0) {
+                    TextRendering rendering = new TextRendering(utils, area);
+                    String chapter = rendering.render(selected, links);
+                    footerNotes.getItems().clear();
+                    footerNotes.getItems().addAll(rendering.getNotes());
+                }
+            }
+
+        });
+
+
         area = new FoldableStyledArea();
         TextOps<String, TextStyle> styledTextOps = SegmentOps.styledTextOps();
         chapterReader = new VirtualizedScrollPane(area);
