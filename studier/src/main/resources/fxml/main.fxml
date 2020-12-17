@@ -50,7 +50,7 @@
                         <ListView fx:id="bibles" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
                      </right>
                      <bottom>
-                        <ListView fx:id="footNotes" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                        <ListView fx:id="footerNotes" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
                      </bottom>
                   </BorderPane>
                </children>

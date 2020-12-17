@@ -143,6 +143,7 @@
                 <xsd:element minOccurs="0" ref="GRAM"/>
                 <xsd:element minOccurs="0" ref="STYLE"/>
                 <xsd:element minOccurs="0" ref="NOTE"/>
+                <xsd:element minOccurs="0" ref="DIV"/>
                 <xsd:element minOccurs="0" ref="BR"/>
                 <xsd:element minOccurs="0" ref="SUP"/>
                 <xsd:element minOccurs="0" ref="XREF"/>
@@ -242,6 +243,7 @@
             <xsd:attribute name="aix" type="TAix" use="optional"/>
         </xsd:complexType>
     </xsd:element>
+
     <xsd:element name="NOTE">
         <xsd:annotation>
             <xsd:documentation>Markiert eine eingebaute Notiz</xsd:documentation>
@@ -280,6 +282,19 @@
             <!--In fscope steht eine Bibelstellen angabe in Klartext z.B. -->
             <!--1Mo 11,27; 17,5; Gal 3,16-->
             <xsd:attribute name="fscope" type="xsd:string" use="optional"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="DIV">
+        <xsd:complexType mixed="true">
+            <xsd:choice minOccurs="0">
+                <xsd:element minOccurs="0" ref="GRAM"/>
+                <xsd:element minOccurs="0" ref="STYLE"/>
+                <xsd:element minOccurs="0" ref="NOTE"/>
+                <xsd:element minOccurs="0" ref="BR"/>
+                <xsd:element minOccurs="0" ref="SUP"/>
+                <xsd:element minOccurs="0" ref="XREF"/>
+            </xsd:choice>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="GRAM">
@@ -693,6 +708,7 @@
     <xsd:element name="m" substitutionGroup="MEDIA"/>
     <xsd:element name="note" substitutionGroup="NOTE"/>
     <xsd:element name="n" substitutionGroup="NOTE"/>
+    <xsd:element name="div" substitutionGroup="DIV"/>
     <xsd:element name="prolog" substitutionGroup="PROLOG"/>
     <xsd:element name="p" substitutionGroup="PROLOG"/>
     <xsd:element name="remark" substitutionGroup="REMARK"/>

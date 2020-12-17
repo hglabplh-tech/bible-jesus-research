@@ -36,6 +36,9 @@ public class MainController {
     ListView<String> bibles;
 
     @FXML
+    ListView<String> footerNotes;
+
+    @FXML
     TreeView<String> booksTree;
 
     @FXML
@@ -66,17 +69,19 @@ public class MainController {
                         String value = new_val.getValue();
                         String regex = "[0-9]+";
                         TextRendering rendering = new TextRendering(utils, area);
-                        String bookName = "";
+                        String bookLabel = "";
                         int chapter = 1;
                         if (value.matches(regex)) {
-                            bookName = new_val.getParent().getValue();
+                            bookLabel = new_val.getParent().getValue();
                             chapter = Integer.valueOf(value, 10);
                         } else {
-                            bookName = value;
+                            bookLabel = value;
                         }
-                        Optional<BIBLEBOOK> book = utils.getBookByName(selected, bookName);
+                        Optional<BIBLEBOOK> book = utils.getBookByName(selected, bookLabel);
                         if (book.isPresent()) {
-                            rendering.render(selected, book.get().getBname(), chapter);
+                            rendering.render(selected, bookLabel, chapter);
+                            footerNotes.getItems().clear();
+                            footerNotes.getItems().addAll(rendering.getNotes());
                         }
                     }
                 });
@@ -86,13 +91,15 @@ public class MainController {
                 selected = utils.getBibles().get(t1.intValue());
                 TreeItem<String> root = buildBooksTree();
                 TextRendering rendering = new TextRendering(utils, area);
-                String chapter = rendering.render(selected, theBooks.get(0).getBname(), 1);
+                String chapter = rendering.render(selected, utils.getBookLabels().get(0), 1);
+                footerNotes.getItems().clear();
+                footerNotes.getItems().addAll(rendering.getNotes());
             }
         });
         area = new FoldableStyledArea();
         TextOps<String, TextStyle> styledTextOps = SegmentOps.styledTextOps();
         chapterReader = new VirtualizedScrollPane(area);
-        chapterReader.setMinSize(1000, 700);
+        chapterReader.setMinSize(1000, 400);
         this.borderPane.setCenter(chapterReader);
         utils = new BibleTextUtils();
         List<String> bibleNames = utils.getBibleInfos();
@@ -104,7 +111,7 @@ public class MainController {
 
         TreeItem<String> root = buildBooksTree();
         TextRendering rendering = new TextRendering(utils, this.area);
-        String chapter = rendering.render(selected, theBooks.get(0).getBname(), 1);
+        String chapter = rendering.render(selected, utils.getBookLabels().get(0), 1);
         root.getChildren().addAll();
         System.out.println("second");
     }
@@ -119,13 +126,16 @@ public class MainController {
         for (JAXBElement<BIBLEBOOK> book: books) {
             theBooks.add(book.getValue());
         }
+        int index = 0;
         for(BIBLEBOOK theBook: theBooks) {
-            TreeItem item = new TreeItem(theBook.getBname());
+            String label = utils.getBookLabels().get(index);
+            TreeItem item = new TreeItem(label);
             root.getChildren().add(item);
             for (JAXBElement<CHAPTER> chapter : theBook.getCHAPTER()) {
                 TreeItem<String> cItem = new TreeItem<>(chapter.getValue().getCnumber().toString());
                 item.getChildren().add(cItem);
             }
+            index++;
         }
         booksTree.refresh();
         return root;

@@ -8,10 +8,7 @@ import org.harry.jesus.jesajautils.browse.TextStyle;
 
 import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class TextRendering {
 
@@ -24,9 +21,15 @@ public class TextRendering {
 
     Map<BigInteger,Map<Integer, IndexRange>> book = new LinkedHashMap<>();
 
+    List<String> notes = new ArrayList<>();
+
     public TextRendering(BibleTextUtils bibleUtils, FoldableStyledArea area) {
         this.bibleUtils = bibleUtils;
         this.area = area;
+    }
+
+    public List<String> getNotes() {
+        return notes;
     }
 
     public String render(XMLBIBLE bible, String xmlBookName, Integer chapterNo) {
@@ -84,6 +87,7 @@ public class TextRendering {
         List<Object> contents = null;
         int breakPoint = 0;
         contents = vers.getContent();
+
         for (Object content: contents) {
 
             if (content instanceof String) {
@@ -94,8 +98,8 @@ public class TextRendering {
             } else if (content instanceof JAXBElement) {
                  Class jaxbClazz = ((JAXBElement<?>) content).getDeclaredType();
                 if (jaxbClazz.getName().equals(STYLE.class.getName()) ) {
-                    STYLE styled = (STYLE)((JAXBElement<?>) content).getValue();
-                    for (Object styledContent: styled.getContent()) {
+                    STYLE styled = (STYLE) ((JAXBElement<?>) content).getValue();
+                    for (Object styledContent : styled.getContent()) {
                         if (styledContent instanceof String) {
                             String text = (String) styledContent;
                             start = strContent.toString().length() - 1;
@@ -108,6 +112,22 @@ public class TextRendering {
                         }
 
                     }
+                } else if (jaxbClazz.getName().equals(DIV.class.getName()) ) {
+                    DIV div = (DIV)((JAXBElement<?>) content).getValue();
+                    List<Object> divContents = div.getContent();
+                    for (Object divCont: divContents) {
+                        if (divCont instanceof JAXBElement) {
+                            if (((JAXBElement)divCont).getValue() instanceof NOTE) {
+                                NOTE theNote = (NOTE)((JAXBElement)divCont).getValue();
+                                saveNote(theNote, vers.getVnumber().intValue());
+                                strContent.append("[N" + notes.size() + "]");
+                            }
+                        }
+                    }
+                } else if (jaxbClazz.getName().equals(NOTE.class.getName()) ) {
+                    NOTE note = (NOTE)((JAXBElement<?>) content).getValue();
+                    saveNote(note, vers.getVnumber().intValue());
+                    strContent.append("[N" + notes.size() + "]");
                 } else if (jaxbClazz.getName().equals(BR.class.getName()) ) {
                     BR br = (BR)((JAXBElement<?>) content).getValue();
                     BreakType type = br.getArt();
@@ -120,5 +140,18 @@ public class TextRendering {
         }
 
         strContent.append("\n");
+    }
+
+    private void saveNote(NOTE theNote, Integer vNumber) {
+        List<Object> noteContents = theNote.getContent();
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("(" + (notes.size() + 1) + ") <VERS: " + vNumber + "> ");
+        for (Object noteContent : noteContents) {
+            if (noteContent instanceof String) {
+                String text = (String) noteContent;
+                buffer.append(text);
+            }
+        }
+        notes.add(buffer.toString());
     }
 }
