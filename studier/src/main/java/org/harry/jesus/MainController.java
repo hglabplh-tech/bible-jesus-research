@@ -6,13 +6,13 @@ import generated.XMLBIBLE;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 
+import javafx.scene.paint.Color;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.GenericStyledArea;
 import org.fxmisc.richtext.model.*;
@@ -59,8 +59,6 @@ public class MainController {
     public void initialize() {
         Parent parent = booksTree.getParent();
         this.borderPane = (BorderPane) parent;
-
-
         booksTree.getSelectionModel().selectedItemProperty()
                 .addListener(new ChangeListener<TreeItem<String>>() {
 
@@ -100,6 +98,19 @@ public class MainController {
         TextOps<String, TextStyle> styledTextOps = SegmentOps.styledTextOps();
         chapterReader = new VirtualizedScrollPane(area);
         chapterReader.setMinSize(1000, 400);
+        ContextMenu contMenu = new ContextMenu();
+        MenuItem mItem = new MenuItem();
+        mItem.setText("setColor");
+        contMenu.getItems().add(mItem);
+        area.contextMenuObjectProperty().setValue(contMenu);
+        mItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                area.setStyle(area.getSelection().getStart(),
+                        area.getSelection().getEnd(),
+                        TextStyle.backgroundColor(Color.GREEN));
+            }
+        });
         this.borderPane.setCenter(chapterReader);
         utils = new BibleTextUtils();
         List<String> bibleNames = utils.getBibleInfos();

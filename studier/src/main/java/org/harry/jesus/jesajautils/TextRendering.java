@@ -74,7 +74,13 @@ public class TextRendering {
                 Integer vRef = caption.getVref().intValue();
                 for (Object content : caption.getContent()) {
                     if (content instanceof String) {
-                        strContent.append(content);
+                        String text = (String)content;
+                        start = strContent.toString().length() - 1;
+                        IndexRange range = new IndexRange(start, start + text.length() + 1);
+                        TextStyle style = TextStyle.bold(true)
+                                .updateUnderline(true);
+                        strContent.append(text);
+                        renderMap.put(range, style);
                     }
                 }
             } else if (thing instanceof PROLOG) {
@@ -148,7 +154,10 @@ public class TextRendering {
         String footNote = "[" + notes.size() + "]";
         start = strContent.toString().length() - 1;
         IndexRange range = new IndexRange(start, start + footNote.length() + 1);
-        TextStyle style = TextStyle.bold(true).updateBackgroundColor(Color.BLUE).updateItalic(true).updateTextColor(Color.WHITE);
+        TextStyle style = TextStyle.bold(true)
+                .updateBackgroundColor(Color.BLUE)
+                .updateItalic(true)
+                .updateTextColor(Color.WHITE);
         renderMap.put(range, style);
         strContent.append(footNote);
     }
