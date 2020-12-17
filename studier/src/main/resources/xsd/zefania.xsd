@@ -285,6 +285,7 @@
         </xsd:complexType>
     </xsd:element>
 
+    <!-- This element is added as a fix for real XML's which use this unfortunately H.G.P. -->
     <xsd:element name="DIV">
         <xsd:complexType mixed="true">
             <xsd:choice minOccurs="0">

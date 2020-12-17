@@ -15,13 +15,18 @@ public class TextRendering {
     private final BibleTextUtils bibleUtils;
     private final FoldableStyledArea area;
 
-    Map<Integer, IndexRange> chapterMap = new LinkedHashMap<>();
+    private Map<Integer, IndexRange> chapterMap = new LinkedHashMap<>();
 
-    Map<IndexRange, TextStyle> renderMap = new LinkedHashMap<>();
+    private Map<IndexRange, TextStyle> renderMap = new LinkedHashMap<>();
 
-    Map<BigInteger,Map<Integer, IndexRange>> book = new LinkedHashMap<>();
+    private Map<BigInteger,Map<Integer, IndexRange>> book = new LinkedHashMap<>();
 
-    List<String> notes = new ArrayList<>();
+    private List<String> notes = new ArrayList<>();
+
+    private Integer lastPosINBuffer = 0;
+
+    private static final int TEXT_WIDTH = 80;
+
 
     public TextRendering(BibleTextUtils bibleUtils, FoldableStyledArea area) {
         this.bibleUtils = bibleUtils;
@@ -85,16 +90,13 @@ public class TextRendering {
                 .append(". ");
         int start = 0;
         List<Object> contents = null;
-        int breakPoint = 0;
         contents = vers.getContent();
 
         for (Object content: contents) {
 
             if (content instanceof String) {
                 String text = (String)content;
-                strContent.append(text);
-                breakPoint = breakPoint + text.length();
-
+                renderBlock(strContent, text);
             } else if (content instanceof JAXBElement) {
                  Class jaxbClazz = ((JAXBElement<?>) content).getDeclaredType();
                 if (jaxbClazz.getName().equals(STYLE.class.getName()) ) {
@@ -106,9 +108,7 @@ public class TextRendering {
                             IndexRange range = new IndexRange(start, start + text.length() + 1);
                             TextStyle style = TextStyle.bold(true).updateBackgroundColor(Color.AZURE);
                             renderMap.put(range, style);
-                            strContent.append(text);
-                            breakPoint = breakPoint + text.length();
-
+                            renderBlock(strContent, text);
                         }
 
                     }
@@ -120,14 +120,15 @@ public class TextRendering {
                             if (((JAXBElement)divCont).getValue() instanceof NOTE) {
                                 NOTE theNote = (NOTE)((JAXBElement)divCont).getValue();
                                 saveNote(theNote, vers.getVnumber().intValue());
-                                strContent.append("[N" + notes.size() + "]");
+                                renderFootNote(strContent);
                             }
                         }
                     }
                 } else if (jaxbClazz.getName().equals(NOTE.class.getName()) ) {
                     NOTE note = (NOTE)((JAXBElement<?>) content).getValue();
                     saveNote(note, vers.getVnumber().intValue());
-                    strContent.append("[N" + notes.size() + "]");
+                   renderFootNote(strContent);
+
                 } else if (jaxbClazz.getName().equals(BR.class.getName()) ) {
                     BR br = (BR)((JAXBElement<?>) content).getValue();
                     BreakType type = br.getArt();
@@ -142,6 +143,16 @@ public class TextRendering {
         strContent.append("\n");
     }
 
+    private void renderFootNote(StringBuffer strContent) {
+        int start;
+        String footNote = "[" + notes.size() + "]";
+        start = strContent.toString().length() - 1;
+        IndexRange range = new IndexRange(start, start + footNote.length() + 1);
+        TextStyle style = TextStyle.bold(true).updateBackgroundColor(Color.BLUE).updateItalic(true).updateTextColor(Color.WHITE);
+        renderMap.put(range, style);
+        strContent.append(footNote);
+    }
+
     private void saveNote(NOTE theNote, Integer vNumber) {
         List<Object> noteContents = theNote.getContent();
         StringBuffer buffer = new StringBuffer();
@@ -153,5 +164,35 @@ public class TextRendering {
             }
         }
         notes.add(buffer.toString());
+    }
+
+    private int renderBlock(StringBuffer strContent, String block) {
+        StringBuffer lineBuffer = new StringBuffer();
+        if (block.length() >= TEXT_WIDTH) {
+            int pos = 0;
+            int actLength = 0;
+            int blockL = block.length();
+            while (actLength < blockL) {
+                int temp = (actLength + pos + 1);
+                actLength = Math.min(temp, block.length());
+                int lastPos = actLength -1;
+                pos = block.indexOf(" ", lastPos + TEXT_WIDTH);
+                if (pos != -1) {
+                    strContent.append(block.substring(lastPos, pos) + "\n");
+                    this.lastPosINBuffer = lineBuffer.toString().length() + (pos - lastPos);
+                } else {
+                    actLength = block.length();
+                    pos = actLength;
+
+                    strContent.append(block.substring(lastPos));
+                    this.lastPosINBuffer = lineBuffer.toString().length() + (pos + 1);
+                }
+            }
+        }else {
+            strContent.append(block);
+            this.lastPosINBuffer = lineBuffer.toString().length() + block.length();
+        }
+        strContent.append(lineBuffer.toString());
+        return lineBuffer.toString().length();
     }
 }
