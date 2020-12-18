@@ -137,10 +137,10 @@ public class BibleTextUtils {
                 if (matches) {
                     Integer chapter = Integer.parseInt(chapStr);
                     String versesStr = temp.substring(start);
-                    String[] single = versesStr.split(".");
+                    String[] single = versesStr.split("\\.");
                     String[] range = versesStr.split("-");
                     List<Integer> verses = new ArrayList<>();
-                    if (single.length == 1 || range.length == 1) {
+                    if (single.length == 1 && range.length == 1) {
                         String numtemp = "";
                         if (single.length == 1) {
                             numtemp = single[0];
@@ -164,7 +164,7 @@ public class BibleTextUtils {
                         processed = true;
                     } else if (single.length >1) {
                         for (String verseStr: single) {
-                            int vers = Integer.parseInt(versesStr);
+                            int vers = Integer.parseInt(verseStr);
                             verses.add(vers);
                         }
                         processed = true;

@@ -28,10 +28,15 @@ public class TextRendering {
 
     private static final int TEXT_WIDTH = 80;
 
+    private final String actBookLabel;
+    private final Integer actChapter;
 
-    public TextRendering(BibleTextUtils bibleUtils, FoldableStyledArea area) {
+
+    public TextRendering(BibleTextUtils bibleUtils, FoldableStyledArea area, String actBookLabel, Integer actChapter) {
         this.bibleUtils = bibleUtils;
         this.area = area;
+        this.actBookLabel = actBookLabel;
+        this.actChapter = actChapter;
     }
 
     public List<String> getNotes() {
@@ -110,10 +115,11 @@ public class TextRendering {
                                     start = start + strContent.toString().length();
                                     this.chapterMap.put(realChapter.getCnumber().intValue(), range);
                                     index++;
+                                    strContent.append("\n");
                                 }
                             }
                         }
-                        strContent.append("\n");
+
                     }
 
               }
