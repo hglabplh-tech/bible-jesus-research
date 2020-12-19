@@ -3,9 +3,11 @@ package org.harry.jesus.jesajautils;
 import generated.*;
 import javafx.scene.control.IndexRange;
 import javafx.scene.paint.Color;
+import org.fxmisc.richtext.model.TwoDimensional;
 import org.harry.jesus.jesajautils.BibleTextUtils.BookLink;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.TextStyle;
+import org.jetbrains.annotations.NotNull;
 
 import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
@@ -59,18 +61,33 @@ public class TextRendering {
 
     }
 
-    public String render(XMLBIBLE bible, String bookLabel, Integer chapterNo) {
+    public boolean render(XMLBIBLE bible, String bookLabel, Integer chapterNo) {
+        boolean chapterFound = false;
         Optional<BIBLEBOOK> book = this.bibleUtils.getBookByLabel(bible, bookLabel);
         Integer start = 0;
         StringBuffer strContent = new StringBuffer();
         if (book.isPresent()) {
             Optional<CHAPTER> chapter = this.bibleUtils.getChapter(book.get(), chapterNo);
             if (chapter.isPresent()) {
+                chapterFound = true;
                 renderChapter(start, strContent, chapter);
             }
         }
         setAreaText(strContent);
-        return strContent.toString();
+        return chapterFound;
+    }
+
+    public int selectVerseByGivenRange(IndexRange range) {
+        int start = range.getStart();
+
+        for (Map.Entry<Integer, IndexRange> entry: this.chapterMap.entrySet()) {
+            IndexRange compRange = entry.getValue();
+            if (start >= compRange.getStart() && start <= compRange.getEnd()) {
+                this.area.setStyle(compRange.getStart(), compRange.getEnd(), TextStyle.underline(true));
+                return entry.getKey();
+            }
+        }
+        return 0;
     }
 
     private void setAreaText(StringBuffer strContent) {
@@ -137,9 +154,7 @@ public class TextRendering {
             Object thing = verseOr.getValue();
             if (thing instanceof VERS) {
                 renderVers(strContent, (VERS) thing);
-                IndexRange range = new IndexRange(start, start + strContent.toString().length() - 1);
-                start = start + strContent.toString().length();
-                this.chapterMap.put(realChapter.getCnumber().intValue(), range);
+                start = setVerseRangeToChapterMap(start, strContent, (VERS) thing);
             } else if (thing instanceof CAPTION) {
                 CAPTION caption = (CAPTION)thing;
                 String type = caption.getType().value();
@@ -163,10 +178,18 @@ public class TextRendering {
         }
     }
 
+    @NotNull
+    private Integer setVerseRangeToChapterMap(Integer start, StringBuffer strContent, VERS thing) {
+        IndexRange range = new IndexRange(start, strContent.toString().length() - 1);
+        this.chapterMap.put(thing.getVnumber().intValue(), range);
+        start = strContent.toString().length();
+        return start;
+    }
+
     private void renderVers(StringBuffer strContent, VERS vers) {
         strContent.append(vers.getVnumber().toString(10))
                 .append(". ");
-        int start = 0;
+        int start;
         List<Object> contents = null;
         contents = vers.getContent();
 

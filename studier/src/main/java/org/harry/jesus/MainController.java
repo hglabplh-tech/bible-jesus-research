@@ -10,6 +10,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 
 import javafx.scene.paint.Color;
@@ -59,10 +60,20 @@ public class MainController {
 
     private Integer actChapter = 1;
 
+    TextRendering rendering = null;
+
     @FXML
     public void initialize() {
         Parent parent = booksTree.getParent();
         this.borderPane = (BorderPane) parent;
+        area = new FoldableStyledArea();
+        chapterReader = new VirtualizedScrollPane(area);
+        chapterReader.setMinSize(1000, 400);
+        ContextMenu contMenu = new ContextMenu();
+        MenuItem mItem = new MenuItem();
+        mItem.setText("setColor");
+        contMenu.getItems().add(mItem);
+        area.contextMenuObjectProperty().setValue(contMenu);
         booksTree.getSelectionModel().selectedItemProperty()
                 .addListener(new ChangeListener<TreeItem<String>>() {
 
@@ -83,10 +94,7 @@ public class MainController {
                         if (book.isPresent()) {
                             actBookLabel = bookLabel;
                             actChapter = chapter;
-                            TextRendering rendering = new TextRendering(utils, area, actBookLabel, actChapter);
-                            rendering.render(selected, actBookLabel, actChapter);
-                            footerNotes.getItems().clear();
-                            footerNotes.getItems().addAll(rendering.getNotes());
+                            showChapter();
                         }
                     }
                 });
@@ -95,10 +103,7 @@ public class MainController {
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
                 selected = utils.getBibles().get(t1.intValue());
                 TreeItem<String> root = buildBooksTree();
-                TextRendering rendering = new TextRendering(utils, area, actBookLabel, actChapter);
-                rendering.render(selected, actBookLabel, actChapter);
-                footerNotes.getItems().clear();
-                footerNotes.getItems().addAll(rendering.getNotes());
+                showChapter();
             }
         });
         footerNotes.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
@@ -107,25 +112,25 @@ public class MainController {
                 String note = footerNotes.getItems().get(t1.intValue());
                 List<BibleTextUtils.BookLink> links = utils.parseLinks(note);
                 if (links.size() > 0) {
-                    TextRendering rendering = new TextRendering(utils, area, actBookLabel, actChapter);
-                    String chapter = rendering.render(selected, links);
-                    footerNotes.getItems().clear();
-                    footerNotes.getItems().addAll(rendering.getNotes());
+                    showLink(links);
                 }
             }
 
         });
 
+        area.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
-        area = new FoldableStyledArea();
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if (mouseEvent.getClickCount() == 1) {
+                    javafx.scene.control.
+                    IndexRange range = area.getSelection();
+                    rendering.selectVerseByGivenRange(range);                }
+            }
+        });
+
         TextOps<String, TextStyle> styledTextOps = SegmentOps.styledTextOps();
-        chapterReader = new VirtualizedScrollPane(area);
-        chapterReader.setMinSize(1000, 400);
-        ContextMenu contMenu = new ContextMenu();
-        MenuItem mItem = new MenuItem();
-        mItem.setText("setColor");
-        contMenu.getItems().add(mItem);
-        area.contextMenuObjectProperty().setValue(contMenu);
+
         mItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -145,10 +150,30 @@ public class MainController {
 
         actBookLabel = utils.getBookLabels().get(0);
         TreeItem<String> root = buildBooksTree();
-        TextRendering rendering = new TextRendering(utils, this.area, actBookLabel, actChapter);
-        String chapter = rendering.render(selected, utils.getBookLabels().get(0), actChapter);
-        root.getChildren().addAll();
+        showRoot();
         System.out.println("second");
+    }
+
+    private void showRoot() {
+        rendering = new TextRendering(utils, this.area, actBookLabel, actChapter);
+        rendering.render(selected, utils.getBookLabels().get(0), actChapter);
+        footerNotes.getItems().clear();
+        footerNotes.getItems().addAll(rendering.getNotes());
+    }
+
+    private boolean showChapter() {
+        rendering = new TextRendering(utils, this.area, actBookLabel, actChapter);
+        rendering = new TextRendering(utils, area, actBookLabel, actChapter);
+        boolean found = rendering.render(selected, actBookLabel, actChapter);
+        footerNotes.getItems().clear();
+        footerNotes.getItems().addAll(rendering.getNotes());
+        return found;
+    }
+
+    private void showLink(List<BibleTextUtils.BookLink> links) {
+        String chapter = rendering.render(selected, links);
+        footerNotes.getItems().clear();
+        footerNotes.getItems().addAll(rendering.getNotes());
     }
 
     @NotNull
@@ -189,5 +214,28 @@ public class MainController {
     @FXML
     public void newPlan(ActionEvent event) {
 
+    }
+
+    @FXML
+    public void prevChapter(ActionEvent event) {
+        actChapter = actChapter - 1;
+        boolean found = showChapter();
+        if (!found) {
+
+        }
+    }
+
+    @FXML
+    public void nextChapter(ActionEvent event) {
+        actChapter = actChapter + 1;
+        boolean found = showChapter();
+        if (!found) {
+
+        }
+    }
+
+    @FXML
+    public void linkBack(ActionEvent event) {
+        showChapter();
     }
 }

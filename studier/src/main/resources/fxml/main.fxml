@@ -52,6 +52,26 @@
                      <bottom>
                         <ListView fx:id="footerNotes" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
                      </bottom>
+                     <top>
+                        <GridPane BorderPane.alignment="CENTER">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Button fx:id="prevChapter" mnemonicParsing="false" onAction="#prevChapter" text="&lt;--" />
+                              <Button fx:id="linkBack" mnemonicParsing="false" onAction="#linkBack" text="Back from link" GridPane.columnIndex="1" />
+                              <Button fx:id="nextChapter" mnemonicParsing="false" onAction="#nextChapter" text="--&gt;" GridPane.columnIndex="2" />
+                              <TextField fx:id="chapterTitle" editable="false" promptText="Chapter:" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                           </children>
+                        </GridPane>
+                     </top>
                   </BorderPane>
                </children>
             </AnchorPane>
