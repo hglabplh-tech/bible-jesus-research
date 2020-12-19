@@ -34,6 +34,9 @@ import java.util.Optional;
 public class MainController {
 
     @FXML
+    TextField chapterTitle;
+
+    @FXML
     ListView<String> bibles;
 
     @FXML
@@ -156,17 +159,31 @@ public class MainController {
 
     private void showRoot() {
         rendering = new TextRendering(utils, this.area, actBookLabel, actChapter);
+        fillTextArea();
+    }
+
+    private void fillTextArea() {
         rendering.render(selected, utils.getBookLabels().get(0), actChapter);
+        actBookLabel = utils.getBookLabels().get(0);
         footerNotes.getItems().clear();
         footerNotes.getItems().addAll(rendering.getNotes());
+        String [] splitted = actBookLabel.split(",");
+        chapterTitle.setText("Book: " + splitted[1] + " Chapter: " + actChapter);
     }
 
     private boolean showChapter() {
         rendering = new TextRendering(utils, this.area, actBookLabel, actChapter);
         rendering = new TextRendering(utils, area, actBookLabel, actChapter);
+        boolean found = fillChapterText();
+        return found;
+    }
+
+    private boolean fillChapterText() {
         boolean found = rendering.render(selected, actBookLabel, actChapter);
         footerNotes.getItems().clear();
         footerNotes.getItems().addAll(rendering.getNotes());
+        String [] splitted = actBookLabel.split(",");
+        chapterTitle.setText("Book: " + splitted[1] + " Chapter: " + actChapter);
         return found;
     }
 
