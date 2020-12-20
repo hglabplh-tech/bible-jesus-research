@@ -2,7 +2,7 @@ package org.harry.jesus.mosedbmodel;
 
 public class RenderInfos {
 
-    private String bible;
+    private Integer bible;
 
     private Integer bibleBook;
 
@@ -16,11 +16,11 @@ public class RenderInfos {
 
     private String attributes;
 
-    public String getBible() {
+    public Integer getBible() {
         return bible;
     }
 
-    public RenderInfos setBible(String bible) {
+    public RenderInfos setBible(Integer bible) {
         this.bible = bible;
         return this;
     }
