@@ -3,21 +3,24 @@ package org.harry.jesus.jesajautils;
 import com.google.common.io.LineReader;
 import generated.BIBLEBOOK;
 import generated.CHAPTER;
+import generated.VERS;
 import generated.XMLBIBLE;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 import org.pmw.tinylog.Logger;
 
 import javax.xml.bind.JAXBElement;
-import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 
 public class BibleTextUtils {
-    List<String> bibleFnames = Arrays.asList(
+    public final static List<String> bibleFnames = Arrays.asList(
             "bible_luther1912.xml",
             "SF_2012-08-14_DEUTSCH_LUT_1545_LH_(LUTHER 1545 (LETZTE HAND)).xml",
             "SF_2009-01-20_GER_ELB1905_(ELBERFELDER 1905).xml",
-           // "SF_2009-01-20_GER_FB2004_(FREEBIBLE2004).xml",
             "SF_2015-08-16_ENG_NHEBYHWH_(NEW HEART ENGLISH BIBLE (YHWH)).xml",
             "SF_2009-01-20_ENG_UKJV_(UPDATED KING JAMES VERSION).xml"
     );
@@ -25,8 +28,10 @@ public class BibleTextUtils {
     List<XMLBIBLE> bibles = new ArrayList<>();
     List<String> bookLabels = new ArrayList<>();
 
+
     public BibleTextUtils() {
         try {
+
             InputStreamReader reader = new InputStreamReader(this.getClass().getResourceAsStream("/booksinfo.csv"));
             LineReader lreader = new LineReader(reader);
             String line = lreader.readLine();
@@ -40,7 +45,9 @@ public class BibleTextUtils {
                 InputStream bibleIN = BibleTextUtils.class.getResourceAsStream("/" + bibleName);
                 XMLBIBLE actBible = BibleReader.loadBible(bibleIN);
                 bibles.add(actBible);
+
             }
+
         } catch (Exception ex) {
             Logger.trace("Exception occured loading bibles");
         }
@@ -83,6 +90,43 @@ public class BibleTextUtils {
                 .findFirst();
         if (optBook.isPresent()) {
             result = Optional.of(optBook.get().getValue());
+        }
+        return result;
+    }
+
+    public List<BIBLEBOOK> getBooks(XMLBIBLE bible) {
+        List<BIBLEBOOK> result = new ArrayList<>();
+        for (JAXBElement<BIBLEBOOK> xmlBook: bible.getBIBLEBOOK()) {
+            result.add(xmlBook.getValue());
+        }
+        return result;
+    }
+
+    public List<CHAPTER> getChapters(BIBLEBOOK book) {
+        List<CHAPTER> result = new ArrayList<>();
+        for (JAXBElement<CHAPTER> xmlChapter: book.getCHAPTER()) {
+            result.add(xmlChapter.getValue());
+        }
+        return result;
+    }
+
+    public Map<BibleFulltextEngine.BibleTextKey, String> getVerses(CHAPTER chapter, Integer bookNumber) {
+        Map<BibleFulltextEngine.BibleTextKey, String> result = new LinkedHashMap<>();
+        for (JAXBElement xmlVers: chapter.getPROLOGOrCAPTIONOrVERS()) {
+            if (xmlVers.getValue() instanceof VERS) {
+              VERS vers = (VERS)xmlVers.getValue();
+              StringBuffer buffer = new StringBuffer();
+              Integer versNo = vers.getVnumber().intValue();
+              for (Object content: vers.getContent()) {
+                  if (content instanceof String) {
+                      buffer.append((String)content);
+                  }
+              }
+
+              BibleFulltextEngine.BibleTextKey keyObj =
+                      new BibleFulltextEngine.BibleTextKey(bookNumber, chapter.getCnumber().intValue(), versNo);
+              result.put(keyObj, buffer.toString());
+            }
         }
         return result;
     }
