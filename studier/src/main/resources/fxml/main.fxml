@@ -6,75 +6,125 @@
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.harry.jesus.MainController">
    <children>
-      <SplitPane dividerPositions="0.005649717514124294" orientation="VERTICAL" prefHeight="734.0" prefWidth="1002.0">
+      <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
         <items>
-          <AnchorPane minHeight="40.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-               <children>
-                  <MenuBar layoutY="14.0" prefHeight="32.0" prefWidth="991.0">
-                    <menus>
-                      <Menu mnemonicParsing="false" text="Datei">
-                        <items>
-                          <MenuItem fx:id="open_plan" mnemonicParsing="false" onAction="#openPlan" text="Open Plan" />
-                              <MenuItem fx:id="save_plan" mnemonicParsing="false" onAction="#savePlan" text="Save 'Plan" />
-                              <MenuItem fx:id="new_plan" mnemonicParsing="false" onAction="#newPlan" text="New Plan" />
-                        </items>
-                      </Menu>
-                      <Menu mnemonicParsing="false" text="Study" />
-                      <Menu mnemonicParsing="false" text="Help">
-                        <items>
-                          <MenuItem mnemonicParsing="false" text="About" />
-                        </items>
-                      </Menu>
-                        <Menu mnemonicParsing="false" text="Unspecified Menu">
-                          <items>
-                            <MenuItem mnemonicParsing="false" text="Action 1" />
-                          </items>
-                        </Menu>
-                        <Menu mnemonicParsing="false" text="Unspecified Menu">
-                          <items>
-                            <MenuItem mnemonicParsing="false" text="Action 1" />
-                          </items>
-                        </Menu>
-                    </menus>
-                  </MenuBar>
-               </children>
-            </AnchorPane>
-          <AnchorPane maxHeight="1.7976931348623157E308" minHeight="700.0" minWidth="1000.0" prefHeight="700.0" prefWidth="1000.0">
-               <children>
-                  <BorderPane prefHeight="650.0" prefWidth="900.0">
-                     <left>
-                        <TreeView fx:id="booksTree" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-                     </left>
-
-                     <right>
-                        <ListView fx:id="bibles" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-                     </right>
-                     <bottom>
-                        <ListView fx:id="footerNotes" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-                     </bottom>
-                     <top>
-                        <GridPane BorderPane.alignment="CENTER">
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
+            <MenuBar prefHeight="32.0" prefWidth="991.0">
+              <menus>
+                <Menu mnemonicParsing="false" text="Datei">
+                  <items>
+                    <MenuItem fx:id="open_plan" mnemonicParsing="false" onAction="#openPlan" text="Open Plan" />
+                        <MenuItem fx:id="save_plan" mnemonicParsing="false" onAction="#savePlan" text="Save 'Plan" />
+                        <MenuItem fx:id="new_plan" mnemonicParsing="false" onAction="#newPlan" text="New Plan" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Study" />
+                <Menu mnemonicParsing="false" text="Help">
+                  <items>
+                    <MenuItem mnemonicParsing="false" text="About" />
+                  </items>
+                </Menu>
+                  <Menu mnemonicParsing="false" text="Unspecified Menu">
+                    <items>
+                      <MenuItem mnemonicParsing="false" text="Action 1" />
+                    </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Unspecified Menu">
+                    <items>
+                      <MenuItem mnemonicParsing="false" text="Action 1" />
+                    </items>
+                  </Menu>
+              </menus>
+            </MenuBar>
+            <TabPane minHeight="750.0" minWidth="1000.0" prefHeight="700.0" prefWidth="900.0" tabClosingPolicy="UNAVAILABLE">
+              <tabs>
+                <Tab text="Read Bible">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
-                              <Button fx:id="prevChapter" mnemonicParsing="false" onAction="#prevChapter" text="&lt;--" />
-                              <Button fx:id="linkBack" mnemonicParsing="false" onAction="#linkBack" text="Back from link" GridPane.columnIndex="1" />
-                              <Button fx:id="nextChapter" mnemonicParsing="false" onAction="#nextChapter" text="--&gt;" GridPane.columnIndex="2" />
-                              <TextField fx:id="chapterTitle" editable="false" promptText="Chapter:" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <SplitPane orientation="VERTICAL" prefHeight="734.0" prefWidth="1002.0">
+                                <items>
+                                  <AnchorPane maxHeight="1.7976931348623157E308" minHeight="700.0" minWidth="1000.0" prefHeight="700.0" prefWidth="1000.0">
+                                       <children>
+                                          <BorderPane prefHeight="650.0" prefWidth="900.0">
+                                             <left>
+                                                <TreeView fx:id="booksTree" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                                             </left>
+                        
+                                                   <right>
+                                                <ListView fx:id="bibles" minHeight="700.0" minWidth="1000.0" BorderPane.alignment="CENTER" />
+                                             </right>
+                                             <bottom>
+                                                <ListView fx:id="footerNotes" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                                             </bottom>
+                                             <top>
+                                                <GridPane BorderPane.alignment="CENTER">
+                                                  <columnConstraints>
+                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                  </columnConstraints>
+                                                  <rowConstraints>
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                  </rowConstraints>
+                                                   <children>
+                                                      <Button fx:id="prevChapter" mnemonicParsing="false" onAction="#prevChapter" text="&lt;--" />
+                                                      <Button fx:id="linkBack" mnemonicParsing="false" onAction="#linkBack" text="Back from link" GridPane.columnIndex="1" />
+                                                      <Button fx:id="nextChapter" mnemonicParsing="false" onAction="#nextChapter" text="--&gt;" GridPane.columnIndex="2" />
+                                                      <TextField fx:id="chapterTitle" editable="false" promptText="Chapter:" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                   </children>
+                                                </GridPane>
+                                             </top>
+                                          </BorderPane>
+                                       </children>
+                                    </AnchorPane>
+                                </items>
+                              </SplitPane>
                            </children>
-                        </GridPane>
-                     </top>
-                  </BorderPane>
-               </children>
-            </AnchorPane>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                <Tab text="Create Devotional">
+                     <content>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+                                <items>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" />
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" />
+                                </items>
+                              </SplitPane>
+                           </children>
+                        </AnchorPane>
+                     </content>
+                </Tab>
+                  <Tab text="Search">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+                                <items>
+                                  <AnchorPane minHeight="150.0" minWidth="900.0">
+                                       <children>
+                                          <Label layoutX="124.0" layoutY="11.0" text="Keyword" />
+                                          <TextField fx:id="query" layoutX="206.0" layoutY="6.0" />
+                                          <Button fx:id="search" layoutX="527.0" layoutY="6.0" mnemonicParsing="false" onAction="#search" text="Search" />
+                                       </children>
+                                    </AnchorPane>
+                                  <AnchorPane minHeight="400.0" minWidth="900.0">
+                                       <children>
+                                          <ListView fx:id="resultlist" minWidth="900.0" />
+                                       </children>
+                                    </AnchorPane>
+                                </items>
+                              </SplitPane>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </Tab>
+              </tabs>
+            </TabPane>
         </items>
       </SplitPane>
    </children>

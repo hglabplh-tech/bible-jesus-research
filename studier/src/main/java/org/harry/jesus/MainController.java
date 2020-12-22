@@ -23,12 +23,15 @@ import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.LinkedImage;
 import org.harry.jesus.jesajautils.browse.ParStyle;
 import org.harry.jesus.jesajautils.browse.TextStyle;
+import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
+import org.harry.jesus.jesajautils.fulltext.StatisticsCollector;
 import org.jetbrains.annotations.NotNull;
 import org.reactfx.util.Either;
 
 import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class MainController {
@@ -44,6 +47,13 @@ public class MainController {
 
     @FXML
     TreeView<String> booksTree;
+
+    @FXML
+    TextField query;
+
+    @FXML
+    ListView<String> resultlist;
+
 
     @FXML
     VirtualizedScrollPane<GenericStyledArea<ParStyle, Either<String, LinkedImage>, TextStyle>> chapterReader;
@@ -65,13 +75,15 @@ public class MainController {
 
     TextRendering rendering = null;
 
+    List<BibleFulltextEngine.BibleTextKey> verseKeys = new ArrayList<>();
+
     @FXML
     public void initialize() {
         Parent parent = booksTree.getParent();
         this.borderPane = (BorderPane) parent;
         area = new FoldableStyledArea();
         chapterReader = new VirtualizedScrollPane(area);
-        chapterReader.setMinSize(1000, 400);
+        chapterReader.setMinSize(550, 400);
         ContextMenu contMenu = new ContextMenu();
         MenuItem mItem = new MenuItem();
         mItem.setText("setColor");
@@ -218,6 +230,23 @@ public class MainController {
         return root;
     }
 
+
+    @FXML
+    public void search(ActionEvent event) {
+        String pattern = query.getText();
+        BibleFulltextEngine engine = new BibleFulltextEngine(this.selected);
+        StatisticsCollector collector = new StatisticsCollector();
+        Map<BibleFulltextEngine.BibleTextKey, String> hits =
+                engine.searchPlain(pattern, collector);
+        verseKeys.clear();
+        resultlist.getItems().clear();
+        for (Map.Entry<BibleFulltextEngine.BibleTextKey, String> entry: hits.entrySet()) {
+            verseKeys.add(entry.getKey());
+            resultlist.getItems().add(generateVersEntry(entry.getKey(), entry.getValue()));
+        }
+
+    }
+
     @FXML
     public void openPlan(ActionEvent event) {
 
@@ -254,5 +283,20 @@ public class MainController {
     @FXML
     public void linkBack(ActionEvent event) {
         showChapter();
+    }
+
+    private String generateVersEntry (BibleFulltextEngine.BibleTextKey key, String versText) {
+        List<String> csv = utils.getBookLabels();
+        Optional<String> book = csv.stream()
+                .filter(e -> e.contains(key.getBook().toString()))
+                .findFirst();
+        if (book.isPresent()) {
+            String [] split = book.get().split(",");
+            String versLink = "[" + split[1] + " " + key.getChapter() + "," + key.getVers() + "]: ";
+            String result = versLink + versText;
+            return result;
+        } else {
+            return versText;
+        }
     }
 }
