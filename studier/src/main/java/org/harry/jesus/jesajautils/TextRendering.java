@@ -77,17 +77,17 @@ public class TextRendering {
         return chapterFound;
     }
 
-    public int selectVerseByGivenRange(IndexRange range) {
+    public Map.Entry<Integer, IndexRange> selectVerseByGivenRange(IndexRange range) {
         int start = range.getStart();
 
         for (Map.Entry<Integer, IndexRange> entry: this.chapterMap.entrySet()) {
             IndexRange compRange = entry.getValue();
             if (start >= compRange.getStart() && start <= compRange.getEnd()) {
                 this.area.setStyle(compRange.getStart(), compRange.getEnd(), TextStyle.underline(true));
-                return entry.getKey();
+                return entry;
             }
         }
-        return 0;
+        return null;
     }
 
     private void setAreaText(StringBuffer strContent) {

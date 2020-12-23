@@ -1,4 +1,4 @@
 package org.harry.jesus.danielpersistence.xmlpersist;
 
-public class VersesPersistence {
+public class VersNotesPersistence {
 }

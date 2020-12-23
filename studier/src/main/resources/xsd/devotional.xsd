@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
         xmlns:dv="http://org.harry.jesus/devotional/1.0"
+        xmlns:vs="http://org.harry.jesus/versnotes/1.0"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         targetNamespace="http://org.harry.jesus/devotional/1.0"
-
         elementFormDefault="qualified">
+    <import namespace="http://org.harry.jesus/versnotes/1.0" schemaLocation="versnotes.xsd"/>
     <element name="devotional">
         <complexType>
             <choice minOccurs="1" maxOccurs="unbounded">
@@ -13,21 +14,11 @@
         </complexType>
     </element>
 
-    <complexType name="Vers">
-        <sequence>
-            <element name = "vers" type="xs:integer" minOccurs="1" maxOccurs="unbounded"/>
-            <element name="vtext" type="xs:string"/>
-        </sequence>
-
-        <attribute  name = "book" type="xs:integer" use="required"/>
-        <attribute name = "chapter" type="xs:integer" use="required"/>
-        <attribute name="style" type="xs:string" use="optional"/>
-    </complexType>
-
     <complexType name="TextBlock">
         <choice minOccurs="1" maxOccurs="unbounded">
             <element name="style" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
-            <element name="verslink" type = "dv:Vers" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="verslink" type = "vs:Vers" minOccurs="0" maxOccurs="unbounded"/>
+            <element name="notelink" type = "vs:Note" minOccurs="0" maxOccurs="unbounded"/>
             <element name="text" type="xs:string" minOccurs="1"/>
         </choice>
         <attribute name="author" type="xs:string" use="optional"/>

@@ -5,6 +5,7 @@ import generated.BIBLEBOOK;
 import generated.CHAPTER;
 import generated.VERS;
 import generated.XMLBIBLE;
+import jesus.harry.org.versnotes._1.Vers;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
@@ -14,6 +15,7 @@ import javax.xml.bind.JAXBElement;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.util.*;
 
 public class BibleTextUtils {
@@ -79,6 +81,10 @@ public class BibleTextUtils {
 
     public List<String> getBookLabels() {
         return this.bookLabels;
+    }
+
+    public BookLabel getBookLabelAsClass(String label) {
+        return new BookLabel(label);
     }
 
     public Optional<BIBLEBOOK> getBookByLabel(XMLBIBLE bible, String bookLabel) {
@@ -249,6 +255,20 @@ public class BibleTextUtils {
 
     }
 
+    public String generateVersLink(List<Vers> verses, BookLabel label) {
+        StringBuffer buffer = new StringBuffer();
+        for (Vers vers : verses) {
+            for (BigInteger versNo: vers.getVers()) {
+                buffer.append("[");
+                buffer.append(label.getLongName() + " ");
+                buffer.append(vers.getChapter() + ",");
+                buffer.append(versNo.toString(10));
+                buffer.append("]");
+            }
+        }
+        return buffer.toString();
+    }
+
     public static class BookLink {
 
         private final String bookLabel;
@@ -273,6 +293,34 @@ public class BibleTextUtils {
 
         public List<Integer> getVerses() {
             return verses;
+        }
+    }
+
+    public static class BookLabel {
+
+        private Integer bookNumber = 0;
+
+        private String shortName = "";
+
+        private String longName = "";
+
+        public BookLabel(String label) {
+            String [] temp = label.split(",");
+            bookNumber = Integer.parseInt(temp[0]);
+            longName = temp[1];
+            shortName = temp[2];
+        }
+
+        public Integer getBookNumber() {
+            return bookNumber;
+        }
+
+        public String getShortName() {
+            return shortName;
+        }
+
+        public String getLongName() {
+            return longName;
         }
     }
 

@@ -4,6 +4,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.control.cell.PropertyValueFactory?>
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.harry.jesus.MainController">
    <children>
       <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
@@ -51,7 +52,7 @@
                                              </left>
                         
                                                    <right>
-                                                <ListView fx:id="bibles" minHeight="700.0" minWidth="1000.0" BorderPane.alignment="CENTER" />
+                                                <ListView fx:id="bibles" minHeight="500.0" minWidth="80.0" BorderPane.alignment="CENTER" />
                                              </right>
                                              <bottom>
                                                 <ListView fx:id="footerNotes" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
@@ -119,6 +120,33 @@
                                     </AnchorPane>
                                 </items>
                               </SplitPane>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </Tab>
+                  <Tab text="Notes">
+                    <content>
+                      <AnchorPane minHeight="600.0" minWidth="900.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                               <TableView fx:id="notesTable" prefHeight="550.0" prefWidth="800.0">
+                                   <columns>
+                                       <TableColumn fx:id="verslink" editable="false" prefWidth="217.0" text="Vers link">
+                                           <cellValueFactory>
+                                               <PropertyValueFactory property="verseLink" />
+                                           </cellValueFactory>
+                                       </TableColumn>
+                                       <TableColumn fx:id="versText" editable="false"  prefWidth="376.0" text="Vers text">
+                                           <cellValueFactory>
+                                               <PropertyValueFactory property="versText" />
+                                           </cellValueFactory>
+                                       </TableColumn>
+                                       <TableColumn fx:id="noteText" editable="false"  prefWidth="376.0" text="Note">
+                                           <cellValueFactory>
+                                               <PropertyValueFactory property="noteText" />
+                                           </cellValueFactory>
+                                       </TableColumn>
+                                   </columns>
+                               </TableView>
                            </children>
                         </AnchorPane>
                     </content>

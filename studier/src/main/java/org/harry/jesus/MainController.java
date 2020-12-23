@@ -5,6 +5,7 @@ import generated.CHAPTER;
 import generated.XMLBIBLE;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -14,9 +15,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 
 import javafx.scene.paint.Color;
+import jesus.harry.org.versnotes._1.Note;
+import jesus.harry.org.versnotes._1.Vers;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.GenericStyledArea;
 import org.fxmisc.richtext.model.*;
+import org.harry.jesus.fxutils.CreateNoteDialog;
+import org.harry.jesus.fxutils.NoteTabEntry;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.TextRendering;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
@@ -29,10 +34,8 @@ import org.jetbrains.annotations.NotNull;
 import org.reactfx.util.Either;
 
 import javax.xml.bind.JAXBElement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.math.BigInteger;
+import java.util.*;
 
 public class MainController {
 
@@ -58,7 +61,7 @@ public class MainController {
     @FXML
     VirtualizedScrollPane<GenericStyledArea<ParStyle, Either<String, LinkedImage>, TextStyle>> chapterReader;
 
-
+    @FXML private TableView<NoteTabEntry> notesTable;
     BorderPane borderPane = null;
 
     BibleTextUtils utils;
@@ -71,24 +74,42 @@ public class MainController {
 
     private String actBookLabel;
 
+    BibleTextUtils.BookLabel actBook = null;
+
     private Integer actChapter = 1;
 
     TextRendering rendering = null;
+
+    Map<Integer, IndexRange> selectedVersesMap = new LinkedHashMap<>();
 
     List<BibleFulltextEngine.BibleTextKey> verseKeys = new ArrayList<>();
 
     @FXML
     public void initialize() {
-        Parent parent = booksTree.getParent();
-        this.borderPane = (BorderPane) parent;
-        area = new FoldableStyledArea();
-        chapterReader = new VirtualizedScrollPane(area);
-        chapterReader.setMinSize(550, 400);
-        ContextMenu contMenu = new ContextMenu();
-        MenuItem mItem = new MenuItem();
-        mItem.setText("setColor");
-        contMenu.getItems().add(mItem);
-        area.contextMenuObjectProperty().setValue(contMenu);
+        initChapterReader();
+        initAreaContextMenu();
+        initListeners();
+
+        TextOps<String, TextStyle> styledTextOps = SegmentOps.styledTextOps();
+
+
+        this.borderPane.setCenter(chapterReader);
+        utils = new BibleTextUtils();
+        List<String> bibleNames = utils.getBibleInfos();
+
+        for (String name: bibleNames) {
+            bibles.getItems().add(name);
+        }
+        bibles.getSelectionModel().selectFirst();
+
+        actBookLabel = utils.getBookLabels().get(0);
+        actBook = utils.getBookLabelAsClass(actBookLabel);
+        TreeItem<String> root = buildBooksTree();
+        showRoot();
+        System.out.println("second");
+    }
+
+    private void initListeners() {
         booksTree.getSelectionModel().selectedItemProperty()
                 .addListener(new ChangeListener<TreeItem<String>>() {
 
@@ -108,6 +129,7 @@ public class MainController {
                         Optional<BIBLEBOOK> book = utils.getBookByLabel(selected, bookLabel);
                         if (book.isPresent()) {
                             actBookLabel = bookLabel;
+                            actBook = utils.getBookLabelAsClass(bookLabel);
                             actChapter = chapter;
                             showChapter();
                         }
@@ -138,35 +160,77 @@ public class MainController {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 if (mouseEvent.getClickCount() == 1) {
-                    javafx.scene.control.
                     IndexRange range = area.getSelection();
-                    rendering.selectVerseByGivenRange(range);                }
+                    Map.Entry<Integer, IndexRange> versPointer =
+                            rendering.selectVerseByGivenRange(range);
+                    selectedVersesMap.put(versPointer.getKey(), versPointer.getValue());
+                }
             }
         });
+    }
 
-        TextOps<String, TextStyle> styledTextOps = SegmentOps.styledTextOps();
-
+    private void initAreaContextMenu() {
+        ContextMenu contMenu = new ContextMenu();
+        MenuItem mItem = new MenuItem();
+        mItem.setText("Highlight selected Verses");
+        contMenu.getItems().add(mItem);
         mItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                area.setStyle(area.getSelection().getStart(),
-                        area.getSelection().getEnd(),
-                        TextStyle.backgroundColor(Color.GREEN));
+                for (IndexRange range: selectedVersesMap.values()) {
+                    area.setStyle(range.getStart(),
+                            range.getEnd(),
+                            TextStyle.backgroundColor(Color.GREEN));
+                }
             }
         });
-        this.borderPane.setCenter(chapterReader);
-        utils = new BibleTextUtils();
-        List<String> bibleNames = utils.getBibleInfos();
+        mItem = new MenuItem();
+        mItem.setText("createNote");
+        mItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Note theNote = new Note();
 
-        for (String name: bibleNames) {
-            bibles.getItems().add(name);
-        }
-        bibles.getSelectionModel().selectFirst();
+                for (Integer versNo: selectedVersesMap.keySet()) {
+                    Vers vers = new Vers();
+                    vers.getVers().add(BigInteger.valueOf((long)versNo));
+                    vers.setChapter(BigInteger.valueOf(actChapter));
+                    vers.setBook(BigInteger.valueOf(actBook.getBookNumber()));
+                    IndexRange range = selectedVersesMap.get(versNo);
+                    String vText = area.getText(range);
+                    vers.setVtext(vText);
+                    theNote.getVerslink().add(vers);
+                }
+                Optional<Note> newNote = CreateNoteDialog.showNoteCreateDialog(theNote);
+                if (newNote.isPresent()) {
+                    notesTable.getSelectionModel().setCellSelectionEnabled(true);
+                    notesTable.setEditable(false);
 
-        actBookLabel = utils.getBookLabels().get(0);
-        TreeItem<String> root = buildBooksTree();
-        showRoot();
-        System.out.println("second");
+                    notesTable.getSelectionModel().getSelectedItem();
+                    NoteTabEntry entry = new NoteTabEntry(utils.generateVersLink(newNote.get().getVerslink(), actBook),
+                            newNote.get().getVerslink().get(0).getVtext()
+                            , newNote.get().getNote());
+                    notesTable.getItems().add(entry);
+
+                    notesTable.setVisible(false);
+                    notesTable.refresh();
+                    notesTable.setVisible(true);
+
+                }
+
+
+            }
+        });
+        contMenu.getItems().add(mItem);
+        area.contextMenuObjectProperty().setValue(contMenu);
+    }
+
+    private void initChapterReader() {
+        Parent parent = booksTree.getParent();
+        this.borderPane = (BorderPane) parent;
+        area = new FoldableStyledArea();
+        chapterReader = new VirtualizedScrollPane(area);
+        chapterReader.setMinSize(400, 400);
     }
 
     private void showRoot() {
@@ -177,6 +241,7 @@ public class MainController {
     private void fillTextArea() {
         rendering.render(selected, utils.getBookLabels().get(0), actChapter);
         actBookLabel = utils.getBookLabels().get(0);
+        actBook = utils.getBookLabelAsClass(actBookLabel);
         footerNotes.getItems().clear();
         footerNotes.getItems().addAll(rendering.getNotes());
         String [] splitted = actBookLabel.split(",");
