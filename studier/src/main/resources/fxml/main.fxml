@@ -188,6 +188,15 @@
                                         <TreeTableColumn fx:id="planDev" minWidth="152.0" prefWidth="337.0" text="Devotional" />
                                         <TreeTableColumn fx:id="planVerses" minWidth="123.0" prefWidth="361.0" text="Verses" />
                                       </columns>
+                                       <contextMenu>
+                                          <ContextMenu>
+                                            <items>
+                                              <MenuItem fx:id="addDay" mnemonicParsing="false" onAction="#addDay" text="Add day" />
+                                                <MenuItem fx:id="addDev" mnemonicParsing="false" onAction="#addDev" text="Add devotional" />
+                                                <MenuItem fx:id="addVers" mnemonicParsing="false" onAction="#addVers" text="Add Vers" />
+                                            </items>
+                                          </ContextMenu>
+                                       </contextMenu>
                                     </TreeTableView>
                                  </children>
                               </AnchorPane>

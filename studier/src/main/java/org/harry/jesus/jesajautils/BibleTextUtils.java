@@ -24,7 +24,9 @@ public class BibleTextUtils {
             "SF_2012-08-14_DEUTSCH_LUT_1545_LH_(LUTHER 1545 (LETZTE HAND)).xml",
             "SF_2009-01-20_GER_ELB1905_(ELBERFELDER 1905).xml",
             "SF_2015-08-16_ENG_NHEBYHWH_(NEW HEART ENGLISH BIBLE (YHWH)).xml",
+            "SF_2009-01-20_SPA_RVA_(REINA VALERA 1989).xml",
             "SF_2009-01-20_ENG_UKJV_(UPDATED KING JAMES VERSION).xml"
+
     );
 
     List<XMLBIBLE> bibles = new ArrayList<>();

@@ -14,6 +14,7 @@ import javafx.print.Printer;
 import javafx.print.PrinterJob;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseEvent;
@@ -21,6 +22,7 @@ import javafx.scene.layout.BorderPane;
 
 import javafx.scene.paint.Color;
 import javafx.scene.web.HTMLEditor;
+import jesus.harry.org.plan._1.Days;
 import jesus.harry.org.versnotes._1.Note;
 import jesus.harry.org.versnotes._1.Vers;
 import jesus.harry.org.versnotes._1.Versnotes;
@@ -28,10 +30,7 @@ import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.GenericStyledArea;
 import org.fxmisc.richtext.model.*;
 import org.harry.jesus.danielpersistence.PersistenceLayer;
-import org.harry.jesus.fxutils.ColorDialog;
-import org.harry.jesus.fxutils.CreateNoteDialog;
-import org.harry.jesus.fxutils.JesusMisc;
-import org.harry.jesus.fxutils.NoteTabEntry;
+import org.harry.jesus.fxutils.*;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.TextRendering;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
@@ -41,13 +40,11 @@ import org.harry.jesus.jesajautils.browse.TextStyle;
 import org.harry.jesus.jesajautils.editor.HTMLToPDF;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 import org.harry.jesus.jesajautils.fulltext.StatisticsCollector;
-import org.jetbrains.annotations.NotNull;
-import org.pmw.tinylog.Logger;
-import org.reactfx.util.Either;
 
-import javax.print.*;
-import javax.print.attribute.*;
-import javax.print.event.PrintServiceAttributeListener;
+import org.tinylog.Logger;
+//import org.reactfx.util.Either;
+
+
 import javax.xml.bind.JAXBElement;
 import java.io.*;
 import java.math.BigInteger;
@@ -75,11 +72,14 @@ public class MainController {
 
 
     @FXML
-    VirtualizedScrollPane<GenericStyledArea<ParStyle, Either<String, LinkedImage>, TextStyle>> chapterReader;
+    VirtualizedScrollPane<GenericStyledArea<ParStyle, String, TextStyle>> chapterReader;
 
     @FXML private TableView<NoteTabEntry> notesTable;
 
     @FXML private HTMLEditor devotionalEdit;
+
+    @FXML TreeTableView<PlanModel> planCreator;
+
     BorderPane borderPane = null;
 
     BibleTextUtils utils;
@@ -104,12 +104,36 @@ public class MainController {
 
     Versnotes noteList = new Versnotes();
 
+    Days planDays = new Days();
+
+    TreeItem<PlanModel> plan;
+
+    int dayNo = 1;
+
+    TreeItem<PlanModel> day;
+
+    TreeItem<PlanModel> dev;
+
     @FXML
     public void initialize() {
         initChapterReader();
         initAreaContextMenu();
         initListeners();
 
+
+
+        TreeTableColumn<PlanModel, String> treeTableColumn1 = new TreeTableColumn<>("Day");
+        TreeTableColumn<PlanModel, String> treeTableColumn2 = new TreeTableColumn<>("Devotional");
+        TreeTableColumn<PlanModel, String> treeTableColumn3 = new TreeTableColumn<>("Vers");
+
+        treeTableColumn1.setCellValueFactory(new TreeItemPropertyValueFactory<>("day"));
+        treeTableColumn2.setCellValueFactory(new TreeItemPropertyValueFactory<>("devotional"));
+        treeTableColumn3.setCellValueFactory(new TreeItemPropertyValueFactory<>("vers"));
+
+        planCreator.getColumns().add(treeTableColumn1);
+        planCreator.getColumns().add(treeTableColumn2);
+        planCreator.getColumns().add(treeTableColumn3);
+        plan = new TreeItem(new PlanModel("Plan", "...", "..."));
         TextOps<String, TextStyle> styledTextOps = SegmentOps.styledTextOps();
 
         this.borderPane.setCenter(chapterReader);
@@ -296,7 +320,7 @@ public class MainController {
         footerNotes.getItems().addAll(rendering.getNotes());
     }
 
-    @NotNull
+
     private TreeItem<String> buildBooksTree() {
         TreeItem<String> root = new TreeItem<>();
         root.setValue("The books");
@@ -350,6 +374,38 @@ public class MainController {
 
     @FXML
     public void newPlan(ActionEvent event) {
+        planDays = new Days();
+    }
+
+    @FXML
+    public void addDay(ActionEvent event) {
+       day = new TreeItem<PlanModel>();
+       day.setValue(new PlanModel("Day " + dayNo, "...", "..."));
+
+
+        planCreator.refresh();
+    }
+
+    @FXML
+    public void addDev(ActionEvent event) {
+        dev = new TreeItem<PlanModel>();
+        dev.setValue(new PlanModel("Day " + dayNo, devotionalEdit.getHtmlText(), "..."));
+        day.getChildren().add(dev);
+
+        planCreator.refresh();
+    }
+
+    @FXML
+    public void addVers(ActionEvent event) {
+
+       TreeItem<PlanModel> versItem = new TreeItem<PlanModel>();
+
+       versItem.setValue(new PlanModel("Day " + dayNo, devotionalEdit.getHtmlText(), "Verse Text"));
+
+       dev.getChildren().add(versItem);
+        plan.getChildren().add(day);
+       planCreator.setRoot(plan);
+       planCreator.refresh();
 
     }
 
@@ -419,7 +475,7 @@ public class MainController {
 
     }
 
-    @NotNull
+
     private StringBuffer buildVersHTML(BibleFulltextEngine.BibleTextKey link, String linkText, CHAPTER chapter) {
         StringBuffer buffer = new StringBuffer();
         buffer.append(linkText + " ");
