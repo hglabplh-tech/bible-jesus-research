@@ -10,6 +10,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.print.Printer;
+import javafx.print.PrinterJob;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
@@ -109,7 +111,6 @@ public class MainController {
         initListeners();
 
         TextOps<String, TextStyle> styledTextOps = SegmentOps.styledTextOps();
-
 
         this.borderPane.setCenter(chapterReader);
         utils = new BibleTextUtils();
@@ -457,15 +458,19 @@ public class MainController {
             buffer.append("<p/>").append(generateVersEntry(vers, vers.getVtext()));
         }
         StringBuffer htmlBuffer = new StringBuffer();
+        noteToHTML(noteText, buffer, htmlBuffer);
+
+
+        copyHtmlToClip(htmlBuffer);
+
+    }
+
+    private void noteToHTML(String noteText, StringBuffer buffer, StringBuffer htmlBuffer) {
         htmlBuffer.append("<div><p style=\"font-family:verdana\">")
                 .append(buffer.toString())
                 .append("</p><p style=\"font-family:verdana\">")
                 .append(noteText)
                 .append("</p></div>");
-
-
-        copyHtmlToClip(htmlBuffer);
-
     }
 
 
@@ -492,7 +497,9 @@ public class MainController {
 
     @FXML
     public void printDev(ActionEvent event) {
-
+        PrinterJob job = PrinterJob.createPrinterJob(Printer.getDefaultPrinter());
+        devotionalEdit.print(job);
+        job.endJob();
     }
 
     @FXML

@@ -1,5 +1,7 @@
 package org.harry.jesus.jesajautils.editor;
 
+import com.itextpdf.html2pdf.ConverterProperties;
+import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.PdfWriter;
@@ -19,13 +21,13 @@ public class HTMLToPDF {
 
 public static void convertTo(String html, OutputStream os) {
         try {
-            ITextRenderer renderer = new ITextRenderer();
-            renderer.setDocumentFromString(html);
-            renderer.layout();
-            renderer.createPDF(os);
+            ConverterProperties
+                    converterProperties = new ConverterProperties();
+            HtmlConverter.convertToPdf(html, os, converterProperties);
             os.close();
+
         } catch (Exception ex) {
-            Logger.trace("Error occured during HTML to PDF");
+            Logger.trace("Error occured during HTML to PDF" + ex.getMessage());
         }
     }
 }

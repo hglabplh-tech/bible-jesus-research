@@ -123,7 +123,6 @@
     <orderEntry type="library" name="Maven: org.apache.pdfbox:jempbox:1.8.10" level="project" />
     <orderEntry type="library" name="Maven: org.icepdf.os:icepdf-viewer:6.2.2" level="project" />
     <orderEntry type="library" name="Maven: org.icepdf.os:icepdf-core:6.2.2" level="project" />
-    <orderEntry type="library" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.54" level="project" />
     <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-ext-jdk15on:1.54" level="project" />
     <orderEntry type="library" name="Maven: batik:batik-awt-util:1.6" level="project" />
     <orderEntry type="library" name="Maven: batik:batik-dom:1.6" level="project" />
@@ -144,7 +143,6 @@
     <orderEntry type="library" name="Maven: org.apache.james:apache-mime4j-dom:0.7.2" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.9" level="project" />
     <orderEntry type="library" name="Maven: org.bouncycastle:bcmail-jdk15on:1.52" level="project" />
-    <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk15on:1.52" level="project" />
     <orderEntry type="library" name="Maven: org.apache.poi:poi:3.12" level="project" />
     <orderEntry type="library" name="Maven: org.apache.poi:poi-scratchpad:3.12" level="project" />
     <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml:3.12" level="project" />
@@ -234,12 +232,17 @@
     <orderEntry type="library" name="Maven: javax.activation:activation:1.1" level="project" />
     <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.2.5" level="project" />
     <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-impl:2.2.5" level="project" />
-    <orderEntry type="library" name="Maven: com.itextpdf:itextpdf:5.5.13" level="project" />
-    <orderEntry type="library" name="Maven: com.itextpdf:io:7.0.0" level="project" />
-    <orderEntry type="library" name="Maven: com.itextpdf:layout:7.0.0" level="project" />
-    <orderEntry type="library" name="Maven: com.itextpdf:kernel:7.0.0" level="project" />
+    <orderEntry type="library" name="Maven: com.itextpdf:itextpdf:5.5.13.2" level="project" />
+    <orderEntry type="library" name="Maven: com.itextpdf:io:7.1.13" level="project" />
+    <orderEntry type="library" name="Maven: com.itextpdf:layout:7.1.13" level="project" />
+    <orderEntry type="library" name="Maven: com.itextpdf:kernel:7.1.13" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.64" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk15on:1.64" level="project" />
     <orderEntry type="library" name="Maven: com.itextpdf:sign:7.0.0" level="project" />
     <orderEntry type="library" name="Maven: com.itextpdf:forms:7.0.0" level="project" />
+    <orderEntry type="library" name="Maven: com.itextpdf:html2pdf:3.0.2" level="project" />
+    <orderEntry type="library" name="Maven: com.itextpdf:svg:7.1.13" level="project" />
+    <orderEntry type="library" name="Maven: com.itextpdf:styled-xml-parser:7.1.13" level="project" />
     <orderEntry type="library" name="Maven: org.xhtmlrenderer:flying-saucer-pdf:9.1.20" level="project" />
     <orderEntry type="library" name="Maven: com.lowagie:itext:2.1.7" level="project" />
     <orderEntry type="library" name="Maven: org.bouncycastle:bcmail-jdk14:1.64" level="project" />
