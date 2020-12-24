@@ -41,6 +41,9 @@ public class TextRendering {
         this.actChapter = actChapter;
     }
 
+    public void clearRendering() {
+        renderMap.clear();
+    }
     public List<String> getNotes() {
         return notes;
     }

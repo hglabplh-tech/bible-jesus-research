@@ -1,158 +1,187 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.web.*?>
+<?import javafx.scene.control.cell.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
-
 <?import javafx.scene.control.cell.PropertyValueFactory?>
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.harry.jesus.MainController">
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.harry.jesus.MainController">
    <children>
-      <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+      <MenuBar maxHeight="-Infinity" maxWidth="-Infinity">
+        <menus>
+          <Menu mnemonicParsing="false" text="Datei">
+            <items>
+              <MenuItem fx:id="open_plan" mnemonicParsing="false" onAction="#openPlan" text="Open Plan" />
+                  <MenuItem fx:id="save_plan" mnemonicParsing="false" onAction="#savePlan" text="Save 'Plan" />
+                  <MenuItem fx:id="new_plan" mnemonicParsing="false" onAction="#newPlan" text="New Plan" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Study" />
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+            <Menu mnemonicParsing="false" text="Unspecified Menu">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Action 1" />
+              </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Unspecified Menu">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Action 1" />
+              </items>
+            </Menu>
+        </menus>
+      </MenuBar>
+      <SplitPane orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
         <items>
-            <MenuBar prefHeight="32.0" prefWidth="991.0">
-              <menus>
-                <Menu mnemonicParsing="false" text="Datei">
-                  <items>
-                    <MenuItem fx:id="open_plan" mnemonicParsing="false" onAction="#openPlan" text="Open Plan" />
-                        <MenuItem fx:id="save_plan" mnemonicParsing="false" onAction="#savePlan" text="Save 'Plan" />
-                        <MenuItem fx:id="new_plan" mnemonicParsing="false" onAction="#newPlan" text="New Plan" />
-                  </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Study" />
-                <Menu mnemonicParsing="false" text="Help">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="About" />
-                  </items>
-                </Menu>
-                  <Menu mnemonicParsing="false" text="Unspecified Menu">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Action 1" />
-                    </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Unspecified Menu">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Action 1" />
-                    </items>
-                  </Menu>
-              </menus>
-            </MenuBar>
-            <TabPane minHeight="750.0" minWidth="1000.0" prefHeight="700.0" prefWidth="900.0" tabClosingPolicy="UNAVAILABLE">
-              <tabs>
-                <Tab text="Read Bible">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <SplitPane orientation="VERTICAL" prefHeight="734.0" prefWidth="1002.0">
-                                <items>
-                                  <AnchorPane maxHeight="1.7976931348623157E308" minHeight="700.0" minWidth="1000.0" prefHeight="700.0" prefWidth="1000.0">
+            <AnchorPane prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <TabPane tabClosingPolicy="UNAVAILABLE">
+                    <tabs>
+                      <Tab text="Read Bible">
+                        <content>
+                          <AnchorPane>
+                                 <children>
+                                  <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity">
                                        <children>
-                                          <BorderPane prefHeight="650.0" prefWidth="900.0">
+                                          <BorderPane maxHeight=".0" maxWidth="1000.0">
                                              <left>
-                                                <TreeView fx:id="booksTree" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                                                <TreeView fx:id="booksTree" maxHeight="300.0" maxWidth="200.0" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
                                              </left>
                         
-                                                   <right>
-                                                <ListView fx:id="bibles" minHeight="500.0" minWidth="80.0" BorderPane.alignment="CENTER" />
+                                                               <right>
+                                                <ListView fx:id="bibles" maxHeight="-Infinity" maxWidth="-Infinity" BorderPane.alignment="CENTER" />
                                              </right>
                                              <bottom>
-                                                <ListView fx:id="footerNotes" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                                                <ListView fx:id="footerNotes" maxHeight="75.0" maxWidth="700.0" minHeight="75.0" minWidth="700.0" BorderPane.alignment="CENTER" />
                                              </bottom>
                                              <top>
-                                                <GridPane BorderPane.alignment="CENTER">
+                                                <GridPane maxHeight="70" BorderPane.alignment="CENTER">
                                                   <columnConstraints>
                                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                                   </columnConstraints>
                                                   <rowConstraints>
-                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints maxHeight="30.0" minHeight="10.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints maxHeight="30.0" minHeight="10.0" vgrow="SOMETIMES" />
+
                                                   </rowConstraints>
                                                    <children>
                                                       <Button fx:id="prevChapter" mnemonicParsing="false" onAction="#prevChapter" text="&lt;--" />
                                                       <Button fx:id="linkBack" mnemonicParsing="false" onAction="#linkBack" text="Back from link" GridPane.columnIndex="1" />
                                                       <Button fx:id="nextChapter" mnemonicParsing="false" onAction="#nextChapter" text="--&gt;" GridPane.columnIndex="2" />
-                                                      <TextField fx:id="chapterTitle" editable="false" promptText="Chapter:" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                      <TextField fx:id="chapterTitle" editable="false" promptText="Chapter:" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                                    </children>
                                                 </GridPane>
                                              </top>
                                           </BorderPane>
                                        </children>
                                     </AnchorPane>
-                                </items>
-                              </SplitPane>
-                           </children>
-                        </AnchorPane>
-                  </content>
-                </Tab>
-                <Tab text="Create Devotional">
-                     <content>
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                           <children>
-                              <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
-                                <items>
-                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" />
-                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" />
-                                </items>
-                              </SplitPane>
-                           </children>
-                        </AnchorPane>
-                     </content>
-                </Tab>
-                  <Tab text="Search">
-                    <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
-                                <items>
-                                  <AnchorPane minHeight="150.0" minWidth="900.0">
-                                       <children>
-                                          <Label layoutX="124.0" layoutY="11.0" text="Keyword" />
-                                          <TextField fx:id="query" layoutX="206.0" layoutY="6.0" />
-                                          <Button fx:id="search" layoutX="527.0" layoutY="6.0" mnemonicParsing="false" onAction="#search" text="Search" />
-                                       </children>
-                                    </AnchorPane>
-                                  <AnchorPane minHeight="400.0" minWidth="900.0">
-                                       <children>
-                                          <ListView fx:id="resultlist" minWidth="900.0" />
-                                       </children>
-                                    </AnchorPane>
-                                </items>
-                              </SplitPane>
-                           </children>
-                        </AnchorPane>
-                    </content>
-                  </Tab>
-                  <Tab text="Notes">
-                    <content>
-                      <AnchorPane minHeight="600.0" minWidth="900.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                               <TableView fx:id="notesTable" prefHeight="550.0" prefWidth="800.0">
-                                   <columns>
-                                       <TableColumn fx:id="verslink" editable="false" prefWidth="217.0" text="Vers link">
-                                           <cellValueFactory>
-                                               <PropertyValueFactory property="verseLink" />
-                                           </cellValueFactory>
-                                       </TableColumn>
-                                       <TableColumn fx:id="versText" editable="false"  prefWidth="376.0" text="Vers text">
-                                           <cellValueFactory>
-                                               <PropertyValueFactory property="versText" />
-                                           </cellValueFactory>
-                                       </TableColumn>
-                                       <TableColumn fx:id="noteText" editable="false"  prefWidth="376.0" text="Note">
-                                           <cellValueFactory>
-                                               <PropertyValueFactory property="noteText" />
-                                           </cellValueFactory>
-                                       </TableColumn>
-                                   </columns>
-                               </TableView>
-                           </children>
-                        </AnchorPane>
-                    </content>
-                  </Tab>
-              </tabs>
-            </TabPane>
+                                 </children>
+                              </AnchorPane>
+                        </content>
+                      </Tab>
+                      <Tab text="Create Devotional">
+                           <content>
+                              <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                                 <children>
+                                    <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="601.0" prefWidth="702.0">
+                                      <items>
+                                        <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="523.0" prefWidth="700.0">
+                                             <children>
+                                                <HTMLEditor fx:id="devotionalEdit" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" layoutY="-12.0" prefHeight="535.0" prefWidth="700.0">
+                                                </HTMLEditor>
+                                             </children></AnchorPane>
+                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                                             <children>
+                                                <Button fx:id="loadDev" layoutX="192.0" layoutY="20.0" mnemonicParsing="false" onAction="#loadDev" text="Load" />
+                                                <Button fx:id="saveDev" layoutX="274.0" layoutY="19.0" mnemonicParsing="false" onAction="#saveDev" text="Save" />
+                                                <Button fx:id="newDev" layoutX="49.0" layoutY="19.0" mnemonicParsing="false" onAction="#newDev" text="New Devotional" />
+                                                <Button fx:id="toPDF" layoutX="350.0" layoutY="19.0" mnemonicParsing="false" onAction="#toPDF" text="To PDF" />
+                                                <Button fx:id="printDev" layoutX="446.0" layoutY="20.0" mnemonicParsing="false" onAction="#printDev" text="Print Devotional" />
+                                             </children></AnchorPane>
+                                      </items>
+                                    </SplitPane>
+                                 </children>
+                              </AnchorPane>
+                           </content>
+                      </Tab>
+                        <Tab text="Search">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+                                      <items>
+                                        <AnchorPane minHeight="150.0" minWidth="900.0">
+                                             <children>
+                                                <Label layoutX="124.0" layoutY="11.0" text="Keyword" />
+                                                <TextField fx:id="query" layoutX="206.0" layoutY="6.0" />
+                                                <Button fx:id="search" layoutX="527.0" layoutY="6.0" mnemonicParsing="false" onAction="#search" text="Search" />
+                                             </children>
+                                          </AnchorPane>
+                                        <AnchorPane minHeight="400.0" minWidth="900.0">
+                                             <children>
+                                                <ListView fx:id="resultlist" minWidth="900.0">
+                                                   <contextMenu>
+                                                      <ContextMenu>
+                                                        <items>
+                                                          <MenuItem fx:id="copyVers" mnemonicParsing="false" onAction="#copyVers" text="Kopieren" />
+                                                        </items>
+                                                      </ContextMenu>
+                                                   </contextMenu></ListView>
+                                             </children>
+                                          </AnchorPane>
+                                      </items>
+                                    </SplitPane>
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </Tab>
+                        <Tab text="Notes">
+                          <content>
+                            <AnchorPane minHeight="600.0" minWidth="900.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                     <TableView fx:id="notesTable" prefHeight="550.0" prefWidth="800.0">
+                                         <columns>
+                                             <TableColumn fx:id="verslink" editable="false" prefWidth="217.0" text="Vers link">
+                                                 <cellValueFactory>
+                                                     <PropertyValueFactory property="verseLink" />
+                                                 </cellValueFactory>
+                                             </TableColumn>
+                                             <TableColumn fx:id="versText" editable="false" prefWidth="376.0" text="Vers text">
+                                                 <cellValueFactory>
+                                                     <PropertyValueFactory property="versText" />
+                                                 </cellValueFactory>
+                                             </TableColumn>
+                                             <TableColumn fx:id="noteText" editable="false" prefWidth="376.0" text="Note">
+                                                 <cellValueFactory>
+                                                     <PropertyValueFactory property="noteText" />
+                                                 </cellValueFactory>
+                                             </TableColumn>
+                                         </columns>
+                                       <contextMenu>
+                                          <ContextMenu>
+                                            <items>
+                                              <MenuItem fx:id="copyNote" mnemonicParsing="false" onAction="#copyNote" text="Kopieren" />
+                                            </items>
+                                          </ContextMenu>
+                                       </contextMenu>
+                                     </TableView>
+                                    <Button fx:id="loadNotes" layoutX="75.0" layoutY="556.0" mnemonicParsing="false" onAction="#loadNotes" text="Load Notes" />
+                                    <Button fx:id="saveNotes" layoutX="294.0" layoutY="556.0" mnemonicParsing="false" onAction="#saveNotes" text="Save Notes" />
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </Tab>
+                    </tabs>
+                  </TabPane>
+               </children>
+            </AnchorPane>
         </items>
       </SplitPane>
    </children>

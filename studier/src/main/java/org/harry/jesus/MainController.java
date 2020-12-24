@@ -11,16 +11,23 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 
 import javafx.scene.paint.Color;
+import javafx.scene.web.HTMLEditor;
 import jesus.harry.org.versnotes._1.Note;
 import jesus.harry.org.versnotes._1.Vers;
+import jesus.harry.org.versnotes._1.Versnotes;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.GenericStyledArea;
 import org.fxmisc.richtext.model.*;
+import org.harry.jesus.danielpersistence.PersistenceLayer;
+import org.harry.jesus.fxutils.ColorDialog;
 import org.harry.jesus.fxutils.CreateNoteDialog;
+import org.harry.jesus.fxutils.JesusMisc;
 import org.harry.jesus.fxutils.NoteTabEntry;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.TextRendering;
@@ -28,12 +35,18 @@ import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.LinkedImage;
 import org.harry.jesus.jesajautils.browse.ParStyle;
 import org.harry.jesus.jesajautils.browse.TextStyle;
+import org.harry.jesus.jesajautils.editor.HTMLToPDF;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 import org.harry.jesus.jesajautils.fulltext.StatisticsCollector;
 import org.jetbrains.annotations.NotNull;
+import org.pmw.tinylog.Logger;
 import org.reactfx.util.Either;
 
+import javax.print.*;
+import javax.print.attribute.*;
+import javax.print.event.PrintServiceAttributeListener;
 import javax.xml.bind.JAXBElement;
+import java.io.*;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -62,6 +75,8 @@ public class MainController {
     VirtualizedScrollPane<GenericStyledArea<ParStyle, Either<String, LinkedImage>, TextStyle>> chapterReader;
 
     @FXML private TableView<NoteTabEntry> notesTable;
+
+    @FXML private HTMLEditor devotionalEdit;
     BorderPane borderPane = null;
 
     BibleTextUtils utils;
@@ -83,6 +98,8 @@ public class MainController {
     Map<Integer, IndexRange> selectedVersesMap = new LinkedHashMap<>();
 
     List<BibleFulltextEngine.BibleTextKey> verseKeys = new ArrayList<>();
+
+    Versnotes noteList = new Versnotes();
 
     @FXML
     public void initialize() {
@@ -177,10 +194,13 @@ public class MainController {
         mItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                Optional<Color> resultColor = ColorDialog.callColorDialog();
                 for (IndexRange range: selectedVersesMap.values()) {
+                    if (resultColor.isPresent()) {
                     area.setStyle(range.getStart(),
                             range.getEnd(),
-                            TextStyle.backgroundColor(Color.GREEN));
+                            TextStyle.backgroundColor(resultColor.get()));
+                    }
                 }
             }
         });
@@ -203,6 +223,7 @@ public class MainController {
                 }
                 Optional<Note> newNote = CreateNoteDialog.showNoteCreateDialog(theNote);
                 if (newNote.isPresent()) {
+                    noteList.getVersenote().add(newNote.get());
                     notesTable.getSelectionModel().setCellSelectionEnabled(true);
                     notesTable.setEditable(false);
 
@@ -230,7 +251,8 @@ public class MainController {
         this.borderPane = (BorderPane) parent;
         area = new FoldableStyledArea();
         chapterReader = new VirtualizedScrollPane(area);
-        chapterReader.setMinSize(400, 400);
+        chapterReader.setMinSize(600, 300);
+        chapterReader.setMaxSize(600, 300);
     }
 
     private void showRoot() {
@@ -260,6 +282,8 @@ public class MainController {
         footerNotes.getItems().clear();
         footerNotes.getItems().addAll(rendering.getNotes());
         String [] splitted = actBookLabel.split(",");
+        selectedVersesMap.clear();
+        rendering.clearRendering();
         chapterTitle.setText("Book: " + splitted[1] + " Chapter: " + actChapter);
         return found;
     }
@@ -337,6 +361,75 @@ public class MainController {
     }
 
     @FXML
+    public void loadDev(ActionEvent event) {
+        byte [] buffer = new byte[4096];
+        InputStream stream = JesusMisc.showOpenDialog(event);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            int read = stream.read(buffer);
+            while (read != -1) {
+                out.write(buffer, 0, read);
+                read = stream.read(buffer);
+            }
+            String html = new String(out.toByteArray());
+            devotionalEdit.setHtmlText(html);
+        } catch (IOException ex) {
+
+        }
+    }
+
+    @FXML
+    public void saveDev(ActionEvent event) {
+        OutputStream os = JesusMisc.showSaveDialog(event);
+        String htmlText = devotionalEdit.getHtmlText();
+        try {
+            PrintWriter writer = new PrintWriter(os);
+            writer.print(htmlText);
+            writer.close();
+            os.close();
+        } catch(IOException ex) {
+            Logger.trace("close html file failed");
+        }
+    }
+
+    @FXML
+    public void newDev(ActionEvent event) {
+
+    }
+
+    @FXML
+    public void copyVers(ActionEvent event) {
+
+    }
+
+    @FXML
+    public void copyNote(ActionEvent event) {
+        Integer row = notesTable.getSelectionModel().getSelectedIndex();
+        Note note = noteList.getVersenote().get(row);
+        String noteText = note.getNote();
+        List<Vers> verses = note.getVerslink();
+        StringBuffer buffer = new StringBuffer();
+        for (Vers vers: verses) {
+            buffer.append("<p/>").append(generateVersEntry(vers, vers.getVtext()));
+        }
+        StringBuffer htmlBuffer = new StringBuffer();
+        htmlBuffer.append("<div><p style=\"font-family:verdana\">")
+                .append(buffer.toString())
+                .append("</p><p style=\"font-family:verdana\">")
+                .append(noteText)
+                .append("</p></div>");
+
+
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+
+        content.putHtml(htmlBuffer.toString());
+        clipboard.setContent(content);
+
+    }
+
+
+    @FXML
     public void nextChapter(ActionEvent event) {
         actChapter = actChapter + 1;
         boolean found = showChapter();
@@ -350,6 +443,47 @@ public class MainController {
         showChapter();
     }
 
+    @FXML
+    public void toPDF(ActionEvent event) {
+        String htmlText = devotionalEdit.getHtmlText();
+        OutputStream pdfOut = JesusMisc.showSaveDialog(event);
+        HTMLToPDF.convertTo(htmlText, pdfOut);
+    }
+
+    @FXML
+    public void printDev(ActionEvent event) {
+
+    }
+
+    @FXML
+    public void loadNotes(ActionEvent event) {
+        InputStream input = JesusMisc.showOpenDialog(event);
+        Versnotes notes = PersistenceLayer.loadNotes(input);
+        noteList = notes;
+
+        for (Note newNote :noteList.getVersenote()) {
+            notesTable.getSelectionModel().setCellSelectionEnabled(true);
+            notesTable.setEditable(false);
+
+            notesTable.getSelectionModel().getSelectedItem();
+            NoteTabEntry entry = new NoteTabEntry(utils.generateVersLink(newNote.getVerslink(), actBook),
+                    newNote.getVerslink().get(0).getVtext()
+                    , newNote.getNote());
+            notesTable.getItems().add(entry);
+        }
+
+        notesTable.setVisible(false);
+        notesTable.refresh();
+        notesTable.setVisible(true);
+
+    }
+
+    @FXML
+    public void saveNotes(ActionEvent event) {
+        OutputStream os = JesusMisc.showSaveDialog(event);
+        PersistenceLayer.storeNotes(noteList, os);
+    }
+
     private String generateVersEntry (BibleFulltextEngine.BibleTextKey key, String versText) {
         List<String> csv = utils.getBookLabels();
         Optional<String> book = csv.stream()
@@ -358,6 +492,21 @@ public class MainController {
         if (book.isPresent()) {
             String [] split = book.get().split(",");
             String versLink = "[" + split[1] + " " + key.getChapter() + "," + key.getVers() + "]: ";
+            String result = versLink + versText;
+            return result;
+        } else {
+            return versText;
+        }
+    }
+
+    private String generateVersEntry (Vers vers, String versText) {
+        List<String> csv = utils.getBookLabels();
+        Optional<String> book = csv.stream()
+                .filter(e -> e.contains(vers.getBook().toString()))
+                .findFirst();
+        if (book.isPresent()) {
+            String [] split = book.get().split(",");
+            String versLink = "[" + split[1] + " " + vers.getChapter() + "," + vers.getVers() + "]: ";
             String result = versLink + versText;
             return result;
         } else {
