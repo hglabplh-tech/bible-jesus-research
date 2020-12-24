@@ -2,6 +2,7 @@ package org.harry.jesus;
 
 import generated.BIBLEBOOK;
 import generated.CHAPTER;
+import generated.VERS;
 import generated.XMLBIBLE;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -399,7 +400,50 @@ public class MainController {
 
     @FXML
     public void copyVers(ActionEvent event) {
+        StringBuffer htmlBuffer = new StringBuffer();
+        int index = resultlist.getSelectionModel().getSelectedIndex();
+        BibleFulltextEngine.BibleTextKey link = verseKeys.get(index);
+        BIBLEBOOK book = theBooks.get(link.getBook() - 1);
+        JAXBElement<CHAPTER> jaxbChapter = book.getCHAPTER().get(link.getChapter() - 1);
+        CHAPTER chapter = jaxbChapter.getValue();
+        String listText = resultlist.getItems().get(index);
+        int endIndex = listText.indexOf("]");
+        StringBuffer buffer = buildVersHTML(link, listText.substring(0, endIndex + 1), chapter);
+        htmlBuffer.append("<div><p style=\"font-family:verdana\">")
+                .append(buffer.toString())
+                .append("</p></div>");
 
+        copyHtmlToClip(htmlBuffer);
+
+
+    }
+
+    @NotNull
+    private StringBuffer buildVersHTML(BibleFulltextEngine.BibleTextKey link, String linkText, CHAPTER chapter) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(linkText + " ");
+        for (Object obj: chapter.getPROLOGOrCAPTIONOrVERS()) {
+            Object thing = ((JAXBElement)obj).getValue();
+            if (thing instanceof VERS) {
+                VERS vers = (VERS)thing;
+                if (vers.getVnumber().intValue() == link.getVers()) {
+                    for (Object object : vers.getContent()) {
+                        if (object instanceof String) {
+                            buffer.append((String)object);
+                        }
+                    }
+                }
+            }
+        }
+        return buffer;
+    }
+
+    private void copyHtmlToClip(StringBuffer htmlBuffer) {
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+
+        content.putHtml(htmlBuffer.toString());
+        clipboard.setContent(content);
     }
 
     @FXML
@@ -420,11 +464,7 @@ public class MainController {
                 .append("</p></div>");
 
 
-        final Clipboard clipboard = Clipboard.getSystemClipboard();
-        final ClipboardContent content = new ClipboardContent();
-
-        content.putHtml(htmlBuffer.toString());
-        clipboard.setContent(content);
+        copyHtmlToClip(htmlBuffer);
 
     }
 

@@ -10,7 +10,7 @@ import javax.xml.bind.Unmarshaller;
 import java.io.InputStream;
 
 public class BibleReader {
-    public static XMLBIBLE loadBible(InputStream trustList) throws Exception {
+    public static XMLBIBLE loadBible(InputStream stream)  {
         JAXBContext jaxbContext;
 
 
@@ -19,18 +19,18 @@ public class BibleReader {
             jaxbContext = JAXBContext.newInstance(XMLBIBLE.class);
             Unmarshaller umarshall  = jaxbContext.createUnmarshaller();
             Logger.trace("About to unmarshall unmarshaller created.....");
-            JAXBElement root = (JAXBElement) umarshall.unmarshal(trustList);
+            JAXBElement root = (JAXBElement) umarshall.unmarshal(stream);
             Logger.trace("About to unmarshall ok.....");
 
 
             System.out.println(root.getValue());
-
+            stream.close();
             return (XMLBIBLE)root.getValue();
         }
-        catch (JAXBException ex) {
-            Logger.trace("trust list not loaded error ->: " + ex.getMessage());
+        catch (Exception ex) {
+            Logger.trace("bible not loaded error ->: " + ex.getMessage());
             Logger.trace(ex);
-            throw new IllegalStateException("trust list not loaded", ex);
+            throw new IllegalStateException("bible not loaded", ex);
         }
     }
 
