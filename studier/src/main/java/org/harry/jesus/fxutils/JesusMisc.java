@@ -13,13 +13,13 @@ import org.pmw.tinylog.Logger;
 import java.io.*;
 
 public class JesusMisc {
-    public static OutputStream showSaveDialog(ActionEvent event) {
+    public static OutputStream showSaveDialog(ActionEvent event, Node node) {
         FileChooser fDialog = new FileChooser();
         fDialog.setTitle("Select Path");
         File currentDir = new File(System.getProperty("user.home", "C:\\")).getAbsoluteFile();
 
         fDialog.setInitialDirectory(currentDir);
-        Window parent = ((Button)event.getTarget()).getScene().getWindow();
+        Window parent = node.getScene().getWindow();
         File file = fDialog.showSaveDialog(parent);
         if (file != null) {
             try {
@@ -33,13 +33,13 @@ public class JesusMisc {
         return null;
     }
 
-    public static InputStream showOpenDialog(ActionEvent event) {
+    public static InputStream showOpenDialog(ActionEvent event, Node node) {
         FileChooser fDialog = new FileChooser();
         fDialog.setTitle("Select Path");
         File currentDir = new File(System.getProperty("user.home", "C:\\")).getAbsoluteFile();
 
         fDialog.setInitialDirectory(currentDir);
-        Window parent = ((Node)event.getTarget()).getScene().getWindow();
+        Window parent = node.getScene().getWindow();
         File file = fDialog.showOpenDialog(parent);
         try {
             if (file != null) {

@@ -187,6 +187,7 @@
                                           <ContextMenu>
                                             <items>
                                               <MenuItem fx:id="addDay" mnemonicParsing="false" onAction="#addDay" text="Add a day to plan" />
+                                                <MenuItem fx:id="setDevotionalText" mnemonicParsing="false" onAction="#setDevotionalText" text="Set devotional from editor" />
                                             </items>
                                           </ContextMenu>
                                        </contextMenu>

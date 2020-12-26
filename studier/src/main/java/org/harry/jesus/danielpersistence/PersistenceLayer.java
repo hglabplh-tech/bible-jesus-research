@@ -1,8 +1,10 @@
 package org.harry.jesus.danielpersistence;
 
 import jesus.harry.org.devotional._1.Devotional;
+import jesus.harry.org.plan._1.Plan;
 import jesus.harry.org.versnotes._1.Versnotes;
 import org.harry.jesus.danielpersistence.xmlpersist.DevotionalPersistence;
+import org.harry.jesus.danielpersistence.xmlpersist.PlanPersistence;
 import org.harry.jesus.danielpersistence.xmlpersist.VersNotesPersistence;
 
 import java.io.InputStream;
@@ -15,9 +17,6 @@ public class PersistenceLayer {
         return DevotionalPersistence.loadDevotional(stream);
     }
 
-
-
-
     public static void storeDevotional(Devotional root, OutputStream out) {
         DevotionalPersistence.storeDevotional(root, out);
     }
@@ -26,10 +25,15 @@ public class PersistenceLayer {
         return VersNotesPersistence.loadNotes(stream);
     }
 
-
-
-
     public static void storeNotes(Versnotes root, OutputStream out) {
         VersNotesPersistence.storeNotes(root, out);
+    }
+
+    public static Plan loadPlan(InputStream stream) {
+        return PlanPersistence.loadPlan(stream);
+    }
+
+    public static void storePlan(Plan root, OutputStream out) {
+        PlanPersistence.storePlan(root, out);
     }
 }

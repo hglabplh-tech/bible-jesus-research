@@ -10,6 +10,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.print.Printer;
 import javafx.print.PrinterJob;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
@@ -22,7 +23,7 @@ import javafx.scene.web.HTMLEditor;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import jesus.harry.org.plan._1.Day;
-import jesus.harry.org.plan._1.Days;
+import jesus.harry.org.plan._1.Plan;
 import jesus.harry.org.versnotes._1.Note;
 import jesus.harry.org.versnotes._1.Vers;
 import jesus.harry.org.versnotes._1.Versnotes;
@@ -106,7 +107,7 @@ public class MainController {
 
     Versnotes noteList = new Versnotes();
 
-    Days planDays = new Days();
+    Plan planDays = new Plan();
 
 
 
@@ -193,12 +194,7 @@ public class MainController {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 Day theDay = planDays.getDay().get(newValue.intValue());
                 String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
-                String devHtml = devotionalEdit.getHtmlText();
-                planDays.getDay().get(newValue.intValue()).setDevotional(devHtml);
-                WebEngine engine = devView.getEngine();
-                engine.loadContent(devHtml);
-                engine = versesView.getEngine();
-                engine.loadContent(versHtml);
+                setPlanOutputSelected(theDay, versHtml);
 
 
             }
@@ -217,6 +213,18 @@ public class MainController {
                 }
             }
         });
+    }
+
+    private void setPlanOutputSelected(Day theDay, String versHtml) {
+        WebEngine engine = devView.getEngine();
+        byte [] devBytes = theDay.getDevotional();
+        if (devBytes != null) {
+            String devotional = new String(Base64.getDecoder().decode(devBytes));
+            engine.loadContent(devotional);
+            devotionalEdit.setHtmlText(devotional);
+        }
+        engine = versesView.getEngine();
+        engine.loadContent(versHtml);
     }
 
     private void initAreaContextMenu() {
@@ -244,10 +252,9 @@ public class MainController {
             public void handle(ActionEvent actionEvent) {
                 Note theNote = new Note();
 
-                for (Integer versNo: getSelectedMapSorted().keySet()) {
-                    Vers vers = BibleTextUtils.generateVers(actBook, actChapter, area, getSelectedMapSorted(), versNo);
-                    theNote.getVerslink().add(vers);
-                }
+
+                Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area, getSelectedMapSorted());
+                theNote.getVerslink().add(vers);
                 Optional<Note> newNote = CreateNoteDialog.showNoteCreateDialog(theNote);
                 if (newNote.isPresent()) {
                     noteList.getVersenote().add(newNote.get());
@@ -302,6 +309,8 @@ public class MainController {
                 Day theDay = dayList.get(dayList.size() - 1);
                 Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area, getSelectedMapSorted());
                 theDay.getVerses().add(vers);
+                String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
+                setPlanOutputSelected(theDay, versHtml);
             }
 
         });
@@ -309,11 +318,15 @@ public class MainController {
         area.contextMenuObjectProperty().setValue(contMenu);
     }
 
+    private void storeDevotional(Day theDay) {
+        byte[] base64 = Base64.getEncoder().encode(devotionalEdit.getHtmlText().getBytes());
+        theDay.setDevotional(base64);
+    }
+
     private Day nextPlanDay() {
         Day newDay = new Day();
         newDay.setTitle("Day" + dayNo);
         dayNo++;
-        newDay.setDevotional(devotionalEdit.getHtmlText());
         return newDay;
     }
 
@@ -322,8 +335,8 @@ public class MainController {
         this.borderPane = (BorderPane) parent;
         area = new FoldableStyledArea();
         chapterReader = new VirtualizedScrollPane(area);
-        chapterReader.setMinSize(600, 300);
-        chapterReader.setMaxSize(600, 300);
+        chapterReader.setMinSize(750, 500);
+        chapterReader.setMaxSize(750, 500);
     }
 
     private void showRoot() {
@@ -409,20 +422,28 @@ public class MainController {
 
     @FXML
     public void openPlan(ActionEvent event) {
-
+        InputStream input = JesusMisc.showOpenDialog(event, notesTable);
+        planDays = PersistenceLayer.loadPlan(input);
+        String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, planDays.getDay().get(0).getVerses());
+        setPlanOutputSelected(planDays.getDay().get(0), versHtml);
+        for(Day day:planDays.getDay()) {
+            planList.getItems().add(day.getTitle());
+        }
     }
 
     @FXML
     public void savePlan(ActionEvent event) {
-
+        OutputStream os = JesusMisc.showSaveDialog(event, notesTable);
+        PersistenceLayer.storePlan(planDays, os);
     }
 
     @FXML
     public void newPlan(ActionEvent event) {
         dayNo = 1;
-        Day newDay = nextPlanDay();
-        planList.getItems().add(newDay.getTitle());
-        planDays.getDay().add(newDay);
+        planList.getItems().clear();
+        planDays = new Plan();
+        versesView.getEngine().loadContent("");
+        devView.getEngine().loadContent("");
     }
 
     @FXML
@@ -430,6 +451,23 @@ public class MainController {
         Day newDay = nextPlanDay();
         planList.getItems().add(newDay.getTitle());
         planDays.getDay().add(newDay);
+        String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, newDay.getVerses());
+        setPlanOutputSelected(newDay, versHtml);
+    }
+
+    @FXML
+    public void setDevotionalText(ActionEvent event) {
+        List<Day> dayList = planDays.getDay();
+        if (dayList.size() == 0) {
+            Day newDay = nextPlanDay();
+            planList.getItems().add(newDay.getTitle());
+            planDays.getDay().add(newDay);
+            dayList = planDays.getDay();
+        }
+        Day theDay = dayList.get(dayList.size() - 1);
+        storeDevotional(theDay);
+        String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
+        setPlanOutputSelected(theDay, versHtml);
     }
 
 
@@ -445,7 +483,7 @@ public class MainController {
     @FXML
     public void loadDev(ActionEvent event) {
         byte [] buffer = new byte[4096];
-        InputStream stream = JesusMisc.showOpenDialog(event);
+        InputStream stream = JesusMisc.showOpenDialog(event, notesTable);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             int read = stream.read(buffer);
@@ -462,7 +500,7 @@ public class MainController {
 
     @FXML
     public void saveDev(ActionEvent event) {
-        OutputStream os = JesusMisc.showSaveDialog(event);
+        OutputStream os = JesusMisc.showSaveDialog(event, notesTable);
         String htmlText = devotionalEdit.getHtmlText();
         try {
             PrintWriter writer = new PrintWriter(os);
@@ -514,7 +552,7 @@ public class MainController {
         List<Vers> verses = note.getVerslink();
         StringBuffer buffer = new StringBuffer();
         for (Vers vers: verses) {
-            buffer.append("<p/>").append(BibleTextUtils.generateVersEntry(utils, vers, vers.getVtext()));
+            buffer.append("<p/>").append(vers.getVtext());
         }
         StringBuffer htmlBuffer = new StringBuffer();
         HTMLRendering.noteToHTML(noteText, buffer, htmlBuffer);
@@ -542,7 +580,7 @@ public class MainController {
     @FXML
     public void toPDF(ActionEvent event) {
         String htmlText = devotionalEdit.getHtmlText();
-        OutputStream pdfOut = JesusMisc.showSaveDialog(event);
+        OutputStream pdfOut = JesusMisc.showSaveDialog(event, notesTable);
         HTMLToPDF.convertTo(htmlText, pdfOut);
     }
 
@@ -555,7 +593,7 @@ public class MainController {
 
     @FXML
     public void loadNotes(ActionEvent event) {
-        InputStream input = JesusMisc.showOpenDialog(event);
+        InputStream input = JesusMisc.showOpenDialog(event, notesTable);
         Versnotes notes = PersistenceLayer.loadNotes(input);
         noteList = notes;
 
@@ -564,7 +602,15 @@ public class MainController {
             notesTable.setEditable(false);
 
             notesTable.getSelectionModel().getSelectedItem();
-            NoteTabEntry entry = new NoteTabEntry(utils.generateVersLink(newNote.getVerslink(), actBook),
+            String bookLabel = utils.getBookLabels()
+                    .get(newNote.getVerslink().get(0).getBook().intValue() - 1 );
+            Optional<BIBLEBOOK> book = utils.getBookByLabel(selected, bookLabel);
+            BibleTextUtils.BookLabel bookLabClass = null;
+            if (book.isPresent()) {
+                bookLabClass = utils.getBookLabelAsClass(bookLabel);
+                showChapter();
+            }
+            NoteTabEntry entry = new NoteTabEntry(utils.generateVersLink(newNote.getVerslink(), bookLabClass),
                     newNote.getVerslink().get(0).getVtext()
                     , newNote.getNote());
             notesTable.getItems().add(entry);
@@ -578,7 +624,7 @@ public class MainController {
 
     @FXML
     public void saveNotes(ActionEvent event) {
-        OutputStream os = JesusMisc.showSaveDialog(event);
+        OutputStream os = JesusMisc.showSaveDialog(event, notesTable);
         PersistenceLayer.storeNotes(noteList, os);
     }
 
