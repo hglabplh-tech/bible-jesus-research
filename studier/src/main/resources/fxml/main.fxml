@@ -130,7 +130,7 @@
                                                    <contextMenu>
                                                       <ContextMenu>
                                                         <items>
-                                                          <MenuItem fx:id="copyVers" mnemonicParsing="false" onAction="#copyVers" text="Kopieren" />
+                                                          <MenuItem fx:id="copyVers" mnemonicParsing="false" onAction="#copyVers" text="Copy" />
                                                         </items>
                                                       </ContextMenu>
                                                    </contextMenu></ListView>
@@ -167,7 +167,7 @@
                                        <contextMenu>
                                           <ContextMenu>
                                             <items>
-                                              <MenuItem fx:id="copyNote" mnemonicParsing="false" onAction="#copyNote" text="Kopieren" />
+                                              <MenuItem fx:id="copyNote" mnemonicParsing="false" onAction="#copyNote" text="Copy" />
                                             </items>
                                           </ContextMenu>
                                        </contextMenu>
@@ -182,22 +182,17 @@
                           <content>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <TreeTableView fx:id="planCreator" layoutX="30.0" layoutY="25.0" prefHeight="511.0" prefWidth="826.0">
-                                      <columns>
-                                          <TreeTableColumn fx:id="day" prefWidth="123.0" text="Day" />
-                                        <TreeTableColumn fx:id="planDev" minWidth="152.0" prefWidth="337.0" text="Devotional" />
-                                        <TreeTableColumn fx:id="planVerses" minWidth="123.0" prefWidth="361.0" text="Verses" />
-                                      </columns>
+                                    <ListView fx:id="planList" prefHeight="575.0" prefWidth="206.0">
                                        <contextMenu>
                                           <ContextMenu>
                                             <items>
-                                              <MenuItem fx:id="addDay" mnemonicParsing="false" onAction="#addDay" text="Add day" />
-                                                <MenuItem fx:id="addDev" mnemonicParsing="false" onAction="#addDev" text="Add devotional" />
-                                                <MenuItem fx:id="addVers" mnemonicParsing="false" onAction="#addVers" text="Add Vers" />
+                                              <MenuItem fx:id="addDay" mnemonicParsing="false" onAction="#addDay" text="Add a day to plan" />
                                             </items>
                                           </ContextMenu>
                                        </contextMenu>
-                                    </TreeTableView>
+                                    </ListView>
+                                    <WebView fx:id="devView" layoutX="209.0" layoutY="7.0" prefHeight="575.0" prefWidth="347.0" />
+                                    <WebView fx:id="versesView" layoutX="558.0" layoutY="7.0" prefWidth="334.0" />
                                  </children>
                               </AnchorPane>
                           </content>

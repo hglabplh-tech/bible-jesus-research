@@ -6,17 +6,18 @@
         targetNamespace="http://org.harry.jesus/plan/1.0"
         elementFormDefault="qualified">
     <import namespace="http://org.harry.jesus/versnotes/1.0" schemaLocation="versnotes.xsd"/>
-    <element name="plan" type="pl:days"/>
-    <complexType name="days">
+    <element name="plan" type="pl:Days"/>
+    <complexType name="Days">
         <sequence minOccurs="1" maxOccurs="unbounded">
-            <element name="day" type="pl:day" minOccurs="1" maxOccurs="unbounded"/>
+            <element name="day" type="pl:Day" minOccurs="1" maxOccurs="unbounded"/>
         </sequence>
     </complexType>
 
-    <complexType name="day">
+    <complexType name="Day">
         <sequence>
-            <element name="devotional" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            <element name="devotional" type="xs:string"  minOccurs="1" maxOccurs="1"/>
             <element name="verses" type="vs:Vers" minOccurs="1" maxOccurs="unbounded"/>
         </sequence>
+        <attribute name="title" type="string" use="required"/>
     </complexType>
 </schema>

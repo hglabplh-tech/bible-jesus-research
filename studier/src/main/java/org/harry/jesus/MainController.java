@@ -2,11 +2,9 @@ package org.harry.jesus;
 
 import generated.BIBLEBOOK;
 import generated.CHAPTER;
-import generated.VERS;
 import generated.XMLBIBLE;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -14,7 +12,6 @@ import javafx.print.Printer;
 import javafx.print.PrinterJob;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseEvent;
@@ -22,6 +19,9 @@ import javafx.scene.layout.BorderPane;
 
 import javafx.scene.paint.Color;
 import javafx.scene.web.HTMLEditor;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import jesus.harry.org.plan._1.Day;
 import jesus.harry.org.plan._1.Days;
 import jesus.harry.org.versnotes._1.Note;
 import jesus.harry.org.versnotes._1.Vers;
@@ -32,9 +32,9 @@ import org.fxmisc.richtext.model.*;
 import org.harry.jesus.danielpersistence.PersistenceLayer;
 import org.harry.jesus.fxutils.*;
 import org.harry.jesus.jesajautils.BibleTextUtils;
+import org.harry.jesus.jesajautils.HTMLRendering;
 import org.harry.jesus.jesajautils.TextRendering;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
-import org.harry.jesus.jesajautils.browse.LinkedImage;
 import org.harry.jesus.jesajautils.browse.ParStyle;
 import org.harry.jesus.jesajautils.browse.TextStyle;
 import org.harry.jesus.jesajautils.editor.HTMLToPDF;
@@ -47,7 +47,6 @@ import org.tinylog.Logger;
 
 import javax.xml.bind.JAXBElement;
 import java.io.*;
-import java.math.BigInteger;
 import java.util.*;
 
 public class MainController {
@@ -78,7 +77,11 @@ public class MainController {
 
     @FXML private HTMLEditor devotionalEdit;
 
-    @FXML TreeTableView<PlanModel> planCreator;
+    @FXML private ListView<String> planList;
+
+    @FXML private WebView devView;
+
+    @FXML private WebView versesView;
 
     BorderPane borderPane = null;
 
@@ -99,20 +102,17 @@ public class MainController {
     TextRendering rendering = null;
 
     Map<Integer, IndexRange> selectedVersesMap = new LinkedHashMap<>();
-
     List<BibleFulltextEngine.BibleTextKey> verseKeys = new ArrayList<>();
 
     Versnotes noteList = new Versnotes();
 
     Days planDays = new Days();
 
-    TreeItem<PlanModel> plan;
+
 
     int dayNo = 1;
 
-    TreeItem<PlanModel> day;
 
-    TreeItem<PlanModel> dev;
 
     @FXML
     public void initialize() {
@@ -122,18 +122,8 @@ public class MainController {
 
 
 
-        TreeTableColumn<PlanModel, String> treeTableColumn1 = new TreeTableColumn<>("Day");
-        TreeTableColumn<PlanModel, String> treeTableColumn2 = new TreeTableColumn<>("Devotional");
-        TreeTableColumn<PlanModel, String> treeTableColumn3 = new TreeTableColumn<>("Vers");
 
-        treeTableColumn1.setCellValueFactory(new TreeItemPropertyValueFactory<>("day"));
-        treeTableColumn2.setCellValueFactory(new TreeItemPropertyValueFactory<>("devotional"));
-        treeTableColumn3.setCellValueFactory(new TreeItemPropertyValueFactory<>("vers"));
 
-        planCreator.getColumns().add(treeTableColumn1);
-        planCreator.getColumns().add(treeTableColumn2);
-        planCreator.getColumns().add(treeTableColumn3);
-        plan = new TreeItem(new PlanModel("Plan", "...", "..."));
         TextOps<String, TextStyle> styledTextOps = SegmentOps.styledTextOps();
 
         this.borderPane.setCenter(chapterReader);
@@ -198,6 +188,23 @@ public class MainController {
 
         });
 
+        planList.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                Day theDay = planDays.getDay().get(newValue.intValue());
+                String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
+                String devHtml = devotionalEdit.getHtmlText();
+                planDays.getDay().get(newValue.intValue()).setDevotional(devHtml);
+                WebEngine engine = devView.getEngine();
+                engine.loadContent(devHtml);
+                engine = versesView.getEngine();
+                engine.loadContent(versHtml);
+
+
+            }
+
+        });
+
         area.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
             @Override
@@ -221,7 +228,7 @@ public class MainController {
             @Override
             public void handle(ActionEvent actionEvent) {
                 Optional<Color> resultColor = ColorDialog.callColorDialog();
-                for (IndexRange range: selectedVersesMap.values()) {
+                for (IndexRange range: getSelectedMapSorted().values()) {
                     if (resultColor.isPresent()) {
                     area.setStyle(range.getStart(),
                             range.getEnd(),
@@ -237,14 +244,8 @@ public class MainController {
             public void handle(ActionEvent actionEvent) {
                 Note theNote = new Note();
 
-                for (Integer versNo: selectedVersesMap.keySet()) {
-                    Vers vers = new Vers();
-                    vers.getVers().add(BigInteger.valueOf((long)versNo));
-                    vers.setChapter(BigInteger.valueOf(actChapter));
-                    vers.setBook(BigInteger.valueOf(actBook.getBookNumber()));
-                    IndexRange range = selectedVersesMap.get(versNo);
-                    String vText = area.getText(range);
-                    vers.setVtext(vText);
+                for (Integer versNo: getSelectedMapSorted().keySet()) {
+                    Vers vers = BibleTextUtils.generateVers(actBook, actChapter, area, getSelectedMapSorted(), versNo);
                     theNote.getVerslink().add(vers);
                 }
                 Optional<Note> newNote = CreateNoteDialog.showNoteCreateDialog(theNote);
@@ -270,6 +271,50 @@ public class MainController {
         });
         contMenu.getItems().add(mItem);
         area.contextMenuObjectProperty().setValue(contMenu);
+        mItem = new MenuItem();
+        mItem.setText("Copy");
+        mItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Note theNote = new Note();
+
+                Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area, getSelectedMapSorted());
+                List<Vers> verses = new ArrayList<>();
+                verses.add(vers);
+                String versHtml = HTMLRendering.renderVerses(selected, utils, verses);
+                copyHtmlToClip(new StringBuffer(versHtml));
+            }
+        });
+        contMenu.getItems().add(mItem);
+        area.contextMenuObjectProperty().setValue(contMenu);
+        mItem = new MenuItem();
+        mItem.setText("copy Link to last PlanDay");
+        mItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                List<Day> dayList = planDays.getDay();
+                if (dayList.size() == 0) {
+                    Day newDay = nextPlanDay();
+                    planList.getItems().add(newDay.getTitle());
+                    planDays.getDay().add(newDay);
+                    dayList = planDays.getDay();
+                }
+                Day theDay = dayList.get(dayList.size() - 1);
+                Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area, getSelectedMapSorted());
+                theDay.getVerses().add(vers);
+            }
+
+        });
+        contMenu.getItems().add(mItem);
+        area.contextMenuObjectProperty().setValue(contMenu);
+    }
+
+    private Day nextPlanDay() {
+        Day newDay = new Day();
+        newDay.setTitle("Day" + dayNo);
+        dayNo++;
+        newDay.setDevotional(devotionalEdit.getHtmlText());
+        return newDay;
     }
 
     private void initChapterReader() {
@@ -357,7 +402,7 @@ public class MainController {
         resultlist.getItems().clear();
         for (Map.Entry<BibleFulltextEngine.BibleTextKey, String> entry: hits.entrySet()) {
             verseKeys.add(entry.getKey());
-            resultlist.getItems().add(generateVersEntry(entry.getKey(), entry.getValue()));
+            resultlist.getItems().add(utils.generateVersEntry(entry.getKey(), entry.getValue()));
         }
 
     }
@@ -374,40 +419,19 @@ public class MainController {
 
     @FXML
     public void newPlan(ActionEvent event) {
-        planDays = new Days();
+        dayNo = 1;
+        Day newDay = nextPlanDay();
+        planList.getItems().add(newDay.getTitle());
+        planDays.getDay().add(newDay);
     }
 
     @FXML
     public void addDay(ActionEvent event) {
-       day = new TreeItem<PlanModel>();
-       day.setValue(new PlanModel("Day " + dayNo, "...", "..."));
-
-
-        planCreator.refresh();
+        Day newDay = nextPlanDay();
+        planList.getItems().add(newDay.getTitle());
+        planDays.getDay().add(newDay);
     }
 
-    @FXML
-    public void addDev(ActionEvent event) {
-        dev = new TreeItem<PlanModel>();
-        dev.setValue(new PlanModel("Day " + dayNo, devotionalEdit.getHtmlText(), "..."));
-        day.getChildren().add(dev);
-
-        planCreator.refresh();
-    }
-
-    @FXML
-    public void addVers(ActionEvent event) {
-
-       TreeItem<PlanModel> versItem = new TreeItem<PlanModel>();
-
-       versItem.setValue(new PlanModel("Day " + dayNo, devotionalEdit.getHtmlText(), "Verse Text"));
-
-       dev.getChildren().add(versItem);
-        plan.getChildren().add(day);
-       planCreator.setRoot(plan);
-       planCreator.refresh();
-
-    }
 
     @FXML
     public void prevChapter(ActionEvent event) {
@@ -465,35 +489,14 @@ public class MainController {
         CHAPTER chapter = jaxbChapter.getValue();
         String listText = resultlist.getItems().get(index);
         int endIndex = listText.indexOf("]");
-        StringBuffer buffer = buildVersHTML(link, listText.substring(0, endIndex + 1), chapter);
-        htmlBuffer.append("<div><p style=\"font-family:verdana\">")
-                .append(buffer.toString())
-                .append("</p></div>");
+        StringBuffer buffer = HTMLRendering.buildVersHTML(link, listText.substring(0, endIndex + 1), chapter);
+        HTMLRendering.renderVers(htmlBuffer, buffer.toString());
 
         copyHtmlToClip(htmlBuffer);
 
 
     }
 
-
-    private StringBuffer buildVersHTML(BibleFulltextEngine.BibleTextKey link, String linkText, CHAPTER chapter) {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(linkText + " ");
-        for (Object obj: chapter.getPROLOGOrCAPTIONOrVERS()) {
-            Object thing = ((JAXBElement)obj).getValue();
-            if (thing instanceof VERS) {
-                VERS vers = (VERS)thing;
-                if (vers.getVnumber().intValue() == link.getVers()) {
-                    for (Object object : vers.getContent()) {
-                        if (object instanceof String) {
-                            buffer.append((String)object);
-                        }
-                    }
-                }
-            }
-        }
-        return buffer;
-    }
 
     private void copyHtmlToClip(StringBuffer htmlBuffer) {
         final Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -511,22 +514,14 @@ public class MainController {
         List<Vers> verses = note.getVerslink();
         StringBuffer buffer = new StringBuffer();
         for (Vers vers: verses) {
-            buffer.append("<p/>").append(generateVersEntry(vers, vers.getVtext()));
+            buffer.append("<p/>").append(BibleTextUtils.generateVersEntry(utils, vers, vers.getVtext()));
         }
         StringBuffer htmlBuffer = new StringBuffer();
-        noteToHTML(noteText, buffer, htmlBuffer);
+        HTMLRendering.noteToHTML(noteText, buffer, htmlBuffer);
 
 
         copyHtmlToClip(htmlBuffer);
 
-    }
-
-    private void noteToHTML(String noteText, StringBuffer buffer, StringBuffer htmlBuffer) {
-        htmlBuffer.append("<div><p style=\"font-family:verdana\">")
-                .append(buffer.toString())
-                .append("</p><p style=\"font-family:verdana\">")
-                .append(noteText)
-                .append("</p></div>");
     }
 
 
@@ -587,33 +582,22 @@ public class MainController {
         PersistenceLayer.storeNotes(noteList, os);
     }
 
-    private String generateVersEntry (BibleFulltextEngine.BibleTextKey key, String versText) {
-        List<String> csv = utils.getBookLabels();
-        Optional<String> book = csv.stream()
-                .filter(e -> e.contains(key.getBook().toString()))
-                .findFirst();
-        if (book.isPresent()) {
-            String [] split = book.get().split(",");
-            String versLink = "[" + split[1] + " " + key.getChapter() + "," + key.getVers() + "]: ";
-            String result = versLink + versText;
-            return result;
-        } else {
-            return versText;
+
+    private Map<Integer, IndexRange> getSelectedMapSorted() {
+        List<Integer> sortedList = new ArrayList<>();
+        sortedList.addAll(selectedVersesMap.keySet());
+        Collections.sort(sortedList, new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return o1.compareTo(o2);
+            }
+        });
+        Map<Integer, IndexRange> temp = new LinkedHashMap<>();
+        for (Integer no: sortedList) {
+            IndexRange range = selectedVersesMap.get(no);
+            temp.put(no, range);
         }
+        return temp;
     }
 
-    private String generateVersEntry (Vers vers, String versText) {
-        List<String> csv = utils.getBookLabels();
-        Optional<String> book = csv.stream()
-                .filter(e -> e.contains(vers.getBook().toString()))
-                .findFirst();
-        if (book.isPresent()) {
-            String [] split = book.get().split(",");
-            String versLink = "[" + split[1] + " " + vers.getChapter() + "," + vers.getVers() + "]: ";
-            String result = versLink + versText;
-            return result;
-        } else {
-            return versText;
-        }
-    }
 }

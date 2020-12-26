@@ -5,14 +5,14 @@ import generated.BIBLEBOOK;
 import generated.CHAPTER;
 import generated.VERS;
 import generated.XMLBIBLE;
+import javafx.scene.control.IndexRange;
 import jesus.harry.org.versnotes._1.Vers;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.queryparser.classic.ParseException;
+import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
+import org.jetbrains.annotations.NotNull;
 import org.pmw.tinylog.Logger;
 
 import javax.xml.bind.JAXBElement;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
@@ -55,6 +55,162 @@ public class BibleTextUtils {
         } catch (Exception ex) {
             Logger.trace("Exception occured loading bibles");
         }
+    }
+
+    public String generateVersEntry(BibleFulltextEngine.BibleTextKey key,
+                                           String versText) {
+        String versLink =  "";
+        versLink = buildVersLink(key);
+        String result = versLink + versText;
+        return result;
+    }
+
+    private String buildVersLink(BibleFulltextEngine.BibleTextKey key) {
+        String versLink = "";
+        List<String> csv = this.getBookLabels();
+        Optional<String> book = csv.stream()
+                .filter(e -> e.contains(key.getBook().toString()))
+                .findFirst();
+        if (book.isPresent()) {
+            String [] split = book.get().split(",");
+            versLink = "[" + split[1] + " " + key.getChapter() + "," + key.getVers() + "]: ";
+        }
+        return versLink;
+    }
+
+    public static String buildVersLinkEnhanced(BibleTextUtils utils, Integer bookNumber, Integer chapter, List versNoList) {
+        String versLink = "";
+        StringBuffer linkBuffer = new StringBuffer();
+        List<String> csv = utils.getBookLabels();
+        Optional<String> book = csv.stream()
+                .filter(e -> e.contains(bookNumber.toString()))
+                .findFirst();
+        if (book.isPresent()) {
+            String [] split = book.get().split(",");
+            List<Tuple<Integer, Integer>> rangesList = detectVersesRangeForLink(versNoList);
+            boolean first = true;
+            for (Tuple<Integer, Integer> range: rangesList) {
+                if (!first) {
+                    linkBuffer.append(";");
+                }
+                if (range.getSecond() == 0) {
+                    versLink = "[" + split[1] + " "
+                            + chapter
+                            + ","
+                            + range.getFirst() + "]";
+                } else {
+                    versLink = "[" + split[1] + " "
+                            + chapter
+                            + ","
+                            + range.getFirst() + "-" + range.getSecond() + "]";
+                }
+                first = false;
+                linkBuffer.append(versLink);
+            }
+        }
+        return linkBuffer.toString();
+    }
+
+    public static List<Tuple<Integer, Integer>> detectVersesRangeForLink(List<Object> verses) {
+        List<Tuple<Integer, Integer>> result = new ArrayList<>();
+        int sequence;
+        sequence = getSequence(verses.get(0));
+        int rangeStart = sequence;
+        int rangeEnd = sequence;
+        for (int index = 1; index < verses.size(); index++) {
+            Integer versNo = getSequence(verses.get(index));
+            if (versNo == sequence + 1) {
+                rangeEnd = versNo;
+                sequence++;
+            } else {
+                if (rangeEnd == rangeStart) {
+                    result.add(new Tuple<Integer, Integer>(rangeStart, 0));
+                } else {
+                    result.add(new Tuple<Integer, Integer>(rangeStart, rangeEnd));
+                }
+                sequence = versNo;
+                rangeStart = sequence;
+                rangeEnd = sequence;
+            }
+        }
+        if (rangeEnd == rangeStart) {
+            result.add(new Tuple<Integer, Integer>(rangeStart, 0));
+        } else {
+            result.add(new Tuple<Integer, Integer>(rangeStart, rangeEnd));
+        }
+        return result;
+    }
+
+    private static int getSequence(Object vers) {
+        int sequence;
+        if (vers instanceof Integer) {
+            sequence = (Integer) vers;
+        } else {
+            sequence = ((BigInteger)vers).intValue();
+        }
+        return sequence;
+    }
+
+    public static String generateVersEntry(BibleTextUtils utils, Vers vers, String versText) {
+        List<String> csv = utils.getBookLabels();
+        Optional<String> book = csv.stream()
+                .filter(e -> e.contains(vers.getBook().toString()))
+                .findFirst();
+        if (book.isPresent()) {
+            String [] split = book.get().split(",");
+            String versLink = "[" + split[1] + " " + vers.getChapter() + "," + vers.getVers() + "]: ";
+            String result = versLink + versText;
+            return result;
+        } else {
+            return versText;
+        }
+    }
+
+    @NotNull
+    public static Vers generateVers(BookLabel actBook, Integer actChapter,
+                                    FoldableStyledArea area, Map<Integer, IndexRange> selectedVersesMap,
+                                    Integer versNo) {
+        Vers vers = new Vers();
+        vers.getVers().add(BigInteger.valueOf((long) versNo));
+        vers.setChapter(BigInteger.valueOf(actChapter));
+        vers.setBook(BigInteger.valueOf(actBook.getBookNumber()));
+        IndexRange range = selectedVersesMap.get(versNo);
+        String vText = area.getText(range);
+        vers.setVtext(vText);
+        return vers;
+    }
+
+    @NotNull
+    public static Vers generateVerses(BibleTextUtils utils, BookLabel actBook, Integer actChapter,
+                                      FoldableStyledArea area, Map<Integer, IndexRange> selectedVersesMap) {
+        Vers vers = new Vers();
+        vers.setChapter(BigInteger.valueOf(actChapter));
+        String links = buildVersLinkEnhanced(utils, actBook.getBookNumber(),
+                actChapter,
+                new ArrayList(selectedVersesMap.keySet()));
+        List<BookLink> bookLinks = utils.parseLinks(links);
+        vers.setBook(BigInteger.valueOf(actBook.getBookNumber()));
+        StringBuffer versBuffer = new StringBuffer();
+        int index = 0;
+        String [] linkArr = links.split(";");
+        versBuffer.append(linkArr[index] + ": ");
+        for (Map.Entry<Integer, IndexRange> entry: selectedVersesMap.entrySet()) {
+
+            Integer versNo = entry.getKey();
+            vers.getVers().add(BigInteger.valueOf((long) versNo));
+            if ((index < (bookLinks.size())) && bookLinks.get(index).getVerses().contains(versNo)) {
+                String vText = area.getText(entry.getValue());
+                versBuffer.append(vText);
+            } else if ((index + 1) < (linkArr.length)) {
+                index++;
+                versBuffer.append(linkArr[index] + ": ");
+                String vText = area.getText(entry.getValue());
+                versBuffer.append(vText);
+            }
+
+        }
+        vers.setVtext(versBuffer.toString());
+        return vers;
     }
 
     public List<String> getBibleInfos() {
@@ -175,7 +331,7 @@ public class BibleTextUtils {
 
     private Optional<BookLink> buildLink(String linkString) {
         int start = 0;
-        int endIndex = linkString.indexOf(" ", start);
+        int endIndex = linkString.lastIndexOf(" ");
         if (endIndex > -1) {
             String bookStr = linkString.substring(start, endIndex);
             Optional<String> label = this.getBookLabels().stream().filter(e ->
