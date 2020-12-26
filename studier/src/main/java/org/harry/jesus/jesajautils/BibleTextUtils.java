@@ -295,6 +295,46 @@ public class BibleTextUtils {
         return result;
     }
 
+    public Map.Entry<BibleFulltextEngine.BibleTextKey, String> getVersEntry(CHAPTER chapter,
+                                                                      BibleFulltextEngine.BibleTextKey key) {
+        StringBuffer buffer = new StringBuffer();
+        Map.Entry<BibleFulltextEngine.BibleTextKey, String> result = null;
+        for (JAXBElement xmlVers: chapter.getPROLOGOrCAPTIONOrVERS()) {
+            if (xmlVers.getValue() instanceof VERS) {
+                VERS vers = (VERS)xmlVers.getValue();
+                Integer versNo = vers.getVnumber().intValue();
+                if (versNo.equals(key.getVers())) {
+                    for (Object content : vers.getContent()) {
+                        if (content instanceof String) {
+                            buffer.append((String) content);
+                        }
+                    }
+                }
+
+
+
+            }
+        }
+        result = new Map.Entry<BibleFulltextEngine.BibleTextKey, String>() {
+            @Override
+            public BibleFulltextEngine.BibleTextKey getKey() {
+                return key;
+            }
+
+            @Override
+            public String getValue() {
+                return buffer.toString();
+            }
+
+            @Override
+            public String setValue(String value) {
+                return buffer.toString();
+            }
+        };
+        return result;
+    }
+
+
     public Optional<CHAPTER> getChapter(BIBLEBOOK book, Integer chapterNo) {
         Optional<CHAPTER> result = Optional.empty();
         Optional<JAXBElement<CHAPTER>> optChapter = book.getCHAPTER().stream()

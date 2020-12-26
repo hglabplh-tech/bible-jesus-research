@@ -6,6 +6,7 @@ import generated.XMLBIBLE;
 import org.apache.pdfbox.pdfviewer.MapEntry;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 
+import java.io.Serializable;
 import java.lang.reflect.MalformedParameterizedTypeException;
 import java.util.*;
 
@@ -50,7 +51,8 @@ public class BibleFulltextEngine {
         return hits;
     }
 
-    public static class BibleTextKey {
+    public static class BibleTextKey implements Serializable {
+
         private final Integer book;
         
         private final Integer chapter;

@@ -50,17 +50,17 @@
                                        <children>
                                           <BorderPane maxHeight=".0" maxWidth="1000.0">
                                              <left>
-                                                <TreeView fx:id="booksTree" maxHeight="300.0" maxWidth="200.0" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                                                <TreeView fx:id="booksTree" maxHeight="300.0" maxWidth="200.0" minHeight="500.0" minWidth="50.0" BorderPane.alignment="CENTER" />
                                              </left>
                         
                                                                <right>
-                                                <ListView fx:id="bibles" maxHeight="-Infinity" maxWidth="-Infinity" BorderPane.alignment="CENTER" />
+                                                <ListView fx:id="bibles" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="500.0" minWidth="50.0" BorderPane.alignment="CENTER" />
                                              </right>
                                              <bottom>
                                                 <ListView fx:id="footerNotes" maxHeight="75.0" maxWidth="700.0" minHeight="75.0" minWidth="700.0" BorderPane.alignment="CENTER" />
                                              </bottom>
                                              <top>
-                                                <GridPane maxHeight="70" BorderPane.alignment="CENTER">
+                                                <GridPane maxHeight="82.0" minHeight="82.0" minWidth="900.0" prefHeight="82.0" prefWidth="900.0" BorderPane.alignment="CENTER">
                                                   <columnConstraints>
                                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -138,6 +138,8 @@
                                           </AnchorPane>
                                       </items>
                                     </SplitPane>
+                                    <Button fx:id="saveSearch" layoutX="75.0" layoutY="598.0" mnemonicParsing="false" onAction="#saveSearch" text="Save Search" />
+                                    <Button fx:id="loadSearch" layoutX="753.0" layoutY="598.0" mnemonicParsing="false" onAction="#loadSearch" text="Load Search" />
                                  </children>
                               </AnchorPane>
                           </content>

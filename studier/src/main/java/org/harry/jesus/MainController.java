@@ -584,6 +584,40 @@ public class MainController {
     }
 
     @FXML
+    public void loadSearch(ActionEvent event) {
+        InputStream is = JesusMisc.showOpenDialog(event, notesTable);
+        try {
+            ObjectInputStream objIN = new ObjectInputStream(is);
+            this.verseKeys = (List<BibleFulltextEngine.BibleTextKey>)objIN.readObject();
+            objIN.close();
+            resultlist.getItems().clear();
+            for (BibleFulltextEngine.BibleTextKey versKey: verseKeys) {
+                BIBLEBOOK book = theBooks.get(versKey.getBook() - 1);
+                CHAPTER chapter = book.getCHAPTER().get(versKey.getChapter() -1).getValue();
+                Map.Entry<BibleFulltextEngine.BibleTextKey, String> entry  =
+                        utils.getVersEntry(chapter, versKey);
+                resultlist.getItems().add(utils.generateVersEntry(entry.getKey(), entry.getValue()));
+
+            }
+        } catch (IOException | ClassNotFoundException ex) {
+
+        }
+    }
+
+    @FXML
+    public void saveSearch(ActionEvent event) {
+        OutputStream os = JesusMisc.showSaveDialog(event, notesTable);
+        try {
+            ObjectOutputStream objOut = new ObjectOutputStream(os);
+            objOut.writeObject(this.verseKeys);
+            objOut.close();
+        } catch (IOException ex) {
+
+        }
+    }
+
+
+    @FXML
     public void toPDF(ActionEvent event) {
         String htmlText = devotionalEdit.getHtmlText();
         OutputStream pdfOut = JesusMisc.showSaveDialog(event, notesTable);
