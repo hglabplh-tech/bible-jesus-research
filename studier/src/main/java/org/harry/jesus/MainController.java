@@ -43,9 +43,15 @@ import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 import org.harry.jesus.jesajautils.fulltext.StatisticsCollector;
 
 import org.tinylog.Logger;
+import sun.print.SunPrinterJobService;
 //import org.reactfx.util.Either;
 
 
+import javax.print.*;
+import javax.print.attribute.DocAttributeSet;
+import javax.print.attribute.HashDocAttributeSet;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
 import javax.xml.bind.JAXBElement;
 import java.io.*;
 import java.util.*;
@@ -586,9 +592,24 @@ public class MainController {
 
     @FXML
     public void printDev(ActionEvent event) {
-        PrinterJob job = PrinterJob.createPrinterJob(Printer.getDefaultPrinter());
-        devotionalEdit.print(job);
-        job.endJob();
+        try {
+            String htmlText = devotionalEdit.getHtmlText();
+            File tempFile = File.createTempFile("temp", ".pdf");
+            tempFile.deleteOnExit();
+            FileOutputStream pdfOut = new FileOutputStream(tempFile);
+            HTMLToPDF.convertTo(htmlText, pdfOut);
+            PrintService pss = PrintServiceLookup.lookupDefaultPrintService();
+            System.out.println("Printer - " + pss.getName());
+            DocPrintJob job = pss.createPrintJob();
+            DocAttributeSet das = new HashDocAttributeSet();
+            Doc document = new SimpleDoc(new FileInputStream(tempFile),
+                    DocFlavor.INPUT_STREAM.AUTOSENSE, das);
+            // new htmldo
+            PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
+            job.print(document, pras);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
