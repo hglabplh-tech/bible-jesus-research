@@ -122,6 +122,8 @@
                                                 <Label layoutX="124.0" layoutY="11.0" text="Keyword" />
                                                 <TextField fx:id="query" layoutX="206.0" layoutY="6.0" />
                                                 <Button fx:id="search" layoutX="527.0" layoutY="6.0" mnemonicParsing="false" onAction="#search" text="Search" />
+                                                <ChoiceBox fx:id="searchOptions" layoutX="736.0" layoutY="17.0" prefWidth="150.0" />
+                                                <Label  layoutX="617.0" layoutY="22.0" prefHeight="21.0" prefWidth="92.0" text="Options:" />
                                              </children>
                                           </AnchorPane>
                                         <AnchorPane minHeight="400.0" minWidth="900.0">

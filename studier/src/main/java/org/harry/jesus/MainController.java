@@ -90,6 +90,8 @@ public class MainController {
 
     @FXML private WebView versesView;
 
+    @FXML ChoiceBox<SearchOptions> searchOptions;
+
     BorderPane borderPane = null;
 
     BibleTextUtils utils;
@@ -136,6 +138,9 @@ public class MainController {
         context = BibleThreadPool.getContext();
         bibles.getSelectionModel().selectFirst();
 
+        searchOptions.getItems().addAll(SearchOptions.SIMPLE,
+                SearchOptions.EXACT,
+                SearchOptions.FUZZY);
         actBookLabel = utils.getBookLabels().get(0);
         actBook = utils.getBookLabelAsClass(actBookLabel);
         SynchThread.loadRendering(context);
@@ -456,8 +461,14 @@ public class MainController {
         String pattern = query.getText();
         BibleFulltextEngine engine = new BibleFulltextEngine(this.selected);
         StatisticsCollector collector = new StatisticsCollector();
-        Map<BibleFulltextEngine.BibleTextKey, String> hits =
-                engine.searchPlain(pattern, collector);
+        Map<BibleFulltextEngine.BibleTextKey, String> hits;
+        if (searchOptions.getValue().equals(SearchOptions.SIMPLE)) {
+            hits = engine.searchPlain(pattern, collector);
+        } else if (searchOptions.getValue().equals(SearchOptions.EXACT)) {
+            hits = engine.searchPattern(pattern, BibleFulltextEngine.INSENSITIVE, collector);
+        } else  {
+            hits = engine.searchPatternFuzzy(pattern, BibleFulltextEngine.INSENSITIVE, collector);
+        }
         verseKeys.clear();
         resultlist.getItems().clear();
         for (Map.Entry<BibleFulltextEngine.BibleTextKey, String> entry: hits.entrySet()) {
@@ -810,6 +821,12 @@ public class MainController {
 
         }
         return temp;
+    }
+
+    public enum SearchOptions {
+        SIMPLE,
+        EXACT,
+        FUZZY
     }
 
 }
