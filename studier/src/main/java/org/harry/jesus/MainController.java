@@ -3,15 +3,12 @@ package org.harry.jesus;
 import generated.BIBLEBOOK;
 import generated.CHAPTER;
 import generated.XMLBIBLE;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.print.PrintQuality;
-import javafx.print.Printer;
-import javafx.print.PrinterJob;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
@@ -43,22 +40,16 @@ import org.harry.jesus.jesajautils.editor.HTMLToPDF;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 import org.harry.jesus.jesajautils.fulltext.StatisticsCollector;
 
+import org.harry.jesus.synchjeremia.BibleThreadPool;
+import org.harry.jesus.synchjeremia.SynchThread;
 import org.tinylog.Logger;
 
 //import org.reactfx.util.Either;
 
 
-import javax.print.*;
-import javax.print.attribute.DocAttributeSet;
-import javax.print.attribute.HashDocAttributeSet;
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.Copies;
-import javax.print.attribute.standard.JobName;
-import javax.print.attribute.standard.Sides;
 import javax.xml.bind.JAXBElement;
 import java.io.*;
-import java.nio.charset.Charset;
+import java.math.BigInteger;
 import java.util.*;
 
 public class MainController {
@@ -113,10 +104,12 @@ public class MainController {
 
     TextRendering rendering = null;
 
-    Map<Integer, IndexRange> selectedVersesMap = new LinkedHashMap<>();
-    List<BibleFulltextEngine.BibleTextKey> verseKeys = new ArrayList<>();
+    BibleThreadPool.ThreadBean context = null;
 
-    Versnotes noteList = new Versnotes();
+    Map<Integer, IndexRange> selectedVersesMap = new LinkedHashMap<>();
+    List<BibleFulltextEngine.BibleTextKey> verseKeys;
+
+    Versnotes noteList;
 
     Plan planDays = new Plan();
 
@@ -131,10 +124,11 @@ public class MainController {
         initChapterReader();
         initAreaContextMenu();
         initListeners();
+        context = BibleThreadPool.getContext();
+        noteList = context.getNoteList();
+        verseKeys = context.getVerseKeys();
 
-
-
-
+        SynchThread.loadRendering(context);
 
         TextOps<String, TextStyle> styledTextOps = SegmentOps.styledTextOps();
 
@@ -247,12 +241,20 @@ public class MainController {
             @Override
             public void handle(ActionEvent actionEvent) {
                 Optional<Color> resultColor = ColorDialog.callColorDialog();
-                for (IndexRange range: getSelectedMapSorted().values()) {
-                    if (resultColor.isPresent()) {
-                    area.setStyle(range.getStart(),
-                            range.getEnd(),
-                            TextStyle.backgroundColor(resultColor.get()));
+                List<Vers> versList = new ArrayList<>();
+                Vers vers = new Vers();
+                vers.setBook(BigInteger.valueOf(actBook.getBookNumber()));
+                vers.setChapter(BigInteger.valueOf(actChapter));
+                if (resultColor.isPresent()) {
+                    for (Integer key: getSelectedMapSorted().keySet()) {
+                        IndexRange range = getSelectedMapSorted().get(key);
+                        area.setStyle(range.getStart(),
+                                range.getEnd(),
+                                TextStyle.backgroundColor(resultColor.get()));
+                        vers.getVers().add(BigInteger.valueOf(key));
                     }
+                    versList.add(vers);
+                    TextRendering.storeVersRendering(versList, resultColor.get());
                 }
             }
         });
@@ -277,7 +279,8 @@ public class MainController {
                             newNote.get().getVerslink().get(0).getVtext()
                             , newNote.get().getNote());
                     notesTable.getItems().add(entry);
-
+                    List<Vers> versList = newNote.get().getVerslink();
+                    TextRendering.storeVersRendering(versList, Color.CORAL);
                     notesTable.setVisible(false);
                     notesTable.refresh();
                     notesTable.setVisible(true);
@@ -367,7 +370,6 @@ public class MainController {
 
     private boolean showChapter() {
         rendering = new TextRendering(utils, this.area, actBookLabel, actChapter);
-        rendering = new TextRendering(utils, area, actBookLabel, actChapter);
         boolean found = fillChapterText();
         return found;
     }
@@ -429,6 +431,11 @@ public class MainController {
             resultlist.getItems().add(utils.generateVersEntry(entry.getKey(), entry.getValue()));
         }
 
+    }
+
+    @FXML
+    public void exitApplication(ActionEvent event) {
+        Platform.exit();
     }
 
     @FXML
@@ -647,7 +654,8 @@ public class MainController {
         for (Note newNote :noteList.getVersenote()) {
             notesTable.getSelectionModel().setCellSelectionEnabled(true);
             notesTable.setEditable(false);
-
+            List<Vers> versList = newNote.getVerslink();
+            TextRendering.storeVersRendering(versList, Color.CORAL);
             notesTable.getSelectionModel().getSelectedItem();
             String bookLabel = utils.getBookLabels()
                     .get(newNote.getVerslink().get(0).getBook().intValue() - 1 );
@@ -689,6 +697,7 @@ public class MainController {
         for (Integer no: sortedList) {
             IndexRange range = selectedVersesMap.get(no);
             temp.put(no, range);
+
         }
         return temp;
     }

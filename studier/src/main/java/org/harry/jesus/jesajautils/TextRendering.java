@@ -3,10 +3,12 @@ package org.harry.jesus.jesajautils;
 import generated.*;
 import javafx.scene.control.IndexRange;
 import javafx.scene.paint.Color;
+import jesus.harry.org.versnotes._1.Vers;
 import org.fxmisc.richtext.model.TwoDimensional;
 import org.harry.jesus.jesajautils.BibleTextUtils.BookLink;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.TextStyle;
+import org.harry.jesus.synchjeremia.BibleThreadPool;
 import org.jetbrains.annotations.NotNull;
 
 import javax.xml.bind.JAXBElement;
@@ -31,6 +33,7 @@ public class TextRendering {
     private static final int TEXT_WIDTH = 80;
 
     private final String actBookLabel;
+    private final Integer actBookNo;
     private final Integer actChapter;
 
 
@@ -38,7 +41,36 @@ public class TextRendering {
         this.bibleUtils = bibleUtils;
         this.area = area;
         this.actBookLabel = actBookLabel;
+        String bookNo = actBookLabel.split(",")[0];
+        this.actBookNo = Integer.parseInt(bookNo);
         this.actChapter = actChapter;
+    }
+
+    public static void storeVersRendering(List<Vers> versList, Color choosenColor) {
+        BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
+        for (Vers actVers : versList) {
+            Tuple<Integer, Integer> key =
+                    new Tuple<Integer, Integer>(actVers.getBook().intValue(),
+                            actVers.getChapter().intValue());
+            List<Tuple<Integer, String>> renderVersList = new ArrayList<>();
+            Color color;
+            if (choosenColor != null) {
+                color = choosenColor;
+            } else {
+                color = Color.YELLOWGREEN;
+            }
+            for (BigInteger bigVersNo: actVers.getVers()) {
+                renderVersList.add(
+                        new Tuple<Integer, String>(bigVersNo.intValue(), color.toString()));
+            }
+            List<Tuple<Integer, String>> temp = context.getRenderMap().get(key);
+            if (temp != null) {
+                temp.addAll(renderVersList);
+                context.addRenderElement(key, temp);
+            } else {
+                context.addRenderElement(key, renderVersList);
+            }
+        }
     }
 
     public void clearRendering() {
@@ -87,6 +119,11 @@ public class TextRendering {
             IndexRange compRange = entry.getValue();
             if (start >= compRange.getStart() && start <= compRange.getEnd()) {
                 this.area.setStyle(compRange.getStart(), compRange.getEnd(), TextStyle.underline(true));
+                Vers vers = new Vers();
+                vers.setBook(BigInteger.valueOf(actBookNo));
+                vers.setChapter(BigInteger.valueOf(actChapter));
+                vers.getVers().add(BigInteger.valueOf(entry.getKey()));
+                storeVersRendering(Arrays.asList(vers), null);
                 return entry;
             }
         }
@@ -105,7 +142,18 @@ public class TextRendering {
             TextStyle style = entry.getValue();
             area.setStyle(range.getStart(), range.getEnd(), style);
         }
+        Tuple<Integer, Integer> key = new Tuple<>(actBookNo, actChapter);
+        List<Tuple<Integer, String>> value = BibleThreadPool.getContext().getRenderMap().get(key);
+        if (value != null) {
+            for (Tuple<Integer, String> versInfo : value) {
+                IndexRange range = chapterMap.get(versInfo.getFirst());
+                    this.area.setStyle(range.getStart(), range.getEnd(),
+                            TextStyle.backgroundColor(Color.web(versInfo.getSecond())));
+            }
+        }
     }
+
+
 
     private void renderLink(XMLBIBLE bible, Integer start, BookLink link, StringBuffer strContent, Map<Integer, List<Integer>> chapterVerses) {
         Optional<BIBLEBOOK> book = this.bibleUtils.getBookByLabel(bible, link.getBookLabel());

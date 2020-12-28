@@ -1,6 +1,7 @@
 package org.harry.jesus.jesajautils;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Class representing a Tuple response
@@ -44,5 +45,19 @@ public class Tuple<F,S> implements Serializable {
      */
     public S getSecond() {
         return second;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Tuple)) return false;
+        Tuple<?, ?> tuple = (Tuple<?, ?>) o;
+        return getFirst().equals(tuple.getFirst()) &&
+                getSecond().equals(tuple.getSecond());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getFirst(), getSecond());
     }
 }

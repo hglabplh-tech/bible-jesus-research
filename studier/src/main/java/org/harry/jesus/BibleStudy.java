@@ -1,6 +1,7 @@
 package org.harry.jesus;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
@@ -8,6 +9,8 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import org.harry.jesus.synchjeremia.BibleThreadPool;
+import org.harry.jesus.synchjeremia.SynchThread;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Level;
 import org.pmw.tinylog.writers.ConsoleWriter;
@@ -29,7 +32,7 @@ public class BibleStudy extends Application {
 
     public static FXMLLoader fxmlLoader = null;
 
-    public static ThreadLocal<Properties> bookmarkLocal = null;
+
 
     public static void setRoot(String fxml, CSS css) throws IOException {
         scene.setRoot(loadFXML(fxml, css));
@@ -39,14 +42,13 @@ public class BibleStudy extends Application {
     public void start(Stage stage) throws IOException {
         Configurator.defaultConfig().level(Level.TRACE).writer(new ConsoleWriter()).activate();
 
+        stage.setOnCloseRequest(event -> {
+            System.out.println("Stage is closing");
+            SynchThread.storeRendering(BibleThreadPool.getContext());
+            System.exit(0);
+        });
         scene = new Scene(loadFXML("main", CSS.BIBLE));
         stage.setScene(scene);
-        synchronized (BibleStudy.class)  {
-            if (bookmarkLocal == null) {
-                bookmarkLocal = new ThreadLocal<>();
-                bookmarkLocal.set(new Properties());
-            }
-        }
         stage.show();
     }
 
