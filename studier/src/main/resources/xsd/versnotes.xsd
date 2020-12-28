@@ -20,7 +20,7 @@
 
         <attribute  name = "book" type="xs:integer" use="required"/>
         <attribute name = "chapter" type="xs:integer" use="required"/>
-        <attribute name="style" type="xs:string" use="optional"/>
+        <attribute name="backcolor" type="xs:string" use="optional"/>
     </complexType>
 
     <complexType name="Note" >

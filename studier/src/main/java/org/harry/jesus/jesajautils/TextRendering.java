@@ -52,7 +52,7 @@ public class TextRendering {
             Tuple<Integer, Integer> key =
                     new Tuple<Integer, Integer>(actVers.getBook().intValue(),
                             actVers.getChapter().intValue());
-            List<Tuple<Integer, String>> renderVersList = new ArrayList<>();
+            Map<Integer, String> renderVersMap = new LinkedHashMap<>();
             Color color;
             if (choosenColor != null) {
                 color = choosenColor;
@@ -60,16 +60,17 @@ public class TextRendering {
                 color = Color.YELLOWGREEN;
             }
             for (BigInteger bigVersNo: actVers.getVers()) {
-                renderVersList.add(
-                        new Tuple<Integer, String>(bigVersNo.intValue(), color.toString()));
+                renderVersMap.put(bigVersNo.intValue(), color.toString());
+
             }
-            List<Tuple<Integer, String>> temp = context.getRenderMap().get(key);
+            Map<Integer, String> temp = context.getRenderMap().get(key);
             if (temp != null) {
-                temp.addAll(renderVersList);
+                temp.putAll(renderVersMap);
                 context.addRenderElement(key, temp);
             } else {
-                context.addRenderElement(key, renderVersList);
+                context.addRenderElement(key, renderVersMap);
             }
+
         }
     }
 
@@ -143,12 +144,12 @@ public class TextRendering {
             area.setStyle(range.getStart(), range.getEnd(), style);
         }
         Tuple<Integer, Integer> key = new Tuple<>(actBookNo, actChapter);
-        List<Tuple<Integer, String>> value = BibleThreadPool.getContext().getRenderMap().get(key);
+        Map<Integer, String> value = BibleThreadPool.getContext().getRenderMap().get(key);
         if (value != null) {
-            for (Tuple<Integer, String> versInfo : value) {
-                IndexRange range = chapterMap.get(versInfo.getFirst());
+            for (Map.Entry<Integer, String> versInfo : value.entrySet()) {
+                IndexRange range = chapterMap.get(versInfo.getKey());
                     this.area.setStyle(range.getStart(), range.getEnd(),
-                            TextStyle.backgroundColor(Color.web(versInfo.getSecond())));
+                            TextStyle.backgroundColor(Color.web(versInfo.getValue())));
             }
         }
     }

@@ -200,6 +200,35 @@
                               </AnchorPane>
                           </content>
                         </Tab>
+                        <Tab fx:id="highlightsView" text="Highlights">
+                           <content>
+                              <AnchorPane minHeight="600.0" minWidth="900.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <TableView fx:id="highlightsTab" prefHeight="550.0" prefWidth="800.0">
+                                       <columns>
+                                           <TableColumn fx:id="highlightlink" editable="false" prefWidth="217.0" text="Vers link">
+                                               <cellValueFactory>
+                                                   <PropertyValueFactory property="verseLink" />
+                                               </cellValueFactory>
+                                           </TableColumn>
+                                           <TableColumn fx:id="highlightText" editable="false" prefWidth="376.0" text="Vers text">
+                                               <cellValueFactory>
+                                                   <PropertyValueFactory property="versText" />
+                                               </cellValueFactory>
+                                           </TableColumn>
+                                       </columns>
+                                       <contextMenu>
+                                          <ContextMenu fx:id="copyHighlight">
+                                             <items>
+                                                <MenuItem fx:id="copyNote1" mnemonicParsing="false" onAction="#copyHighlight" text="Copy" />
+                                             </items>
+                                          </ContextMenu>
+                                       </contextMenu>
+                                    </TableView>
+                                 </children>
+                              </AnchorPane>
+                           </content>
+                        </Tab>
                     </tabs>
                   </TabPane>
                </children>

@@ -3,9 +3,10 @@ package org.harry.jesus.jesajautils.editor;
 import com.itextpdf.html2pdf.ConverterProperties;
 import com.itextpdf.html2pdf.HtmlConverter;
 
-import javafx.print.Printer;
-import javafx.print.PrinterJob;
+import javafx.print.*;
+import javafx.scene.transform.Scale;
 import javafx.scene.web.HTMLEditor;
+import javafx.scene.web.WebView;
 import org.pmw.tinylog.Logger;
 
 import javax.print.*;
@@ -40,13 +41,13 @@ public static void convertTo(String html, OutputStream os) {
 
     public static void printDocument(HTMLEditor htmlEdit) {
     try {
-
-        Printer printer = Printer.getDefaultPrinter();
-        System.out.println("Printer - " + printer.getName());
-        PrinterJob job = PrinterJob.createPrinterJob(printer);
-        job.showPageSetupDialog(htmlEdit.getScene().getWindow());
+        PrinterJob job = PrinterJob.createPrinterJob();
+        System.out.println(htmlEdit.getHtmlText());
+        job.showPrintDialog(htmlEdit.getScene().getWindow());
+        System.out.println("Printer - " + job.getPrinter().getName());
         htmlEdit.print(job);
         job.endJob();
+
     } catch (Exception ex) {
         Logger.trace("Print error: " + ex.getMessage());
     }

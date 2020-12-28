@@ -1,6 +1,7 @@
 package org.harry.jesus.synchjeremia;
 
 import javafx.scene.paint.Color;
+import jesus.harry.org.highlights._1.Highlights;
 import jesus.harry.org.versnotes._1.Versnotes;
 import org.harry.jesus.jesajautils.Tuple;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
@@ -45,7 +46,9 @@ public class BibleThreadPool {
 
         Versnotes noteList = new Versnotes();
 
-        Map<Tuple<Integer, Integer>, List<Tuple<Integer, String>>> renderMap = new LinkedHashMap<>();
+        Highlights highlights = new Highlights();
+
+        Map<Tuple<Integer, Integer>, Map<Integer, String>> renderMap = new LinkedHashMap<>();
 
         public List<BibleFulltextEngine.BibleTextKey> getVerseKeys() {
             return verseKeys;
@@ -60,23 +63,24 @@ public class BibleThreadPool {
             return noteList;
         }
 
-        public ThreadBean setNoteList(Versnotes noteList) {
-            this.noteList = noteList;
-            return this;
-        }
-
-        public Map<Tuple<Integer, Integer>,List<Tuple<Integer, String>>> getRenderMap() {
+        public Map<Tuple<Integer, Integer>, Map<Integer, String>> getRenderMap() {
             return renderMap;
         }
 
-        public ThreadBean setRenderMap(Map<Tuple<Integer, Integer>, List<Tuple<Integer, String>>> renderMap) {
+        public ThreadBean setRenderMap(Map<Tuple<Integer, Integer>, Map<Integer, String>> renderMap) {
             this.renderMap = renderMap;
             return this;
         }
 
-        public ThreadBean addRenderElement(Tuple<Integer, Integer> key, List<Tuple<Integer, String>> value) {
+        public ThreadBean addRenderElement(Tuple<Integer, Integer> key, Map<Integer, String> value) {
             this.renderMap.put(key, value);
             return this;
         }
+
+        public Highlights getHighlights() {
+            return highlights;
+        }
+
+
     }
 }

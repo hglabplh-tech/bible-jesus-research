@@ -2,6 +2,7 @@ package org.harry.jesus.synchjeremia;
 
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
+import org.harry.jesus.danielpersistence.PersistenceLayer;
 import org.harry.jesus.jesajautils.Tuple;
 import org.pmw.tinylog.Logger;
 
@@ -25,6 +26,10 @@ public class SynchThread extends TimerTask {
 
     private static final File renderObj;
 
+    private static final File notesXML;
+
+    private static final File highlightsXML;
+
     private static Timer timer = new Timer();
 
 
@@ -35,6 +40,8 @@ public class SynchThread extends TimerTask {
             appDir.mkdirs();
         }
         renderObj = new File(appDir, RENDER_OBJ);
+        notesXML = new File(appDir, NOTES_XML);
+        highlightsXML = new File(appDir, HIGHLIGHT_XML);
         timer.schedule (new SynchThread()
            , (long)(1000L * 120L), (long)(1000L * 60L));
     }
@@ -45,12 +52,59 @@ public class SynchThread extends TimerTask {
             public void run() {
                 BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
                 storeRendering(context);
+                storeNotes(context);
+                storeHighlights(context);
             }
 
 
 
         });
     }
+
+    public static void storeNotes(BibleThreadPool.ThreadBean context) {
+        synchronized (SynchThread.class) {
+            try {
+                FileOutputStream stream = new FileOutputStream(notesXML);
+                PersistenceLayer.storeNotes(context.getNoteList(), stream);
+            } catch (IOException ex) {
+                Logger.trace("Error storing rendering" + ex.getMessage());
+            }
+        }
+    }
+
+    public static void loadNotes(BibleThreadPool.ThreadBean context) {
+        synchronized (SynchThread.class) {
+            try {
+                FileInputStream stream = new FileInputStream(notesXML);
+                context.getNoteList().getVersenote().addAll(PersistenceLayer.loadNotes(stream).getVersenote());
+            } catch (IOException ex) {
+                Logger.trace("Error storing rendering" + ex.getMessage());
+            }
+        }
+    }
+
+    public static void storeHighlights(BibleThreadPool.ThreadBean context) {
+        synchronized (SynchThread.class) {
+            try {
+                FileOutputStream stream = new FileOutputStream(highlightsXML);
+                PersistenceLayer.storeHighligts(context.getHighlights(), stream);
+            } catch (IOException ex) {
+                Logger.trace("Error storing rendering" + ex.getMessage());
+            }
+        }
+    }
+
+    public static void loadHighlights(BibleThreadPool.ThreadBean context) {
+        synchronized (SynchThread.class) {
+            try {
+                FileInputStream stream = new FileInputStream(highlightsXML);
+                context.getHighlights().getHighlight().addAll(PersistenceLayer.loadHighlights(stream).getHighlight());
+            } catch (IOException ex) {
+                Logger.trace("Error storing rendering" + ex.getMessage());
+            }
+        }
+    }
+
 
     public static void storeRendering(BibleThreadPool.ThreadBean context) {
         synchronized(SynchThread.class)  {
@@ -71,8 +125,7 @@ public class SynchThread extends TimerTask {
                 if (renderObj.exists()) {
                     FileInputStream stream = new FileInputStream(renderObj);
                     ObjectInputStream objStream = new ObjectInputStream(stream);
-                    context.setRenderMap((Map<Tuple<Integer, Integer>, List<Tuple<Integer, String>>>) objStream.readObject());
-
+                    context.setRenderMap((Map<Tuple<Integer, Integer>, Map<Integer, String>>) objStream.readObject());
                     objStream.close();
                 }
             } catch (IOException | ClassNotFoundException ex) {

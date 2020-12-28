@@ -45,6 +45,8 @@ public class BibleStudy extends Application {
         stage.setOnCloseRequest(event -> {
             System.out.println("Stage is closing");
             SynchThread.storeRendering(BibleThreadPool.getContext());
+            SynchThread.storeNotes(BibleThreadPool.getContext());
+            SynchThread.storeHighlights(BibleThreadPool.getContext());
             System.exit(0);
         });
         scene = new Scene(loadFXML("main", CSS.BIBLE));

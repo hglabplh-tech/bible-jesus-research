@@ -20,6 +20,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.web.HTMLEditor;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import jesus.harry.org.highlights._1.Highlights;
 import jesus.harry.org.plan._1.Day;
 import jesus.harry.org.plan._1.Plan;
 import jesus.harry.org.versnotes._1.Note;
@@ -42,6 +43,7 @@ import org.harry.jesus.jesajautils.fulltext.StatisticsCollector;
 
 import org.harry.jesus.synchjeremia.BibleThreadPool;
 import org.harry.jesus.synchjeremia.SynchThread;
+import org.jetbrains.annotations.NotNull;
 import org.tinylog.Logger;
 
 //import org.reactfx.util.Either;
@@ -78,6 +80,8 @@ public class MainController {
 
     @FXML private TableView<NoteTabEntry> notesTable;
 
+    @FXML private TableView<HighlightsEntry> highlightsTab;
+
     @FXML private HTMLEditor devotionalEdit;
 
     @FXML private ListView<String> planList;
@@ -107,9 +111,12 @@ public class MainController {
     BibleThreadPool.ThreadBean context = null;
 
     Map<Integer, IndexRange> selectedVersesMap = new LinkedHashMap<>();
+
     List<BibleFulltextEngine.BibleTextKey> verseKeys;
 
     Versnotes noteList;
+
+    Highlights highlights;
 
     Plan planDays = new Plan();
 
@@ -124,25 +131,31 @@ public class MainController {
         initChapterReader();
         initAreaContextMenu();
         initListeners();
+        utils = new BibleTextUtils();
+        selected = utils.getBibles().get(0);
         context = BibleThreadPool.getContext();
+        bibles.getSelectionModel().selectFirst();
+
+        actBookLabel = utils.getBookLabels().get(0);
+        actBook = utils.getBookLabelAsClass(actBookLabel);
+        SynchThread.loadRendering(context);
+        SynchThread.loadNotes(context);
+        SynchThread.loadHighlights(context);
         noteList = context.getNoteList();
         verseKeys = context.getVerseKeys();
-
-        SynchThread.loadRendering(context);
+        highlights = context.getHighlights();
+        loadNotesAndRender();
+        loadHighlightsAndRender();
 
         TextOps<String, TextStyle> styledTextOps = SegmentOps.styledTextOps();
 
         this.borderPane.setCenter(chapterReader);
-        utils = new BibleTextUtils();
         List<String> bibleNames = utils.getBibleInfos();
 
         for (String name: bibleNames) {
             bibles.getItems().add(name);
         }
-        bibles.getSelectionModel().selectFirst();
 
-        actBookLabel = utils.getBookLabels().get(0);
-        actBook = utils.getBookLabelAsClass(actBookLabel);
         TreeItem<String> root = buildBooksTree();
         showRoot();
         System.out.println("second");
@@ -240,21 +253,27 @@ public class MainController {
         mItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                highlightsTab.getSelectionModel().setCellSelectionEnabled(true);
+                highlightsTab.setEditable(false);
                 Optional<Color> resultColor = ColorDialog.callColorDialog();
                 List<Vers> versList = new ArrayList<>();
-                Vers vers = new Vers();
-                vers.setBook(BigInteger.valueOf(actBook.getBookNumber()));
-                vers.setChapter(BigInteger.valueOf(actChapter));
+                Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area, getSelectedMapSorted());
                 if (resultColor.isPresent()) {
                     for (Integer key: getSelectedMapSorted().keySet()) {
                         IndexRange range = getSelectedMapSorted().get(key);
                         area.setStyle(range.getStart(),
                                 range.getEnd(),
                                 TextStyle.backgroundColor(resultColor.get()));
-                        vers.getVers().add(BigInteger.valueOf(key));
+                        if(!vers.getVers().contains(BigInteger.valueOf(key))) {
+                            vers.getVers().add(BigInteger.valueOf(key));
+                        }
+                        vers.setBackcolor(resultColor.get().toString());
                     }
                     versList.add(vers);
                     TextRendering.storeVersRendering(versList, resultColor.get());
+                    highlights.getHighlight().addAll(versList);
+                    HighlightsEntry entry = getHighlightsEntry(vers);
+                    highlightsTab.getItems().add(entry);
                 }
             }
         });
@@ -268,9 +287,17 @@ public class MainController {
 
                 Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area, getSelectedMapSorted());
                 theNote.getVerslink().add(vers);
+                Optional<Color> resultColor = ColorDialog.callColorDialog();
+
                 Optional<Note> newNote = CreateNoteDialog.showNoteCreateDialog(theNote);
                 if (newNote.isPresent()) {
+                    Color noteColor = null;
+                    if (resultColor.isPresent()) {
+                        noteColor = resultColor.get();
+                        vers.setBackcolor(noteColor.toString());
+                    }
                     noteList.getVersenote().add(newNote.get());
+
                     notesTable.getSelectionModel().setCellSelectionEnabled(true);
                     notesTable.setEditable(false);
 
@@ -280,7 +307,14 @@ public class MainController {
                             , newNote.get().getNote());
                     notesTable.getItems().add(entry);
                     List<Vers> versList = newNote.get().getVerslink();
-                    TextRendering.storeVersRendering(versList, Color.CORAL);
+                    for (BigInteger versNo: vers.getVers()) {
+                        IndexRange range = getSelectedMapSorted().get(versNo.intValue());
+                        area.setStyle(range.getStart(),
+                                range.getEnd(),
+                                TextStyle.backgroundColor(resultColor.get()));
+                    }
+                    TextRendering.storeVersRendering(versList, noteColor);
+                    noteList.getVersenote().add(newNote.get());
                     notesTable.setVisible(false);
                     notesTable.refresh();
                     notesTable.setVisible(true);
@@ -553,6 +587,31 @@ public class MainController {
 
     }
 
+    @FXML
+    public void copyHighlight(ActionEvent event) {
+        Integer row = highlightsTab.getSelectionModel().getSelectedIndex();
+        Vers vers = highlights.getHighlight().get(row);
+        BIBLEBOOK book = theBooks.get(vers.getBook().intValue() - 1);
+        JAXBElement<CHAPTER> jaxbChapter = book.getCHAPTER().get(vers.getChapter().intValue() - 1);
+        CHAPTER chapter = jaxbChapter.getValue();
+        HighlightsEntry entry = highlightsTab.getItems().get(row);
+        String listText = entry.getVerseLink();
+        int startIndex = 0;
+        StringBuffer htmlBuffer = new StringBuffer();
+        for (BigInteger versNo: vers.getVers()) {
+            int endIndex = listText.indexOf("]", startIndex);
+            BibleFulltextEngine.BibleTextKey link =
+                    new BibleFulltextEngine
+                            .BibleTextKey(vers.getBook().intValue(),
+                            vers.getChapter().intValue(), versNo.intValue());
+            StringBuffer buffer = HTMLRendering.buildVersHTML(link, listText.substring(startIndex, endIndex + 1), chapter);
+            startIndex = endIndex + 1;
+            HTMLRendering.renderVers(htmlBuffer, buffer.toString());
+            copyHtmlToClip(htmlBuffer);
+        }
+
+    }
+
 
     private void copyHtmlToClip(StringBuffer htmlBuffer) {
         final Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -649,32 +708,83 @@ public class MainController {
     public void loadNotes(ActionEvent event) {
         InputStream input = JesusMisc.showOpenDialog(event, notesTable);
         Versnotes notes = PersistenceLayer.loadNotes(input);
-        noteList = notes;
+        noteList.getVersenote().addAll(notes.getVersenote());
 
-        for (Note newNote :noteList.getVersenote()) {
-            notesTable.getSelectionModel().setCellSelectionEnabled(true);
-            notesTable.setEditable(false);
-            List<Vers> versList = newNote.getVerslink();
-            TextRendering.storeVersRendering(versList, Color.CORAL);
-            notesTable.getSelectionModel().getSelectedItem();
-            String bookLabel = utils.getBookLabels()
-                    .get(newNote.getVerslink().get(0).getBook().intValue() - 1 );
-            Optional<BIBLEBOOK> book = utils.getBookByLabel(selected, bookLabel);
-            BibleTextUtils.BookLabel bookLabClass = null;
-            if (book.isPresent()) {
-                bookLabClass = utils.getBookLabelAsClass(bookLabel);
-                showChapter();
-            }
-            NoteTabEntry entry = new NoteTabEntry(utils.generateVersLink(newNote.getVerslink(), bookLabClass),
-                    newNote.getVerslink().get(0).getVtext()
-                    , newNote.getNote());
-            notesTable.getItems().add(entry);
-        }
+        loadNotesAndRender();
 
         notesTable.setVisible(false);
         notesTable.refresh();
         notesTable.setVisible(true);
 
+    }
+
+    private void loadNotesAndRender() {
+        notesTable.setEditable(false);
+        for (Note newNote :noteList.getVersenote()) {
+            NoteTabEntry entry = getNoteTabEntry(newNote);
+            notesTable.getItems().add(entry);
+        }
+    }
+
+    @NotNull
+    private NoteTabEntry getNoteTabEntry(Note newNote) {
+        List<Vers> versList = newNote.getVerslink();
+        String color = versList.get(0).getBackcolor();
+        Color noteColor;
+        if (color != null && !color.isEmpty()) {
+            noteColor = Color.web(color);
+        } else {
+            noteColor = Color.CORAL;
+        }
+
+        TextRendering.storeVersRendering(versList, noteColor);
+        notesTable.getSelectionModel().getSelectedItem();
+        String bookLabel = utils.getBookLabels()
+                .get(newNote.getVerslink().get(0).getBook().intValue() - 1 );
+        Optional<BIBLEBOOK> book = utils.getBookByLabel(selected, bookLabel);
+        BibleTextUtils.BookLabel bookLabClass = null;
+        if (book.isPresent()) {
+            bookLabClass = utils.getBookLabelAsClass(bookLabel);
+            showChapter();
+        }
+        NoteTabEntry entry = new NoteTabEntry(utils.generateVersLink(newNote.getVerslink(), bookLabClass),
+                newNote.getVerslink().get(0).getVtext()
+                , newNote.getNote());
+        return entry;
+    }
+
+    private void loadHighlightsAndRender() {
+        highlightsTab.setEditable(false);
+        for (Vers newVers :highlights.getHighlight()) {
+            HighlightsEntry entry = getHighlightsEntry(newVers);
+            highlightsTab.getItems().add(entry);
+        }
+    }
+
+    @NotNull
+    private HighlightsEntry getHighlightsEntry(Vers newVers) {
+        String color = newVers.getBackcolor();
+        Color noteColor;
+        if (color != null && !color.isEmpty()) {
+            noteColor = Color.web(color);
+        } else {
+            noteColor = Color.ALICEBLUE;
+        }
+
+        List<Vers> versList = new ArrayList<>();
+        versList.add(newVers);
+        TextRendering.storeVersRendering(versList, noteColor);
+        String bookLabel = utils.getBookLabels()
+                .get(newVers.getBook().intValue() - 1 );
+        Optional<BIBLEBOOK> book = utils.getBookByLabel(selected, bookLabel);
+        BibleTextUtils.BookLabel bookLabClass = null;
+        if (book.isPresent()) {
+            bookLabClass = utils.getBookLabelAsClass(bookLabel);
+            showChapter();
+        }
+        HighlightsEntry entry = new HighlightsEntry(utils.generateVersLink(versList, bookLabClass),
+                newVers.getVtext());
+        return entry;
     }
 
     @FXML

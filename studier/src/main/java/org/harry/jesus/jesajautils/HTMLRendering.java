@@ -21,7 +21,7 @@ public class HTMLRendering {
         return buffer;
     }
 
-    private static void getVersText(Integer versNumber,CHAPTER chapter, StringBuffer buffer) {
+    public static void getVersText(Integer versNumber,CHAPTER chapter, StringBuffer buffer) {
         for (Object obj: chapter.getPROLOGOrCAPTIONOrVERS()) {
             Object thing = ((JAXBElement)obj).getValue();
             if (thing instanceof VERS) {

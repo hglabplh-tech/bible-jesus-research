@@ -282,14 +282,12 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <!--xjbSources>
-                            <xjbSource>src/main/resources/xsd/binding.xjb</xjbSource>
-                        </xjbSources-->
                         <sources>
                             <source>src/main/resources/xsd/zefania.xsd</source>
                             <source>src/main/resources/xsd/versnotes.xsd</source>
                             <source>src/main/resources/xsd/devotional.xsd</source>
                             <source>src/main/resources/xsd/plan.xsd</source>
+                            <source>src/main/resources/xsd/highlights.xsd</source>
                         </sources>
                     </configuration>
                 </plugin>
