@@ -11,11 +11,16 @@ import javafx.stage.Window;
 import org.pmw.tinylog.Logger;
 
 import java.io.*;
+import java.util.Arrays;
 
 public class JesusMisc {
     public static OutputStream showSaveDialog(ActionEvent event, Node node) {
         FileChooser fDialog = new FileChooser();
         fDialog.setTitle("Select Path");
+        fDialog.getExtensionFilters()
+                .addAll(Arrays.asList(new FileChooser.ExtensionFilter("HTML doc(*.html)", "*.html"),
+                        new FileChooser.ExtensionFilter("PDF doc(*.pdf)", "*.pdf"),
+                        new FileChooser.ExtensionFilter("XML doc(*.xml)", "*.xml")));
         File currentDir = new File(System.getProperty("user.home", "C:\\")).getAbsoluteFile();
 
         fDialog.setInitialDirectory(currentDir);

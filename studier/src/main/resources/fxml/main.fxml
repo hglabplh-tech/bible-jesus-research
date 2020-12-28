@@ -123,7 +123,7 @@
                                                 <TextField fx:id="query" layoutX="206.0" layoutY="6.0" />
                                                 <Button fx:id="search" layoutX="527.0" layoutY="6.0" mnemonicParsing="false" onAction="#search" text="Search" />
                                                 <ChoiceBox fx:id="searchOptions" layoutX="736.0" layoutY="17.0" prefWidth="150.0" />
-                                                <Label  layoutX="617.0" layoutY="22.0" prefHeight="21.0" prefWidth="92.0" text="Options:" />
+                                                <Label layoutX="617.0" layoutY="22.0" prefHeight="21.0" prefWidth="92.0" text="Options:" />
                                              </children>
                                           </AnchorPane>
                                         <AnchorPane minHeight="400.0" minWidth="900.0">
@@ -133,6 +133,7 @@
                                                       <ContextMenu>
                                                         <items>
                                                           <MenuItem fx:id="copyVers" mnemonicParsing="false" onAction="#copyVers" text="Copy" />
+                                                            <MenuItem fx:id="copyToPlanDay" mnemonicParsing="false" onAction="#copyToPlanDay" text="copy Link to last PlanDay" />
                                                         </items>
                                                       </ContextMenu>
                                                    </contextMenu></ListView>
@@ -172,6 +173,7 @@
                                           <ContextMenu>
                                             <items>
                                               <MenuItem fx:id="copyNote" mnemonicParsing="false" onAction="#copyNote" text="Copy" />
+                                                <MenuItem mnemonicParsing="false" onAction="#copyToPlanFromNote" text="copy Link to last PlanDay" />
                                             </items>
                                           </ContextMenu>
                                        </contextMenu>

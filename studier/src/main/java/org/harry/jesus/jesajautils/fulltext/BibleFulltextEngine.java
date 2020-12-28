@@ -3,7 +3,6 @@ package org.harry.jesus.jesajautils.fulltext;
 import generated.BIBLEBOOK;
 import generated.CHAPTER;
 import generated.XMLBIBLE;
-import org.apache.pdfbox.pdfviewer.MapEntry;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 
 import java.io.Serializable;

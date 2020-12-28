@@ -88,6 +88,9 @@ public class MainController {
 
     @FXML private WebView devView;
 
+    @FXML Button printDev;
+
+
     @FXML private WebView versesView;
 
     @FXML ChoiceBox<SearchOptions> searchOptions;
@@ -132,6 +135,7 @@ public class MainController {
     public void initialize() {
         initChapterReader();
         initAreaContextMenu();
+        printDev.setDisable(true);
         initListeners();
         utils = new BibleTextUtils();
         selected = utils.getBibles().get(0);
@@ -519,6 +523,25 @@ public class MainController {
     }
 
     @FXML
+    public void copyToPlanDay(ActionEvent event) {
+        int index = resultlist.getSelectionModel().getSelectedIndex();
+        BibleFulltextEngine.BibleTextKey link = verseKeys.get(index);
+        BIBLEBOOK book = theBooks.get(link.getBook() - 1);
+        JAXBElement<CHAPTER> jaxbChapter = book.getCHAPTER().get(link.getChapter() - 1);
+        CHAPTER chapter = jaxbChapter.getValue();
+        List<Day> dayList = planDays.getDay();
+        Day theDay = dayList.get(dayList.size() - 1);
+        Vers vers = new Vers();
+        vers.setBook(book.getBnumber());
+        vers.setChapter(chapter.getCnumber());
+        vers.setVtext(resultlist.getItems().get(index));
+        vers.getVers().add(BigInteger.valueOf(link.getVers()));
+        theDay.getVerses().add(vers);
+        String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
+        setPlanOutputSelected(theDay, versHtml);
+    }
+
+    @FXML
     public void setDevotionalText(ActionEvent event) {
         List<Day> dayList = planDays.getDay();
         if (dayList.size() == 0) {
@@ -648,6 +671,18 @@ public class MainController {
 
         copyHtmlToClip(htmlBuffer);
 
+    }
+
+    @FXML
+    public void copyToPlanFromNote(ActionEvent event) {
+        Integer row = notesTable.getSelectionModel().getSelectedIndex();
+        Note note = noteList.getVersenote().get(row);
+        List<Day> dayList = planDays.getDay();
+        Day theDay = dayList.get(dayList.size() - 1);
+        List<Vers> verses = note.getVerslink();
+        theDay.getVerses().addAll(verses);
+        String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
+        setPlanOutputSelected(theDay, versHtml);
     }
 
 

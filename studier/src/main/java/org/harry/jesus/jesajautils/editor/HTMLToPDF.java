@@ -4,23 +4,21 @@ import com.itextpdf.html2pdf.ConverterProperties;
 import com.itextpdf.html2pdf.HtmlConverter;
 
 import javafx.print.*;
-import javafx.scene.transform.Scale;
+
 import javafx.scene.web.HTMLEditor;
-import javafx.scene.web.WebView;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+
+import org.apache.pdfbox.printing.PDFPageable;
+import org.apache.pdfbox.printing.PDFPrintable;
 import org.pmw.tinylog.Logger;
 
 import javax.print.*;
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.Copies;
-import javax.print.attribute.standard.JobName;
-import javax.print.attribute.standard.Sides;
 import javax.print.event.PrintJobAdapter;
 import javax.print.event.PrintJobEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.awt.*;
+import java.awt.print.PrinterJob;
+import java.io.*;
 import java.util.UUID;
 
 
@@ -41,12 +39,17 @@ public static void convertTo(String html, OutputStream os) {
 
     public static void printDocument(HTMLEditor htmlEdit) {
     try {
-        PrinterJob job = PrinterJob.createPrinterJob();
-        System.out.println(htmlEdit.getHtmlText());
-        job.showPrintDialog(htmlEdit.getScene().getWindow());
-        System.out.println("Printer - " + job.getPrinter().getName());
-        htmlEdit.print(job);
-        job.endJob();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        convertTo(htmlEdit.getHtmlText(), os);
+        PrinterJob job = PrinterJob.getPrinterJob();
+        ByteArrayInputStream pdfIN = new ByteArrayInputStream(os.toByteArray());
+        PDDocument doc = PDDocument.load(pdfIN);
+        PDFPrintable pdfPrintable = new PDFPrintable(doc);
+        pdfPrintable.setSubsamplingAllowed(true);
+        if (job.printDialog()) {
+            job.setPrintable(pdfPrintable);
+            job.print();
+        }
 
     } catch (Exception ex) {
         Logger.trace("Print error: " + ex.getMessage());

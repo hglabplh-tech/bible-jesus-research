@@ -42,6 +42,7 @@ public class PlanPersistence {
             Logger.trace("About to unmarshall.....");
             jaxbContext = JAXBContext.newInstance(Plan.class);
             Marshaller marshall = jaxbContext.createMarshaller();
+            marshall.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             Logger.trace("About to unmarshall unmarshaller created.....");
             marshall.marshal(root, out);
             Logger.trace("About to unmarshall ok.....");
