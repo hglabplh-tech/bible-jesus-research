@@ -356,13 +356,7 @@ public class MainController {
         mItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                List<Day> dayList = planDays.getDay();
-                if (dayList.size() == 0) {
-                    Day newDay = nextPlanDay();
-                    planList.getItems().add(newDay.getTitle());
-                    planDays.getDay().add(newDay);
-                    dayList = planDays.getDay();
-                }
+                List<Day> dayList = ensureFirstDay();
                 Day theDay = dayList.get(dayList.size() - 1);
                 Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area, getSelectedMapSorted());
                 theDay.getVerses().add(vers);
@@ -373,6 +367,17 @@ public class MainController {
         });
         contMenu.getItems().add(mItem);
         area.contextMenuObjectProperty().setValue(contMenu);
+    }
+
+    private List<Day> ensureFirstDay() {
+        List<Day> dayList = planDays.getDay();
+        if (dayList.size() == 0) {
+            Day newDay = nextPlanDay();
+            planList.getItems().add(newDay.getTitle());
+            planDays.getDay().add(newDay);
+            dayList = planDays.getDay();
+        }
+        return dayList;
     }
 
     private void storeDevotional(Day theDay) {
@@ -529,7 +534,7 @@ public class MainController {
         BIBLEBOOK book = theBooks.get(link.getBook() - 1);
         JAXBElement<CHAPTER> jaxbChapter = book.getCHAPTER().get(link.getChapter() - 1);
         CHAPTER chapter = jaxbChapter.getValue();
-        List<Day> dayList = planDays.getDay();
+        List<Day> dayList = ensureFirstDay();
         Day theDay = dayList.get(dayList.size() - 1);
         Vers vers = new Vers();
         vers.setBook(book.getBnumber());
@@ -543,13 +548,7 @@ public class MainController {
 
     @FXML
     public void setDevotionalText(ActionEvent event) {
-        List<Day> dayList = planDays.getDay();
-        if (dayList.size() == 0) {
-            Day newDay = nextPlanDay();
-            planList.getItems().add(newDay.getTitle());
-            planDays.getDay().add(newDay);
-            dayList = planDays.getDay();
-        }
+        List<Day> dayList = ensureFirstDay();
         Day theDay = dayList.get(dayList.size() - 1);
         storeDevotional(theDay);
         String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
@@ -646,6 +645,17 @@ public class MainController {
 
     }
 
+    @FXML
+    public void copyHighlightToPlan(ActionEvent event) {
+        Integer row = highlightsTab.getSelectionModel().getSelectedIndex();
+        Vers vers = highlights.getHighlight().get(row);
+        List<Day> dayList = ensureFirstDay();
+        Day theDay = dayList.get(dayList.size() - 1);
+        theDay.getVerses().add(vers);
+        String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
+        setPlanOutputSelected(theDay, versHtml);
+    }
+
 
     private void copyHtmlToClip(StringBuffer htmlBuffer) {
         final Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -677,7 +687,7 @@ public class MainController {
     public void copyToPlanFromNote(ActionEvent event) {
         Integer row = notesTable.getSelectionModel().getSelectedIndex();
         Note note = noteList.getVersenote().get(row);
-        List<Day> dayList = planDays.getDay();
+        List<Day> dayList = ensureFirstDay();
         Day theDay = dayList.get(dayList.size() - 1);
         List<Vers> verses = note.getVerslink();
         theDay.getVerses().addAll(verses);

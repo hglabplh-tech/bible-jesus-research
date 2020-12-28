@@ -38,17 +38,18 @@ public class HTMLRendering {
     }
 
     public static void noteToHTML(String noteText, StringBuffer buffer, StringBuffer htmlBuffer) {
-        htmlBuffer.append("<div><p style=\"font-family:verdana\">")
+        htmlBuffer.append("<hr><p><span style=\"font-size: small; font-family: &quot;Times New Roman&quot;;\">")
                 .append(buffer.toString())
-                .append("</p><p style=\"font-family:verdana\">")
+                .append("</span></p><hr>")
+                .append("<hr><p><span style=\"font-size: small; font-family: &quot;Times New Roman&quot;;\">")
                 .append(noteText)
-                .append("</p></div>");
+                .append("</p><hr>");
     }
 
     public static void renderVers(StringBuffer htmlBuffer, String buffer) {
-        htmlBuffer.append("<p style=\"font-family:verdana\">")
+        htmlBuffer.append("<hr><p><span style=\"font-size: small; font-family: &quot;Times New Roman&quot;;\">")
                 .append(buffer.toString())
-                .append("</p>");
+                .append("</span></p><hr>");
     }
 
     public static String renderVersesASDoc(XMLBIBLE selected, BibleTextUtils utils, List<Vers> verses) {

@@ -225,6 +225,7 @@
                                           <ContextMenu fx:id="copyHighlight">
                                              <items>
                                                 <MenuItem fx:id="copyNote1" mnemonicParsing="false" onAction="#copyHighlight" text="Copy" />
+                                                <MenuItem mnemonicParsing="false" onAction="#copyHighlightToPlan" text="copy Vers to Plan" />
                                              </items>
                                           </ContextMenu>
                                        </contextMenu>
