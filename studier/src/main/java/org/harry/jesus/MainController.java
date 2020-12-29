@@ -33,6 +33,7 @@ import org.harry.jesus.danielpersistence.PersistenceLayer;
 import org.harry.jesus.fxutils.*;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.HTMLRendering;
+import org.harry.jesus.jesajautils.LinkHandler;
 import org.harry.jesus.jesajautils.TextRendering;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.ParStyle;
@@ -212,7 +213,7 @@ public class MainController {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
                 String note = footerNotes.getItems().get(t1.intValue());
-                List<BibleTextUtils.BookLink> links = utils.parseLinks(note);
+                List<BibleTextUtils.BookLink> links = LinkHandler.parseLinks(utils, note);
                 if (links.size() > 0) {
                     showLink(links);
                 }
@@ -430,6 +431,13 @@ public class MainController {
         boolean found = rendering.render(selected, actBookLabel, actChapter);
         footerNotes.getItems().clear();
         footerNotes.getItems().addAll(rendering.getNotes());
+        footerNotes.getItems().add("Fuzzy Link matches -->");
+        for (String note: rendering.getNotes()) {
+            String links = LinkHandler.generateLinksFuzzy(utils, note);
+            if (!links.isEmpty()) {
+                footerNotes.getItems().add(links);
+            }
+        }
         String [] splitted = actBookLabel.split(",");
         selectedVersesMap.clear();
         rendering.clearRendering();

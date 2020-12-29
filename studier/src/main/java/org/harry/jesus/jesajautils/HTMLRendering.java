@@ -9,7 +9,6 @@ import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 
 import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -119,7 +118,7 @@ public class HTMLRendering {
             BIBLEBOOK book = utils.getBooks(selected).get(vers.getBook().intValue() - 1);
             Optional<CHAPTER> chapter = utils.getChapter(book, vers.getChapter().intValue());
             if (chapter.isPresent()) {
-                String linkText = BibleTextUtils.buildVersLinkEnhanced(utils, book.getBnumber().intValue(),
+                String linkText = LinkHandler.buildVersLinkEnhanced(utils, book.getBnumber().intValue(),
                         chapter.get().getCnumber().intValue(), vers.getVers());
                 renderVers(buffer, linkText);
                 renderVers(buffer, vers.getVtext());

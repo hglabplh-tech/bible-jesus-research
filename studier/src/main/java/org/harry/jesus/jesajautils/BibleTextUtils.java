@@ -23,6 +23,7 @@ public class BibleTextUtils {
             "bible_luther1912.xml",
             "SF_2012-08-14_DEUTSCH_LUT_1545_LH_(LUTHER 1545 (LETZTE HAND)).xml",
             "SF_2009-01-20_GER_ELB1905_(ELBERFELDER 1905).xml",
+            "SF_2014-09-30_GER_NEU_(NEUE EVANGELISTISCHE ÜBERSETZUNG (NEÜ)).xml",
             "SF_2015-08-16_ENG_NHEBYHWH_(NEW HEART ENGLISH BIBLE (YHWH)).xml",
             "SF_2009-01-20_SPA_RVA_(REINA VALERA 1989).xml",
             "SF_2009-01-20_ENG_UKJV_(UPDATED KING JAMES VERSION).xml"
@@ -76,39 +77,6 @@ public class BibleTextUtils {
             versLink = "[" + split[1] + " " + key.getChapter() + "," + key.getVers() + "]: ";
         }
         return versLink;
-    }
-
-    public static String buildVersLinkEnhanced(BibleTextUtils utils, Integer bookNumber, Integer chapter, List versNoList) {
-        String versLink = "";
-        StringBuffer linkBuffer = new StringBuffer();
-        List<String> csv = utils.getBookLabels();
-        Optional<String> book = csv.stream()
-                .filter(e -> e.contains(bookNumber.toString()))
-                .findFirst();
-        if (book.isPresent()) {
-            String [] split = book.get().split(",");
-            List<Tuple<Integer, Integer>> rangesList = detectVersesRangeForLink(versNoList);
-            boolean first = true;
-            for (Tuple<Integer, Integer> range: rangesList) {
-                if (!first) {
-                    linkBuffer.append(";");
-                }
-                if (range.getSecond() == 0) {
-                    versLink = "[" + split[1] + " "
-                            + chapter
-                            + ","
-                            + range.getFirst() + "]";
-                } else {
-                    versLink = "[" + split[1] + " "
-                            + chapter
-                            + ","
-                            + range.getFirst() + "-" + range.getSecond() + "]";
-                }
-                first = false;
-                linkBuffer.append(versLink);
-            }
-        }
-        return linkBuffer.toString();
     }
 
     public static List<Tuple<Integer, Integer>> detectVersesRangeForLink(List<Object> verses) {
@@ -185,10 +153,10 @@ public class BibleTextUtils {
                                       FoldableStyledArea area, Map<Integer, IndexRange> selectedVersesMap) {
         Vers vers = new Vers();
         vers.setChapter(BigInteger.valueOf(actChapter));
-        String links = buildVersLinkEnhanced(utils, actBook.getBookNumber(),
+        String links = LinkHandler.buildVersLinkEnhanced(utils, actBook.getBookNumber(),
                 actChapter,
                 new ArrayList(selectedVersesMap.keySet()));
-        List<BookLink> bookLinks = utils.parseLinks(links);
+        List<BookLink> bookLinks = LinkHandler.parseLinks(utils, links);
         vers.setBook(BigInteger.valueOf(actBook.getBookNumber()));
         StringBuffer versBuffer = new StringBuffer();
         int index = 0;
@@ -344,113 +312,6 @@ public class BibleTextUtils {
             result = Optional.of(optChapter.get().getValue());
         }
         return result;
-    }
-
-    public List<BookLink> parseLinks(String text) {
-        List<BookLink> links = new ArrayList<>();
-        int start = 0;
-        int startLink = 0;
-        while (startLink != -1) {
-            startLink = text.indexOf("[", start);
-            if (startLink != -1) {
-                int endLink = text.indexOf("]", startLink);
-                if (endLink != -1) {
-                    String linkString = text.substring(startLink + 1, endLink);
-                    Optional<BookLink> link = buildLink(linkString);
-                    if (link.isPresent()) {
-                        links.add(link.get());
-                    }
-                    start = endLink + 1;
-                } else {
-                    startLink = -1;
-                }
-            }
-        }
-        return links;
-    }
-
-    private Optional<BookLink> buildLink(String linkString) {
-        int start = 0;
-        int endIndex = linkString.lastIndexOf(" ");
-        if (endIndex > -1) {
-            String bookStr = linkString.substring(start, endIndex);
-            Optional<String> label = this.getBookLabels().stream().filter(e ->
-                    e.contains(bookStrMapping(bookStr))).findFirst();
-            String temp = linkString.substring(endIndex + 1);
-            endIndex = temp.indexOf(",");
-            if (endIndex > -1) {
-                String chapStr = temp.substring(0, endIndex).trim();
-                start = endIndex + 1;
-                boolean matches = chapStr.matches("[0-9]+");
-                boolean processed = false;
-                if (matches) {
-                    Integer chapter = Integer.parseInt(chapStr);
-                    String versesStr = temp.substring(start);
-                    String[] single = versesStr.split("\\.");
-                    String[] range = versesStr.split("-");
-                    List<Integer> verses = new ArrayList<>();
-                    if (single.length == 1 && range.length == 1) {
-                        String numtemp = "";
-                        if (single.length == 1) {
-                            numtemp = single[0];
-                        } else {
-                            numtemp = range[0];
-                        }
-
-                        if (numtemp.matches("[0-9]+")) {
-                            verses.add(Integer.parseInt(numtemp));
-                            processed = true;
-                        }
-                    }
-                    else if (range.length == 2) {
-                        String startStr = range[0];
-                        String endStr = range[1];
-                        int sRange = Integer.parseInt(startStr);
-                        int eRange = Integer.parseInt(endStr);
-                        for (Integer vers = sRange; vers <= eRange; vers++) {
-                            verses.add(vers);
-                        }
-                        processed = true;
-                    } else if (single.length >1) {
-                        for (String verseStr: single) {
-                            int vers = Integer.parseInt(verseStr);
-                            verses.add(vers);
-                        }
-                        processed = true;
-                    }
-                    if (processed) {
-                        if (label.isPresent()) {
-                            return Optional.of(new BookLink(label.get(), chapter, verses));
-                        }
-                    }
-                }
-            }
-        }
-        return Optional.empty();
-    }
-
-    private String bookStrMapping(String book) {
-        Map<String, String> map = new HashMap<>();
-        map.put("1.Mo", "1. Mose");
-        map.put("1.Mose", "1. Mose");
-        map.put("2.Mo", "2. Mose");
-        map.put("2.Mose", "2. Mose");
-        map.put("3.Mo", "3. Mose");
-        map.put("3.Mose", "3. Mose");
-        map.put("4.Mo", "4. Mose");
-        map.put("4.Mose", "4. Mose");
-        map.put("5.Mo", "5. Mose");
-        map.put("5.Mose", "5. Mose");
-        map.put("1.Ch", "1. Chr");
-        map.put("2.Ch", "2. Chr");
-        map.put("1.Chr", "1. Chr");
-        map.put("2.Chr", "2. Chr");
-        if (map.get(book) != null) {
-            return map.get(book);
-        } else {
-            return book;
-        }
-
     }
 
     public String generateVersLink(List<Vers> verses, BookLabel label) {
