@@ -439,7 +439,7 @@ public class MainController {
 
     private void showLink(List<BibleTextUtils.BookLink> links) {
         String htmlText = HTMLRendering.renderLink(utils, selected, links);
-        ReadLinksDialog.showReadLinkDialog(htmlText);
+        ReadLinksDialog.showReadLinkDialog(utils, area, htmlText);
     }
 
 

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.web.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity"
+      minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="406.0" prefWidth="600.0"
+      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.harry.jesus.LinkReaderController">
+   <children>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0">
+         <children>
+            <WebView fx:id="linkReader" layoutX="14.0" prefHeight="341.0" prefWidth="570.0" />
+         </children>
+      </AnchorPane>
+      <Button fx:id="closeWin" mnemonicParsing="false" onAction="#closeWin" text="Close" />
+   </children>
+</VBox>

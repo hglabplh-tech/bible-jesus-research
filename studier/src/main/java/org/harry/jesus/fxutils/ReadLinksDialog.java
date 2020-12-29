@@ -1,14 +1,21 @@
 package org.harry.jesus.fxutils;
 
-import javafx.application.Platform;
-import javafx.geometry.Insets;
-import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.web.WebView;
-import jesus.harry.org.versnotes._1.Note;
-import jesus.harry.org.versnotes._1.Vers;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
+
+import org.harry.jesus.BibleStudy;
+import org.harry.jesus.LinkReaderController;
+import org.harry.jesus.jesajautils.BibleTextUtils;
+import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
+import org.pmw.tinylog.Logger;
+
+import javax.swing.event.HyperlinkEvent;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Optional;
 
 /**
@@ -17,47 +24,34 @@ import java.util.Optional;
  */
 public class ReadLinksDialog {
 
+    public static FXMLLoader fxmlLoader = null;
+
     /**
      * This method creates and calls the dialog to define a production place of a signature
 
      *
      */
-    public static void showReadLinkDialog(String htmlText) {
-        // Create the custom dialog.
-        Dialog<Void> dialog = new Dialog<>();
-        dialog.setTitle("Create the Note");
+    public static void showReadLinkDialog(BibleTextUtils utils, FoldableStyledArea area, String htmlText) {
 
+        Stage stage = new Stage();
+        stage.setTitle("Second Stage");
+        try {
+            Scene secondScene = new Scene(loadFXML("linkReader", utils, area, htmlText));
+            stage.setScene(secondScene);
+            stage.show();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            Logger.trace("Cannot load reason", ex.getMessage());
+        }
+    }
 
+    public static Parent loadFXML(String fxml, BibleTextUtils utils, FoldableStyledArea area, String htmlText) throws IOException {
+        URL resourceURL = BibleStudy.class.getResource("/fxml/" + fxml + ".fxml");
+        fxmlLoader = new FXMLLoader(resourceURL);
 
-// Set the button types.
-        ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.OK);
-
-        ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-        dialog.getDialogPane().getButtonTypes().addAll(cancelButtonType, ButtonType.CANCEL);
-
-// Create the passwordKey and password labels and fields.
-        AnchorPane pane = new AnchorPane();
-        WebView linkArea = new WebView();
-        linkArea.getEngine().loadContent(htmlText);
-        pane.getChildren().add(linkArea);
-
-// Enable/Disable login button depending on whether a passwordKey was entered.
-
-
-
-        dialog.getDialogPane().setContent(pane);
-
-// Request focus on the passwordKey field by default.
-
-
-// Convert the result to a passwordKey-password-pair when the login button is clicked.
-
-
-
-
-
-
-        dialog.showAndWait();
+        Pane root = (Pane) fxmlLoader.load();
+        LinkReaderController controller = (LinkReaderController)fxmlLoader.getController();
+        controller.setWebViewListener(utils, area, htmlText);
+        return root;
     }
 }
