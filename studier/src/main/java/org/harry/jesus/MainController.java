@@ -57,6 +57,10 @@ import java.util.*;
 public class MainController {
 
     @FXML
+    TabPane mainTabPane;
+
+    @FXML Tab readBible;
+    @FXML
     TextField chapterTitle;
 
     @FXML
@@ -434,9 +438,8 @@ public class MainController {
     }
 
     private void showLink(List<BibleTextUtils.BookLink> links) {
-        String chapter = rendering.render(selected, links);
-        footerNotes.getItems().clear();
-        footerNotes.getItems().addAll(rendering.getNotes());
+        String htmlText = HTMLRendering.renderLink(utils, selected, links);
+        ReadLinksDialog.showReadLinkDialog(htmlText);
     }
 
 
@@ -490,6 +493,42 @@ public class MainController {
     @FXML
     public void exitApplication(ActionEvent event) {
         Platform.exit();
+    }
+
+    @FXML
+    public void readFullChapter(ActionEvent event) {
+        int index = resultlist.getSelectionModel().getSelectedIndex();
+        BibleFulltextEngine.BibleTextKey textKey = verseKeys.get(index);
+        actChapter = textKey.getChapter();
+        actBookLabel = utils.getBookLabels().get(textKey.getBook() - 1);
+        actBook = new BibleTextUtils.BookLabel(actBookLabel);
+        showChapter();
+        mainTabPane.getSelectionModel().select(readBible);
+    }
+
+    @FXML
+    public void readFullChapterNote(ActionEvent event) {
+        int index = notesTable.getSelectionModel().getSelectedIndex();
+        Note note = noteList.getVersenote().get(index);
+        Vers vers = note.getVerslink().get(0);
+        fullChapterFromVers(vers);
+
+    }
+
+    @FXML
+    public void readFullChapterHighlight(ActionEvent event) {
+        int index = highlightsTab.getSelectionModel().getSelectedIndex();
+        Vers vers = highlights.getHighlight().get(index);
+        fullChapterFromVers(vers);
+
+    }
+
+    private void fullChapterFromVers(Vers vers) {
+        actChapter = vers.getChapter().intValue();
+        actBookLabel = utils.getBookLabels().get(vers.getBook().intValue() - 1);
+        actBook = new BibleTextUtils.BookLabel(actBookLabel);
+        showChapter();
+        mainTabPane.getSelectionModel().select(readBible);
     }
 
     @FXML

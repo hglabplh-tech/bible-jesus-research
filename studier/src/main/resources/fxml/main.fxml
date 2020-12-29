@@ -16,6 +16,14 @@
               <MenuItem fx:id="open_plan" mnemonicParsing="false" onAction="#openPlan" text="Open Plan" />
                   <MenuItem fx:id="save_plan" mnemonicParsing="false" onAction="#savePlan" text="Save 'Plan" />
                   <MenuItem fx:id="new_plan" mnemonicParsing="false" onAction="#newPlan" text="New Plan" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" onAction="#loadSearch" text="Load Search" />
+                  <MenuItem mnemonicParsing="false" onAction="#saveSearch" text="Save Search" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" onAction="#newDev" text="New Devotional" />
+                  <MenuItem mnemonicParsing="false" onAction="#loadDev" text="Load Devotional" />
+                  <MenuItem mnemonicParsing="false" onAction="#saveDev" text="Save Devotional" />
+                  <MenuItem mnemonicParsing="false" onAction="#toPDF" text="Devotional to PDF" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Study" />
@@ -40,9 +48,9 @@
         <items>
             <AnchorPane prefHeight="200.0" prefWidth="200.0">
                <children>
-                  <TabPane tabClosingPolicy="UNAVAILABLE">
+                  <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
-                      <Tab text="Read Bible">
+                      <Tab fx:id="readBible" text="Read Bible">
                         <content>
                           <AnchorPane>
                                  <children>
@@ -86,7 +94,7 @@
                               </AnchorPane>
                         </content>
                       </Tab>
-                      <Tab text="Create Devotional">
+                      <Tab fx:id="createDevTab" text="Create Devotional">
                            <content>
                               <AnchorPane prefHeight="200.0" prefWidth="200.0">
                                  <children>
@@ -134,6 +142,7 @@
                                                         <items>
                                                           <MenuItem fx:id="copyVers" mnemonicParsing="false" onAction="#copyVers" text="Copy" />
                                                             <MenuItem fx:id="copyToPlanDay" mnemonicParsing="false" onAction="#copyToPlanDay" text="copy Link to last PlanDay" />
+                                                            <MenuItem fx:id="readFullChapter" mnemonicParsing="false" onAction="#readFullChapter" text="Read Full Chapter" />
                                                         </items>
                                                       </ContextMenu>
                                                    </contextMenu></ListView>
@@ -147,7 +156,7 @@
                               </AnchorPane>
                           </content>
                         </Tab>
-                        <Tab text="Notes">
+                        <Tab fx:id="notesTab" text="Notes">
                           <content>
                             <AnchorPane minHeight="600.0" minWidth="900.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
@@ -172,8 +181,10 @@
                                        <contextMenu>
                                           <ContextMenu>
                                             <items>
-                                              <MenuItem fx:id="copyNote" mnemonicParsing="false" onAction="#copyNote" text="Copy" />
+                                                <MenuItem fx:id="copyNote" mnemonicParsing="false" onAction="#copyNote" text="Copy" />
                                                 <MenuItem mnemonicParsing="false" onAction="#copyToPlanFromNote" text="copy Link to last PlanDay" />
+                                                <MenuItem fx:id="readFullChapterNote" mnemonicParsing="false" onAction="#readFullChapterNote" text="Read Full Chapter" />
+
                                             </items>
                                           </ContextMenu>
                                        </contextMenu>
@@ -184,7 +195,7 @@
                               </AnchorPane>
                           </content>
                         </Tab>
-                        <Tab text="Plan Creator">
+                        <Tab fx:id="planTab" text="Plan Creator">
                           <content>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
@@ -224,8 +235,9 @@
                                        <contextMenu>
                                           <ContextMenu fx:id="copyHighlight">
                                              <items>
-                                                <MenuItem fx:id="copyNote1" mnemonicParsing="false" onAction="#copyHighlight" text="Copy" />
-                                                <MenuItem mnemonicParsing="false" onAction="#copyHighlightToPlan" text="copy Vers to Plan" />
+                                                 <MenuItem fx:id="copyNote1" mnemonicParsing="false" onAction="#copyHighlight" text="Copy" />
+                                                 <MenuItem mnemonicParsing="false" onAction="#copyHighlightToPlan" text="copy Vers to Plan" />
+                                                 <MenuItem fx:id="readFullChapterHighlight" mnemonicParsing="false" onAction="#readFullChapterHighlight" text="Read Full Chapter" />
                                              </items>
                                           </ContextMenu>
                                        </contextMenu>

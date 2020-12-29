@@ -9,7 +9,9 @@ import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 
 import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class HTMLRendering {
@@ -36,6 +38,51 @@ public class HTMLRendering {
             }
         }
     }
+
+    public static String renderLink(BibleTextUtils utils, XMLBIBLE bible,
+                                                List<BibleTextUtils.BookLink> links) {
+        StringBuffer htmlContent = new StringBuffer();
+
+        Integer start = 0;
+        for (BibleTextUtils.BookLink link:links) {
+            Optional<BIBLEBOOK> book = utils.getBookByLabel(bible, link.getBookLabel());
+            if (book.isPresent()) {
+                Vers vers = new Vers();
+                vers.setBook(book.get().getBnumber());
+                vers.setChapter(BigInteger.valueOf(link.getChapter()));
+                for (Integer versNo: link.getVerses()) {
+                    vers.getVers().add(BigInteger.valueOf(versNo));
+                    JAXBElement<CHAPTER> jaxbChapter = book.get().getCHAPTER().get(link.getChapter() - 1);
+                    BibleFulltextEngine.BibleTextKey key =
+                            new BibleFulltextEngine.BibleTextKey(book.get().getBnumber().intValue(),
+                                    link.getChapter(), versNo);
+                    Map.Entry<BibleFulltextEngine.BibleTextKey, String> mapEntry =
+                            utils.getVersEntry(jaxbChapter.getValue(), key);
+                    String versText = mapEntry.getValue();
+                    vers.setVtext(versText);
+                    generateHyperLink(htmlContent, "[" + link.getBookLabel()
+                            + link.getChapter()
+                            + "," + versNo
+                            + "]");
+                    renderVers(htmlContent, versText);
+
+
+                }
+            }
+        }
+        return htmlContent.toString();
+    }
+
+
+
+
+    private static String generateHyperLink(StringBuffer buffer, String link) {
+        buffer.append("<p><a href=\"" + link + "\">" + link + "</a></p>");
+        return buffer.toString();
+    }
+
+
+
 
     public static void noteToHTML(String noteText, StringBuffer buffer, StringBuffer htmlBuffer) {
         htmlBuffer.append("<hr><p><span style=\"font-size: small; font-family: &quot;Times New Roman&quot;;\">")
