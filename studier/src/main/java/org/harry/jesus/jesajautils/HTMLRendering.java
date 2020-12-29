@@ -60,8 +60,9 @@ public class HTMLRendering {
                             utils.getVersEntry(jaxbChapter.getValue(), key);
                     String versText = mapEntry.getValue();
                     vers.setVtext(versText);
-                    generateHyperLink(htmlContent, "[" + link.getBookLabel()
-                            + link.getChapter()
+                    BibleTextUtils.BookLabel labelClass = new BibleTextUtils.BookLabel(link.getBookLabel());
+                    generateHyperLink(htmlContent, "[" + labelClass.getLongName()
+                            + " " + link.getChapter()
                             + "," + versNo
                             + "]");
                     renderVers(htmlContent, versText);
