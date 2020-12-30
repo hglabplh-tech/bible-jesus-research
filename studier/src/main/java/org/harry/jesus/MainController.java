@@ -728,14 +728,10 @@ public class MainController {
         Note note = noteList.getVersenote().get(row);
         String noteText = note.getNote();
         List<Vers> verses = note.getVerslink();
-        StringBuffer buffer = new StringBuffer();
-        for (Vers vers: verses) {
-            buffer.append("<p/>").append(vers.getVtext());
-        }
+        HTMLRendering.renderVerses(selected, utils,verses);
         StringBuffer htmlBuffer = new StringBuffer();
-        HTMLRendering.noteToHTML(noteText, buffer, htmlBuffer);
-
-
+        htmlBuffer.append(HTMLRendering.renderVerses(selected, utils,verses));
+        htmlBuffer.append("<p>" + noteText + "<p>");
         copyHtmlToClip(htmlBuffer);
 
     }

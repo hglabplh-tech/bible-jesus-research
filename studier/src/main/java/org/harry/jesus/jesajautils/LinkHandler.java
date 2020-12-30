@@ -59,91 +59,97 @@ public class LinkHandler {
         return buffer.toString();
     }
 
-    public static List<BibleTextUtils.BookLink> parseLinksFuzzy(BibleTextUtils utils, String text) {
+    public static List<BibleTextUtils.BookLink> parseLinksFuzzy(BibleTextUtils utils, final String text) {
         List<BibleTextUtils.BookLabel> labelList = getTransformedLabels(utils);
         List<BibleTextUtils.BookLink> bookLink = new ArrayList<>();
         boolean found = true;
         String bookString = null;
-        while(found) {
-            found = false;
-            for (BibleTextUtils.BookLabel label : labelList) {
-                if (text.contains(label.getLongName())) {
-                    bookString = label.getLongName();
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                for (BibleTextUtils.BookLabel label : labelList) {
-                    if (text.contains(label.getShortName())) {
-                        bookString = label.getShortName();
-                        found = true;
-                        break;
-                    }
-                }
-            }
-            if (!found) {
-                text = "";
-                break;
-            }
-            if (found) {
-                Integer chapter = -1;
-                int startLinks = -1;
-                int startNum = -1;
-                int startVers = -1;
-                int index = text.indexOf(bookString);
-                if (index > -1) {
-                    startLinks = index;
-                    String newSub = text.substring((index + bookString.length() - 1));
-                    index = newSub.indexOf(" ");
-                    if (index > -1) {
-                        startNum = index + startLinks + bookString.length();
-                        String num = newSub.substring(index + 1).trim();
-                        index = num.indexOf(",");
-                        if (index == -1) {
-                            text = "";
-                            found = false;
-                        } else {
-                            startVers = startNum + index + 1;
-                            num = num.substring(0, index);
-                            boolean isNumeric = num.matches("[0-9]+");
-                            if (isNumeric) {
-                                Tuple<Integer, Integer> scanResult = cutString(text, startVers);
-                                int semicolon = scanResult.getSecond();
-                                int lastIndex = scanResult.getFirst();
-                                lastIndex = Math.min(lastIndex, text.length());
-                                String linkString = text.substring(startLinks, lastIndex);
-                                Optional<BibleTextUtils.BookLink> link = buildLink(utils, linkString);
-                                System.out.println(linkString);
-                                if (link.isPresent()) {
-                                    bookLink.add(link.get());
-                                }
-                                found = true;
-                                if (semicolon == -1) {
-                                    text = text.substring(lastIndex);
-                                } else {
-                                    text = text.substring(semicolon).trim();
-                                    index = text.indexOf(",");
-                                    if (index > -1) {
-                                        String nextNum = text.substring(0, index).trim();
-                                        if (nextNum.matches("[0-9]+")) {
-                                            text = bookString + " " + text;
+        String tempText;
+        Map<String, List<Integer>> bookCol = LinkHandler.collectLabelsWithBeginIndex(utils, text);
+        for (Map.Entry<String, List<Integer>> entry: bookCol.entrySet()) {
+            tempText = text;
+            found = true;
+            bookString = entry.getKey();
+            for (Integer startLink : entry.getValue()) {
+                    int startLinks = -1;
+                    int startNum = -1;
+                    int startVers = -1;
+                    int index = startLink;
+                    while (index > -1) {
+                        startLinks = index;
+                        String newSub = tempText.substring((index + bookString.length() - 1));
+                        index = newSub.indexOf(" ");
+                        if (index > -1) {
+                            startNum = index + startLinks + bookString.length();
+                            String num = newSub.substring(index + 1).trim();
+                            index = num.indexOf(",");
+                            if (index == -1) {
+                                tempText = "";
+                            } else {
+                                startVers = startNum + index + 1;
+                                num = num.substring(0, index);
+                                boolean isNumeric = num.matches("[0-9]+");
+                                if (isNumeric) {
+                                    Tuple<Integer, Integer> scanResult = cutString(text, startVers);
+                                    int semicolon = scanResult.getSecond();
+                                    int lastIndex = scanResult.getFirst();
+                                    lastIndex = Math.min(lastIndex, text.length());
+                                    String linkString = text.substring(startLinks, lastIndex);
+                                    Optional<BibleTextUtils.BookLink> link = buildLink(utils, linkString);
+                                    if (link.isPresent()) {
+                                        System.out.println(linkString);
+                                        bookLink.add(link.get());
+                                    }
+                                    found = true;
+                                    if (semicolon == -1) {
+                                        tempText = tempText.substring(lastIndex);
+                                    } else {
+                                        tempText = tempText.substring(semicolon).trim();
+                                        index = tempText.indexOf(",");
+                                        if (index > -1) {
+                                            String nextNum = text.substring(0, index).trim();
+                                            if (nextNum.matches("[0-9]+")) {
+                                                tempText = bookString + " " + text;
+                                            }
                                         }
                                     }
+                                } else {
+                                    index = -1;
+                                    tempText = tempText.substring(startVers);
                                 }
-                            } else {
-                                text = text.substring(startVers);
-                                found = false;
                             }
                         }
+
                     }
-                }
-            } else {
-                text = "";
+
             }
         }
 
        return bookLink;
+    }
+
+    public static Map<String, List<Integer>> collectLabelsWithBeginIndex(BibleTextUtils utils, String text) {
+        Map<String, List<Integer>> result = new LinkedHashMap<>();
+        List<BibleTextUtils.BookLabel> labelList = getTransformedLabels(utils);
+        for (BibleTextUtils.BookLabel label : labelList) {
+            String bookString = null;
+            if (text.contains(label.getLongName())) {
+                bookString = label.getLongName();
+
+            } else if (text.contains(label.getShortName())) {
+                bookString = label.getShortName();
+            }
+            if (bookString != null) {
+                int index = text.indexOf(bookString);
+                List<Integer> hits = new ArrayList<>();
+                while (index > -1) {
+                    hits.add(index);
+                    index = text.indexOf(bookString, index + bookString.length());
+                }
+                result.put(bookString, hits);
+            }
+        }
+        return result;
     }
 
     public static Tuple<Integer, Integer> cutString (String toCut, int startVers) {
