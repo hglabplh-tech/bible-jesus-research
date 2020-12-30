@@ -606,7 +606,7 @@ public class MainController {
     @FXML
     public void setDevotionalText(ActionEvent event) {
         List<Day> dayList = ensureFirstDay();
-        Day theDay = dayList.get(dayList.size() - 1);
+        Day theDay = dayList.get(editPlanDayIndex);
         storeDevotional(theDay);
         String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
         setPlanOutputSelected(theDay, versHtml);
