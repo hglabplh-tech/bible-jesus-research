@@ -134,6 +134,8 @@ public class MainController {
 
     int dayNo = 1;
 
+    int selectedIndex = 0;
+
 
 
     @FXML
@@ -204,6 +206,7 @@ public class MainController {
         bibles.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                selectedIndex = t1.intValue();
                 selected = utils.getBibles().get(t1.intValue());
                 TreeItem<String> root = buildBooksTree();
                 showChapter();
@@ -431,11 +434,13 @@ public class MainController {
         boolean found = rendering.render(selected, actBookLabel, actChapter);
         footerNotes.getItems().clear();
         footerNotes.getItems().addAll(rendering.getNotes());
-        footerNotes.getItems().add("Fuzzy Link matches -->");
-        for (String note: rendering.getNotes()) {
-            String links = LinkHandler.generateLinksFuzzy(utils, note);
-            if (!links.isEmpty()) {
-                footerNotes.getItems().add(links);
+        if (BibleTextUtils.fuzzyIndex.contains(Integer.valueOf(selectedIndex))) {
+            footerNotes.getItems().add("Fuzzy Link matches -->");
+            for (String note : rendering.getNotes()) {
+                String links = LinkHandler.generateLinksFuzzy(utils, note);
+                if (!links.isEmpty()) {
+                    footerNotes.getItems().add(links);
+                }
             }
         }
         String [] splitted = actBookLabel.split(",");

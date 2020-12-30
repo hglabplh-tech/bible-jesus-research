@@ -30,6 +30,8 @@ public class BibleTextUtils {
 
     );
 
+    public final static List<Integer> fuzzyIndex = Arrays.asList(3);
+
     List<XMLBIBLE> bibles = new ArrayList<>();
     List<String> bookLabels = new ArrayList<>();
 
