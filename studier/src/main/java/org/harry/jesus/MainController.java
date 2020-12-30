@@ -132,7 +132,9 @@ public class MainController {
 
 
 
-    int dayNo = 1;
+    int planDayNumber = 0;
+
+    int editPlanDayIndex = 0;
 
     int selectedIndex = 0;
 
@@ -227,7 +229,8 @@ public class MainController {
         planList.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                Day theDay = planDays.getDay().get(newValue.intValue());
+                editPlanDayIndex = newValue.intValue();
+                Day theDay = planDays.getDay().get(editPlanDayIndex);
                 String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
                 setPlanOutputSelected(theDay, versHtml);
 
@@ -395,8 +398,8 @@ public class MainController {
 
     private Day nextPlanDay() {
         Day newDay = new Day();
-        newDay.setTitle("Day" + dayNo);
-        dayNo++;
+        planDayNumber++;
+        newDay.setTitle("Day " + planDayNumber);
         return newDay;
     }
 
@@ -553,6 +556,8 @@ public class MainController {
         for(Day day:planDays.getDay()) {
             planList.getItems().add(day.getTitle());
         }
+        planDayNumber = planDays.getDay().size();
+        editPlanDayIndex = planDayNumber - 1;
     }
 
     @FXML
@@ -563,7 +568,7 @@ public class MainController {
 
     @FXML
     public void newPlan(ActionEvent event) {
-        dayNo = 1;
+        planDayNumber = 1;
         planList.getItems().clear();
         planDays = new Plan();
         versesView.getEngine().loadContent("");
@@ -587,7 +592,7 @@ public class MainController {
         JAXBElement<CHAPTER> jaxbChapter = book.getCHAPTER().get(link.getChapter() - 1);
         CHAPTER chapter = jaxbChapter.getValue();
         List<Day> dayList = ensureFirstDay();
-        Day theDay = dayList.get(dayList.size() - 1);
+        Day theDay = dayList.get(editPlanDayIndex);
         Vers vers = new Vers();
         vers.setBook(book.getBnumber());
         vers.setChapter(chapter.getCnumber());
@@ -702,7 +707,7 @@ public class MainController {
         Integer row = highlightsTab.getSelectionModel().getSelectedIndex();
         Vers vers = highlights.getHighlight().get(row);
         List<Day> dayList = ensureFirstDay();
-        Day theDay = dayList.get(dayList.size() - 1);
+        Day theDay = dayList.get(editPlanDayIndex);
         theDay.getVerses().add(vers);
         String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
         setPlanOutputSelected(theDay, versHtml);
@@ -740,7 +745,7 @@ public class MainController {
         Integer row = notesTable.getSelectionModel().getSelectedIndex();
         Note note = noteList.getVersenote().get(row);
         List<Day> dayList = ensureFirstDay();
-        Day theDay = dayList.get(dayList.size() - 1);
+        Day theDay = dayList.get(editPlanDayIndex);
         List<Vers> verses = note.getVerslink();
         theDay.getVerses().addAll(verses);
         String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
