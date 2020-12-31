@@ -29,6 +29,7 @@ import jesus.harry.org.plan._1.Plan;
 import jesus.harry.org.versnotes._1.Note;
 import jesus.harry.org.versnotes._1.Vers;
 import jesus.harry.org.versnotes._1.Versnotes;
+import net.didion.jwnl.data.Exc;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.GenericStyledArea;
 import org.fxmisc.richtext.model.*;
@@ -223,6 +224,7 @@ public class MainController {
                         } else {
                             bookLabel = value;
                         }
+                        if (utils.getBookLabels().contains(bookLabel)) {
                         Optional<BIBLEBOOK> book = utils.getBookByLabel(selected, bookLabel);
                         if (book.isPresent()) {
                             actBookLabel = bookLabel;
@@ -236,6 +238,7 @@ public class MainController {
                             }
                             initMediaView();
                         }
+                        }
                     }
                 });
         bibles.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
@@ -245,6 +248,12 @@ public class MainController {
                 selected = utils.getBibles().get(t1.intValue());
                 TreeItem<String> root = buildBooksTree();
                 showChapter();
+                BibleTextUtils.BookLink link =
+                        new BibleTextUtils.BookLink(actBookLabel, actChapter, Arrays.asList(1));
+                if (playBible != null) {
+                    playBible.stopChapter();
+                }
+                initMediaView();
             }
         });
         footerNotes.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
@@ -471,7 +480,12 @@ public class MainController {
         if (BibleTextUtils.fuzzyIndex.contains(Integer.valueOf(selectedIndex))) {
             footerNotes.getItems().add("Fuzzy Link matches -->");
             for (String note : rendering.getNotes()) {
-                String links = LinkHandler.generateLinksFuzzy(utils, note);
+                String links = "";
+                try {
+                    links = LinkHandler.generateLinksFuzzy(utils, note);
+                } catch (Exception ex) {
+                    Logger.trace("Something went wrong with fuzzy!!! This feature has to be enhanced");
+                }
                 if (!links.isEmpty()) {
                     footerNotes.getItems().add(links);
                 }
