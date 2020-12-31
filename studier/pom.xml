@@ -257,7 +257,6 @@
             </plugins>
         </pluginManagement>
         <plugins>
-
             <plugin>
                 <groupId>com.zenjava</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
@@ -271,17 +270,13 @@
                     <jarFileName>biblestudy.jar</jarFileName>
 
                     <!-- optionally sign the jar file if security is needed -->
-                    <!--
-                        to create keystore use command line:
-                            keytool -genkey -alias example-user -keystore keystore.jks
-                    -->
+
 
 
                     <!-- optionally build webstart bundle -->
                     <webstart>
                         <requiresAllPermissions>true</requiresAllPermissions>
                     </webstart>
-
                     <!-- optionally build native installers -->
                     <nativeInstallers/>
 
@@ -310,9 +305,6 @@
                         </sources>
                     </configuration>
                 </plugin>
-
-
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -332,10 +324,8 @@
                     <archive>
                         <manifest>
                             <mainClass>org.harry.jesus.BibleStudy</mainClass>
-
                         </manifest>
                     </archive>
-
                 </configuration>
                 <executions>
                     <execution>

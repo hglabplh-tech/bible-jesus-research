@@ -543,7 +543,9 @@ public class MainController {
 
     @FXML
     public void bibleInfo(ActionEvent event) {
-        //SettingsDialog.showAppSettingsDialog();
+        int index = bibles.getSelectionModel().getSelectedIndex();
+        BibleInfoDialog.callBibleInfoDialog(utils.getBibles().get(index)
+                ,utils.getBibleHashes().get(index));
     }
 
     @FXML

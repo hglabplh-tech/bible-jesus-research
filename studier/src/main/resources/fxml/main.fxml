@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.*?>
 <?import javafx.scene.media.*?>
 <?import javafx.scene.web.*?>
 <?import javafx.scene.control.cell.*?>
@@ -38,9 +39,9 @@
           </Menu>
         </menus>
       </MenuBar>
-      <SplitPane orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+      <SplitPane orientation="VERTICAL">
         <items>
-            <AnchorPane prefHeight="200.0" prefWidth="200.0">
+            <AnchorPane>
                <children>
                   <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
@@ -111,11 +112,23 @@
                                              </children></AnchorPane>
                                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                                              <children>
-                                                <Button fx:id="loadDev" layoutX="192.0" layoutY="20.0" mnemonicParsing="false" onAction="#loadDev" text="Load" />
-                                                <Button fx:id="saveDev" layoutX="274.0" layoutY="19.0" mnemonicParsing="false" onAction="#saveDev" text="Save" />
+                                                <Button fx:id="loadDev" layoutX="192.0" layoutY="20.0" mnemonicParsing="false" onAction="#loadDev" text="Load">
+                                                   <tooltip>
+                                                      <Tooltip text="This her loads a devotional stored as html" />
+                                                   </tooltip></Button>
+                                                <Button fx:id="saveDev" layoutX="274.0" layoutY="19.0" mnemonicParsing="false" onAction="#saveDev" text="Save">
+                                                   <tooltip>
+                                                      <Tooltip text="This here saves the devotional as html" />
+                                                   </tooltip></Button>
                                                 <Button fx:id="newDev" layoutX="49.0" layoutY="19.0" mnemonicParsing="false" onAction="#newDev" text="New Devotional" />
-                                                <Button fx:id="toPDF" layoutX="350.0" layoutY="19.0" mnemonicParsing="false" onAction="#toPDF" text="To PDF" />
-                                                <Button fx:id="printDev" layoutX="446.0" layoutY="20.0" mnemonicParsing="false" onAction="#printDev" text="Print Devotional" />
+                                                <Button fx:id="toPDF" layoutX="350.0" layoutY="19.0" mnemonicParsing="false" onAction="#toPDF" text="To PDF">
+                                                   <tooltip>
+                                                      <Tooltip text="Export HTML as PDF" />
+                                                   </tooltip></Button>
+                                                <Button fx:id="printDev" layoutX="446.0" layoutY="20.0" mnemonicParsing="false" onAction="#printDev" text="Print Devotional">
+                                                   <tooltip>
+                                                      <Tooltip text="Later on print directly" />
+                                                   </tooltip></Button>
                                              </children></AnchorPane>
                                       </items>
                                     </SplitPane>
@@ -132,9 +145,18 @@
                                         <AnchorPane minHeight="150.0" minWidth="900.0">
                                              <children>
                                                 <Label layoutX="124.0" layoutY="11.0" text="Keyword" />
-                                                <TextField fx:id="query" layoutX="206.0" layoutY="6.0" />
-                                                <Button fx:id="search" layoutX="527.0" layoutY="6.0" mnemonicParsing="false" onAction="#search" text="Search" />
-                                                <ChoiceBox fx:id="searchOptions" layoutX="736.0" layoutY="17.0" prefWidth="150.0" />
+                                                <TextField fx:id="query" layoutX="206.0" layoutY="6.0">
+                                                   <tooltip>
+                                                      <Tooltip text="Enter search term" />
+                                                   </tooltip></TextField>
+                                                <Button fx:id="search" layoutX="527.0" layoutY="6.0" mnemonicParsing="false" onAction="#search" text="Search">
+                                                   <tooltip>
+                                                      <Tooltip text="Start the search" />
+                                                   </tooltip></Button>
+                                                <ChoiceBox fx:id="searchOptions" layoutX="736.0" layoutY="17.0" prefWidth="150.0">
+                                                   <tooltip>
+                                                      <Tooltip text="Here you have to make your choice" />
+                                                   </tooltip></ChoiceBox>
                                                 <Label layoutX="617.0" layoutY="22.0" prefHeight="21.0" prefWidth="92.0" text="Options:" />
                                              </children>
                                           </AnchorPane>
@@ -256,5 +278,7 @@
             </AnchorPane>
         </items>
       </SplitPane>
+      <AmbientLight color="CHARTREUSE" lightOn="true" />
+      <PointLight color="CHARTREUSE" lightOn="true" />
    </children>
 </VBox>
