@@ -30,6 +30,15 @@ public class BibleTextUtils {
 
     );
 
+    List<String> bibleHashes = Arrays.asList(
+            "d78b23abc90a1e9fd44ef796953ea552b0f8e2f0d15cc96b04217ba11e436f0d",
+            "66fe26a722e9fb908e1baf631ea7bc9cd8e9366f4afe65994e4042421728ea3a",
+            "336b9137ecb8fda38688c408d7dc6d4c36f4caa5a3a2599ac200c9ab8d198abf",
+            "fa192749106f8ba3a27552f394d01a11904488cfb269c8244313c1170c096938",
+            "faba332e53dd17ead43106aabe4ab4605dcb3b0a8b10040d670fca913680bf83",
+            "6e4a8381e4377f54e29d592eafeba72a92fe0b8384bdd598e6fd52c258eb4cd4",
+            "ca6d02c950945462d543dd6a85e3c46e52321c646abe2dd204088f2449d9bbfc");
+
     public final static List<Integer> fuzzyIndex = Arrays.asList(3);
 
     List<XMLBIBLE> bibles = new ArrayList<>();
@@ -193,6 +202,10 @@ public class BibleTextUtils {
 
     public List<XMLBIBLE> getBibles() {
         return this.bibles;
+    }
+
+    public List<String> getBibleHashes() {
+        return this.bibleHashes;
     }
 
     public List<String> getBibleBookInfo(XMLBIBLE bible) {

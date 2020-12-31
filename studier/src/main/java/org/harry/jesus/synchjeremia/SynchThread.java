@@ -22,6 +22,8 @@ public class SynchThread extends TimerTask {
 
     private static final String RENDER_OBJ = "render.obj";
 
+    private static final String SETTINGS_PROP = "application.properties";
+
     private static final File appDir;
 
     private static final File renderObj;
@@ -29,6 +31,8 @@ public class SynchThread extends TimerTask {
     private static final File notesXML;
 
     private static final File highlightsXML;
+
+    private static final File appProps;
 
     private static Timer timer = new Timer();
 
@@ -42,6 +46,7 @@ public class SynchThread extends TimerTask {
         renderObj = new File(appDir, RENDER_OBJ);
         notesXML = new File(appDir, NOTES_XML);
         highlightsXML = new File(appDir, HIGHLIGHT_XML);
+        appProps = new File(appDir, SETTINGS_PROP);
         timer.schedule (new SynchThread()
            , (long)(1000L * 120L), (long)(1000L * 60L));
     }
@@ -54,6 +59,7 @@ public class SynchThread extends TimerTask {
                 storeRendering(context);
                 storeNotes(context);
                 storeHighlights(context);
+                storeApplicationProperties();
             }
 
 
@@ -66,6 +72,7 @@ public class SynchThread extends TimerTask {
             try {
                 FileOutputStream stream = new FileOutputStream(notesXML);
                 PersistenceLayer.storeNotes(context.getNoteList(), stream);
+
             } catch (IOException ex) {
                 Logger.trace("Error storing rendering" + ex.getMessage());
             }
@@ -131,6 +138,29 @@ public class SynchThread extends TimerTask {
             } catch (IOException | ClassNotFoundException ex) {
                 Logger.trace("Error storing rendering" + ex.getMessage());
             }
+        }
+    }
+
+    public static void storeApplicationProperties() {
+        try {
+
+            BibleThreadPool.getContext().getSettings().store(new FileOutputStream(appProps)
+                    , "Bible Study Properties");
+
+        } catch (IOException  ex) {
+            Logger.trace(ex);
+            Logger.trace("Error storing properties: " + ex.getMessage());
+        }
+    }
+
+    public static void loadApplicationProperties() {
+        try {
+            if (appProps.exists()) {
+                BibleThreadPool.getContext().getSettings().load(new FileInputStream(appProps));
+            }
+        } catch (IOException  ex) {
+            Logger.trace(ex);
+            Logger.trace("Error loading properties: " + ex.getMessage());
         }
     }
 }

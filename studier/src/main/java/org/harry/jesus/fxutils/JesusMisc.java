@@ -56,4 +56,18 @@ public class JesusMisc {
         }
         return null;
     }
+
+    public static String showOpenDialogString(ActionEvent event, Node node) {
+        FileChooser fDialog = new FileChooser();
+        fDialog.setTitle("Select Path");
+        File currentDir = new File(System.getProperty("user.home", "C:\\")).getAbsoluteFile();
+
+        fDialog.setInitialDirectory(currentDir);
+        Window parent = node.getScene().getWindow();
+        File file = fDialog.showOpenDialog(parent);
+        if (file != null) {
+            return file.getAbsolutePath();
+        }
+        return System.getProperty("usert.home");
+    }
 }

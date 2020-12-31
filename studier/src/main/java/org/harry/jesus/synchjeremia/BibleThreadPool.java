@@ -8,14 +8,13 @@ import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 
 import javax.mail.Message;
 import java.security.PrivateKey;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BibleThreadPool {
 
     public static final ThreadLocal<ThreadBean> contexts = new ThreadLocal<>();
+
+    public static final String AUDIO_PATH = "com.harry.jesus.apath";
 
 
 
@@ -42,6 +41,7 @@ public class BibleThreadPool {
     public static class ThreadBean {
 
 
+        final Properties settings = new Properties();
         List<BibleFulltextEngine.BibleTextKey> verseKeys = new ArrayList<>();
 
         Versnotes noteList = new Versnotes();
@@ -81,6 +81,13 @@ public class BibleThreadPool {
             return highlights;
         }
 
+        public Properties getSettings() {
+            return settings;
+        }
 
+        public Properties addSetting(String key, String value) {
+            settings.setProperty(key, value);
+            return settings;
+        }
     }
 }

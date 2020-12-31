@@ -29,7 +29,6 @@ import jesus.harry.org.plan._1.Plan;
 import jesus.harry.org.versnotes._1.Note;
 import jesus.harry.org.versnotes._1.Vers;
 import jesus.harry.org.versnotes._1.Versnotes;
-import net.didion.jwnl.data.Exc;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.GenericStyledArea;
 import org.fxmisc.richtext.model.*;
@@ -174,6 +173,13 @@ public class MainController {
         SynchThread.loadRendering(context);
         SynchThread.loadNotes(context);
         SynchThread.loadHighlights(context);
+        SynchThread.loadApplicationProperties();
+        String mediaPath = context.getSettings()
+                .getProperty(BibleThreadPool.AUDIO_PATH, System.getProperty("user.home")
+                        + File.separator
+                        + "bibleStudyAudio"
+                );
+        context.addSetting(BibleThreadPool.AUDIO_PATH, mediaPath);
         noteList = context.getNoteList();
         verseKeys = context.getVerseKeys();
         highlights = context.getHighlights();
@@ -196,7 +202,8 @@ public class MainController {
     }
 
     private void initMediaView() {
-        this.playBible = new PlayBible("C:\\Users\\haral\\biblebooks\\to_hear\\MP3"
+        String mediaPath = context.getSettings().getProperty(BibleThreadPool.AUDIO_PATH);
+        this.playBible = new PlayBible(mediaPath
                 , chapterPlayView);
         BibleTextUtils.BookLink link =
                 new BibleTextUtils.BookLink(actBookLabel, actChapter, Arrays.asList(1));
@@ -528,6 +535,16 @@ public class MainController {
         return root;
     }
 
+
+    @FXML
+    public void settings(ActionEvent event) {
+        SettingsDialog.showAppSettingsDialog();
+    }
+
+    @FXML
+    public void bibleInfo(ActionEvent event) {
+        //SettingsDialog.showAppSettingsDialog();
+    }
 
     @FXML
     public void search(ActionEvent event) {

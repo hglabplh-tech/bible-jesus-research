@@ -27,22 +27,15 @@
                   <MenuItem mnemonicParsing="false" onAction="#toPDF" text="Devotional to PDF" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Study" />
+          <Menu mnemonicParsing="false" text="Study">
+               <items>
+                  <MenuItem fx:id="settings" mnemonicParsing="false" onAction="#settings" text="Settings" />
+               </items></Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>
               <MenuItem mnemonicParsing="false" text="About" />
             </items>
           </Menu>
-            <Menu mnemonicParsing="false" text="Unspecified Menu">
-              <items>
-                <MenuItem mnemonicParsing="false" text="Action 1" />
-              </items>
-            </Menu>
-            <Menu mnemonicParsing="false" text="Unspecified Menu">
-              <items>
-                <MenuItem mnemonicParsing="false" text="Action 1" />
-              </items>
-            </Menu>
         </menus>
       </MenuBar>
       <SplitPane orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
@@ -63,7 +56,14 @@
                                              </left>
                         
                                                                <right>
-                                                <ListView fx:id="bibles" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="500.0" minWidth="50.0" BorderPane.alignment="CENTER" />
+                                                <ListView fx:id="bibles" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="500.0" minWidth="50.0" BorderPane.alignment="CENTER">
+                                                   <contextMenu>
+                                                      <ContextMenu>
+                                                        <items>
+                                                          <MenuItem fx:id="bibleInfo" mnemonicParsing="false" onAction="#bibleInfo" text="Bible Info" />
+                                                        </items>
+                                                      </ContextMenu>
+                                                   </contextMenu></ListView>
                                              </right>
                                              <bottom>
                                                 <ListView fx:id="footerNotes" maxHeight="75.0" maxWidth="700.0" minHeight="75.0" minWidth="700.0" BorderPane.alignment="CENTER" />
@@ -87,7 +87,7 @@
                                                       <Button fx:id="linkBack" mnemonicParsing="false" onAction="#linkBack" text="Back from link" GridPane.columnIndex="1" />
                                                       <Button fx:id="nextChapter" mnemonicParsing="false" onAction="#nextChapter" text="--&gt;" GridPane.columnIndex="2" />
                                                       <TextField fx:id="chapterTitle" editable="false" promptText="Chapter:" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                      <MediaView fx:id="chapterPlayView" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.rowSpan="2" />
+                                                      <MediaView fx:id="chapterPlayView" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.rowSpan="2" />
                                                    </children>
                                                 </GridPane>
                                              </top>
