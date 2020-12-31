@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.media.*?>
 <?import javafx.scene.web.*?>
 <?import javafx.scene.control.cell.*?>
 <?import javafx.scene.control.*?>
@@ -68,7 +69,7 @@
                                                 <ListView fx:id="footerNotes" maxHeight="75.0" maxWidth="700.0" minHeight="75.0" minWidth="700.0" BorderPane.alignment="CENTER" />
                                              </bottom>
                                              <top>
-                                                <GridPane maxHeight="82.0" minHeight="82.0" minWidth="900.0" prefHeight="82.0" prefWidth="900.0" BorderPane.alignment="CENTER">
+                                                <GridPane fx:id="topGridPane" maxHeight="82.0" minHeight="82.0" minWidth="900.0" prefHeight="82.0" prefWidth="900.0" BorderPane.alignment="CENTER">
                                                   <columnConstraints>
                                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -77,13 +78,16 @@
                                                   <rowConstraints>
                                                     <RowConstraints maxHeight="30.0" minHeight="10.0" vgrow="SOMETIMES" />
                                                     <RowConstraints maxHeight="30.0" minHeight="10.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="30.0" minHeight="10.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="30.0" minHeight="10.0" vgrow="SOMETIMES" />
 
                                                   </rowConstraints>
                                                    <children>
                                                       <Button fx:id="prevChapter" mnemonicParsing="false" onAction="#prevChapter" text="&lt;--" />
                                                       <Button fx:id="linkBack" mnemonicParsing="false" onAction="#linkBack" text="Back from link" GridPane.columnIndex="1" />
                                                       <Button fx:id="nextChapter" mnemonicParsing="false" onAction="#nextChapter" text="--&gt;" GridPane.columnIndex="2" />
-                                                      <TextField fx:id="chapterTitle" editable="false" promptText="Chapter:" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                      <TextField fx:id="chapterTitle" editable="false" promptText="Chapter:" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                      <MediaView fx:id="chapterPlayView" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.rowSpan="2" />
                                                    </children>
                                                 </GridPane>
                                              </top>

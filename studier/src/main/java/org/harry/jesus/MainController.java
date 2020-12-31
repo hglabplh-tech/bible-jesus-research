@@ -16,6 +16,9 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 
+import javafx.scene.layout.GridPane;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.web.HTMLEditor;
 import javafx.scene.web.WebEngine;
@@ -31,6 +34,8 @@ import org.fxmisc.richtext.GenericStyledArea;
 import org.fxmisc.richtext.model.*;
 import org.harry.jesus.danielpersistence.PersistenceLayer;
 import org.harry.jesus.fxutils.*;
+import org.harry.jesus.fxutils.media.MediaControl;
+import org.harry.jesus.fxutils.media.PlayBible;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.HTMLRendering;
 import org.harry.jesus.jesajautils.LinkHandler;
@@ -100,6 +105,11 @@ public class MainController {
 
     @FXML ChoiceBox<SearchOptions> searchOptions;
 
+    @FXML
+    GridPane topGridPane;
+
+    @FXML MediaView chapterPlayView;
+
     BorderPane borderPane = null;
 
     BibleTextUtils utils;
@@ -137,6 +147,10 @@ public class MainController {
     int editPlanDayIndex = 0;
 
     int selectedIndex = 0;
+
+    private PlayBible playBible;
+
+    private MediaControl mediaControl;
 
 
 
@@ -176,7 +190,20 @@ public class MainController {
 
         TreeItem<String> root = buildBooksTree();
         showRoot();
+        initMediaView();
         System.out.println("second");
+    }
+
+    private void initMediaView() {
+        this.playBible = new PlayBible("C:\\Users\\haral\\biblebooks\\to_hear\\MP3"
+                , chapterPlayView);
+        BibleTextUtils.BookLink link =
+                new BibleTextUtils.BookLink(actBookLabel, actChapter, Arrays.asList(1));
+        MediaPlayer mp = playBible.playChapter(link);
+        if (mp != null) {
+            mediaControl = new MediaControl(mp, chapterPlayView);
+            topGridPane.add(mediaControl, 0, 1,1,2);
+        }
     }
 
     private void initListeners() {
@@ -202,6 +229,12 @@ public class MainController {
                             actBook = utils.getBookLabelAsClass(bookLabel);
                             actChapter = chapter;
                             showChapter();
+                            BibleTextUtils.BookLink link =
+                                    new BibleTextUtils.BookLink(actBookLabel, actChapter, Arrays.asList(1));
+                            if (playBible != null) {
+                                playBible.stopChapter();
+                            }
+                            initMediaView();
                         }
                     }
                 });
@@ -303,8 +336,6 @@ public class MainController {
             @Override
             public void handle(ActionEvent actionEvent) {
                 Note theNote = new Note();
-
-
                 Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area, getSelectedMapSorted());
                 theNote.getVerslink().add(vers);
                 Optional<Color> resultColor = ColorDialog.callColorDialog();
@@ -721,6 +752,16 @@ public class MainController {
         content.putHtml(htmlBuffer.toString());
         clipboard.setContent(content);
     }
+
+    @FXML
+    public void playChapter(ActionEvent event) {
+        BibleTextUtils.BookLink link =
+                new BibleTextUtils.BookLink(actBookLabel, actChapter, Arrays.asList(1));
+        this.playBible = new PlayBible("C:\\Users\\haral\\biblebooks\\to_hear\\MP3"
+                , chapterPlayView);
+        this.playBible.playChapter(link);
+    }
+
 
     @FXML
     public void copyNote(ActionEvent event) {

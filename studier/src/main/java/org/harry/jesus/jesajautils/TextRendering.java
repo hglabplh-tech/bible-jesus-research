@@ -30,7 +30,7 @@ public class TextRendering {
 
     private Integer lastPosINBuffer = 0;
 
-    private static final int TEXT_WIDTH = 80;
+    private static final int TEXT_WIDTH = 160;
 
     private final String actBookLabel;
     private final Integer actBookNo;
@@ -335,14 +335,15 @@ public class TextRendering {
                 pos = block.indexOf(" ", lastPos + TEXT_WIDTH);
                 if (pos != -1) {
                     strContent.append(block.substring(lastPos, pos) + "\n");
-                    this.lastPosINBuffer = lineBuffer.toString().length() + (pos - lastPos);
+                    this.lastPosINBuffer = block.substring(lastPos, pos).length() + (pos - lastPos);
                 } else {
                     actLength = block.length();
                     pos = actLength;
 
                     strContent.append(block.substring(lastPos));
-                    this.lastPosINBuffer = lineBuffer.toString().length() + (pos + 1);
+                    this.lastPosINBuffer = block.substring(lastPos).length() + (pos + 1);
                 }
+
             }
         }else {
             strContent.append(block);
