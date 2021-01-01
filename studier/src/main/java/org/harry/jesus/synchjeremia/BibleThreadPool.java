@@ -16,6 +16,8 @@ public class BibleThreadPool {
 
     public static final String AUDIO_PATH = "com.harry.jesus.apath";
 
+    public static final String BIBLE_XML_PATH = "com.harry.jesus.biblespath";
+
 
 
     static  {
@@ -42,6 +44,9 @@ public class BibleThreadPool {
 
 
         final Properties settings = new Properties();
+
+        List<BibleRef> bibleRefList = new ArrayList<>();
+
         List<BibleFulltextEngine.BibleTextKey> verseKeys = new ArrayList<>();
 
         Versnotes noteList = new Versnotes();
@@ -88,6 +93,10 @@ public class BibleThreadPool {
         public Properties addSetting(String key, String value) {
             settings.setProperty(key, value);
             return settings;
+        }
+
+        public List<BibleRef> getBibleRefList() {
+            return bibleRefList;
         }
     }
 }

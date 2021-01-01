@@ -9,12 +9,13 @@ import javafx.scene.control.IndexRange;
 import jesus.harry.org.versnotes._1.Vers;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
+import org.harry.jesus.synchjeremia.BibleRef;
+import org.harry.jesus.synchjeremia.BibleThreadPool;
 import org.jetbrains.annotations.NotNull;
 import org.pmw.tinylog.Logger;
 
 import javax.xml.bind.JAXBElement;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -41,6 +42,7 @@ public class BibleTextUtils {
 
     public final static List<Integer> fuzzyIndex = Arrays.asList(3);
 
+    List<BibleBookInstance> bibleInstances = new ArrayList<>();
     List<XMLBIBLE> bibles = new ArrayList<>();
     List<String> bookLabels = new ArrayList<>();
 
@@ -57,16 +59,57 @@ public class BibleTextUtils {
             }
             reader.close();
 
-            for (String bibleName: bibleFnames) {
-                InputStream bibleIN = BibleTextUtils.class.getResourceAsStream("/" + bibleName);
-                XMLBIBLE actBible = BibleReader.loadBible(bibleIN);
-                bibles.add(actBible);
-
-            }
+            File biblePath = new File(BibleThreadPool.getContext()
+                    .getSettings().getProperty(BibleThreadPool.BIBLE_XML_PATH,
+                            System.getProperty("user.home")));
+            BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
+            loadBiblesDownLoaded(biblePath, context);
+            // loadInternal();
 
         } catch (Exception ex) {
             Logger.trace("Exception occured loading bibles");
         }
+    }
+
+    private void loadBiblesDownLoaded(File biblePath, BibleThreadPool.ThreadBean context) {
+        for (File bibleFile : biblePath.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                if (name.contains(".xml")) {
+                    return true;
+                }
+                return false;
+            }
+        })) {
+            BibleRef newRef = new BibleRef().setPathToBook(bibleFile.getAbsolutePath());
+            context.getBibleRefList().add(newRef);
+        }
+        loadBiblesFromRef(context.getBibleRefList());
+    }
+
+    private void loadInternal() {
+        for (String bibleName: bibleFnames) {
+            InputStream bibleIN = BibleTextUtils.class.getResourceAsStream("/" + bibleName);
+            XMLBIBLE actBible = BibleReader.loadBible(bibleIN);
+            bibles.add(actBible);
+
+        }
+    }
+
+    private void loadBiblesFromRef(List<BibleRef> references) {
+
+        for (BibleRef ref : references) {
+            try {
+                InputStream bibleIN = new FileInputStream(ref.getPathToBook());
+                XMLBIBLE actBible = BibleReader.loadBible(bibleIN);
+                bibles.add(actBible);
+                bibleInstances.add(new BibleBookInstance(ref, actBible));
+            } catch(IOException ex) {
+                Logger.trace(ex);
+                Logger.trace("Load error during loading bibles", ex.getMessage());
+            }
+        }
+
     }
 
     public String generateVersEntry(BibleFulltextEngine.BibleTextKey key,
@@ -206,6 +249,18 @@ public class BibleTextUtils {
 
     public List<String> getBibleHashes() {
         return this.bibleHashes;
+    }
+
+    public static List<String> getBibleFnames() {
+        return bibleFnames;
+    }
+
+    public static List<Integer> getFuzzyIndex() {
+        return fuzzyIndex;
+    }
+
+    public List<BibleBookInstance> getBibleInstances() {
+        return bibleInstances;
     }
 
     public List<String> getBibleBookInfo(XMLBIBLE bible) {
@@ -399,4 +454,23 @@ public class BibleTextUtils {
     }
 
 
+    public static class BibleBookInstance {
+
+        private final BibleRef bibleRef;
+
+        private XMLBIBLE bible;
+
+        public BibleBookInstance(BibleRef bibleRef, XMLBIBLE bible) {
+            this.bibleRef = bibleRef;
+            this.bible = bible;
+        }
+
+        public BibleRef getBibleRef() {
+            return bibleRef;
+        }
+
+        public XMLBIBLE getBible() {
+            return bible;
+        }
+    }
 }

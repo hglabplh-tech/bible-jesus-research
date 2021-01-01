@@ -1,1 +1,1 @@
-java -cp ./lib/* --module-path ./lib --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.web org.harry.jesus.BibleStudy
+.\jre1.8.0_271\bin\java -cp ./*  org.harry.jesus.BibleStudy

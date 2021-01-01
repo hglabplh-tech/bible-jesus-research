@@ -160,16 +160,11 @@ public class MainController {
         initAreaContextMenu();
         printDev.setDisable(true);
         initListeners();
-        utils = new BibleTextUtils();
-        selected = utils.getBibles().get(0);
+
         context = BibleThreadPool.getContext();
         bibles.getSelectionModel().selectFirst();
 
-        searchOptions.getItems().addAll(SearchOptions.SIMPLE,
-                SearchOptions.EXACT,
-                SearchOptions.FUZZY);
-        actBookLabel = utils.getBookLabels().get(0);
-        actBook = utils.getBookLabelAsClass(actBookLabel);
+
         SynchThread.loadRendering(context);
         SynchThread.loadNotes(context);
         SynchThread.loadHighlights(context);
@@ -179,12 +174,22 @@ public class MainController {
                         + File.separator
                         + "bibleStudyAudio"
                 );
+        utils = new BibleTextUtils();
+        selected = null;
+        if (utils.getBibles().size() > 0) {
+            selected = utils.getBibles().get(0);
+        }
+        searchOptions.getItems().addAll(SearchOptions.SIMPLE,
+                SearchOptions.EXACT,
+                SearchOptions.FUZZY);
+        searchOptions.getSelectionModel().select(0);
+        actBookLabel = utils.getBookLabels().get(0);
+        actBook = utils.getBookLabelAsClass(actBookLabel);
         context.addSetting(BibleThreadPool.AUDIO_PATH, mediaPath);
         noteList = context.getNoteList();
         verseKeys = context.getVerseKeys();
         highlights = context.getHighlights();
-        loadNotesAndRender();
-        loadHighlightsAndRender();
+
 
         TextOps<String, TextStyle> styledTextOps = SegmentOps.styledTextOps();
 
@@ -196,9 +201,13 @@ public class MainController {
         }
 
         TreeItem<String> root = buildBooksTree();
-        showRoot();
-        initMediaView();
-        System.out.println("second");
+        if (selected != null) {
+            loadNotesAndRender();
+            loadHighlightsAndRender();
+            showRoot();
+            initMediaView();
+            System.out.println("second");
+        }
     }
 
     private void initMediaView() {
@@ -484,20 +493,19 @@ public class MainController {
         boolean found = rendering.render(selected, actBookLabel, actChapter);
         footerNotes.getItems().clear();
         footerNotes.getItems().addAll(rendering.getNotes());
-        if (BibleTextUtils.fuzzyIndex.contains(Integer.valueOf(selectedIndex))) {
-            footerNotes.getItems().add("Fuzzy Link matches -->");
-            for (String note : rendering.getNotes()) {
-                String links = "";
-                try {
-                    links = LinkHandler.generateLinksFuzzy(utils, note);
-                } catch (Exception ex) {
-                    Logger.trace("Something went wrong with fuzzy!!! This feature has to be enhanced");
-                }
-                if (!links.isEmpty()) {
-                    footerNotes.getItems().add(links);
-                }
+        footerNotes.getItems().add("Fuzzy Link matches -->");
+        for (String note : rendering.getNotes()) {
+            String links = "";
+            try {
+                links = LinkHandler.generateLinksFuzzy(utils, note);
+            } catch (Exception ex) {
+                Logger.trace("Something went wrong with fuzzy!!! This feature has to be enhanced");
+            }
+            if (!links.isEmpty()) {
+                footerNotes.getItems().add(links);
             }
         }
+
         String [] splitted = actBookLabel.split(",");
         selectedVersesMap.clear();
         rendering.clearRendering();
@@ -512,27 +520,30 @@ public class MainController {
 
 
     private TreeItem<String> buildBooksTree() {
-        TreeItem<String> root = new TreeItem<>();
-        root.setValue("The books");
-        booksTree.setRoot(root);
-        theBooks.clear();
-        List<JAXBElement<BIBLEBOOK>> books = selected.getBIBLEBOOK();
-        for (JAXBElement<BIBLEBOOK> book: books) {
-            theBooks.add(book.getValue());
-        }
-        int index = 0;
-        for(BIBLEBOOK theBook: theBooks) {
-            String label = utils.getBookLabels().get(index);
-            TreeItem item = new TreeItem(label);
-            root.getChildren().add(item);
-            for (JAXBElement<CHAPTER> chapter : theBook.getCHAPTER()) {
-                TreeItem<String> cItem = new TreeItem<>(chapter.getValue().getCnumber().toString());
-                item.getChildren().add(cItem);
+        if (selected != null) {
+            TreeItem<String> root = new TreeItem<>();
+            root.setValue("The books");
+            booksTree.setRoot(root);
+            theBooks.clear();
+            List<JAXBElement<BIBLEBOOK>> books = selected.getBIBLEBOOK();
+            for (JAXBElement<BIBLEBOOK> book : books) {
+                theBooks.add(book.getValue());
             }
-            index++;
+            int index = 0;
+            for (BIBLEBOOK theBook : theBooks) {
+                String label = utils.getBookLabels().get(index);
+                TreeItem item = new TreeItem(label);
+                root.getChildren().add(item);
+                for (JAXBElement<CHAPTER> chapter : theBook.getCHAPTER()) {
+                    TreeItem<String> cItem = new TreeItem<>(chapter.getValue().getCnumber().toString());
+                    item.getChildren().add(cItem);
+                }
+                index++;
+            }
+            return root;
         }
         booksTree.refresh();
-        return root;
+        return null;
     }
 
 
@@ -720,7 +731,7 @@ public class MainController {
 
     @FXML
     public void newDev(ActionEvent event) {
-
+        devotionalEdit.setHtmlText("<html><header/><body/></html>");
     }
 
     @FXML

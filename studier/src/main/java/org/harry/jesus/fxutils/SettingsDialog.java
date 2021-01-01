@@ -42,15 +42,32 @@ public class SettingsDialog {
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
+        Label bibleDirLab = new Label("Bible Source Bible Directory:");
+        TextField bibleDirField = new TextField();
         Label mediaDirLab = new Label("Play Bible Directory:");
         TextField mediaDirField = new TextField();
         String path = context.getSettings().getProperty(BibleThreadPool.AUDIO_PATH,
                 System.getProperty("user.home")
                         + File.separator
                         + "bibleStudyAudio");
+        String biblePath = context.getSettings().getProperty(BibleThreadPool.BIBLE_XML_PATH,
+                System.getProperty("user.home")
+                        + File.separator
+                        + "bibleStudyAudio");
         mediaDirField.setText(path);
-        Button getDirButton = new Button("Get Directory");
-        getDirButton.addEventHandler(ActionEvent.ACTION, new EventHandler<ActionEvent>() {
+        Button getMediaDirButton = new Button("Get Media Directory");
+        Button getBibleDirButton = new Button("Get Media Directory");
+        getBibleDirButton.addEventHandler(ActionEvent.ACTION, new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                String biblePath = JesusMisc.showOpenDialogString(event, dialog.getDialogPane());
+                biblePath = biblePath.substring(0, biblePath.lastIndexOf(File.separator));
+                mediaDirField.setText(biblePath);
+                context.addSetting(BibleThreadPool.BIBLE_XML_PATH, biblePath);
+                SynchThread.storeApplicationProperties();
+            }
+        });
+        getMediaDirButton.addEventHandler(ActionEvent.ACTION, new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 String path = JesusMisc.showOpenDialogString(event, dialog.getDialogPane());
@@ -60,9 +77,12 @@ public class SettingsDialog {
                 SynchThread.storeApplicationProperties();
             }
         });
-        grid.add(mediaDirLab, 0, 0);
-        grid.add(mediaDirField, 1, 0);
-        grid.add(getDirButton, 2, 0);
+        grid.add(bibleDirLab, 0, 0);
+        grid.add(bibleDirField, 1, 0);
+        grid.add(getBibleDirButton, 2, 0);
+        grid.add(mediaDirLab, 0, 1);
+        grid.add(mediaDirField, 1, 1);
+        grid.add(getMediaDirButton, 2, 1);
 
         dialog.getDialogPane().setContent(grid);
 

@@ -1,6 +1,7 @@
 package org.harry.jesus.jesajautils;
 
 import generated.XMLBIBLE;
+import org.harry.jesus.synchjeremia.BibleRef;
 import org.tinylog.Logger;
 
 import javax.xml.bind.JAXBContext;

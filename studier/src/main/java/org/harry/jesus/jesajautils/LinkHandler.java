@@ -39,9 +39,12 @@ public class LinkHandler {
         return linkBuffer.toString();
     }
 
-    public static String generateLinksFuzzy(BibleTextUtils utils, String text) {
+    public static String generateLinksFuzzy(BibleTextUtils utils, final String text) {
         List<BibleTextUtils.BookLabel> labelList = getTransformedLabels(utils);
-        List<BibleTextUtils.BookLink> links = parseLinksFuzzy(utils, text);
+        List<BibleTextUtils.BookLink> links = parseLinks(utils, text);
+        if (links.size() == 0) {
+            links = parseLinksFuzzy(utils, text);
+        }
         StringBuffer buffer = new StringBuffer();
         List<Vers> verses = new ArrayList<>();
         for (BibleTextUtils.BookLink link : links) {
@@ -133,11 +136,11 @@ public class LinkHandler {
         List<BibleTextUtils.BookLabel> labelList = getTransformedLabels(utils);
         for (BibleTextUtils.BookLabel label : labelList) {
             String bookString = null;
-            if (text.contains(label.getLongName())) {
-                bookString = label.getLongName();
+            if (text.contains(bookStrMapping(label.getLongName()))) {
+                bookString = bookStrMapping(label.getLongName());
 
-            } else if (text.contains(label.getShortName())) {
-                bookString = label.getShortName();
+            } else if (text.contains(bookStrMapping(label.getShortName()))) {
+                bookString = bookStrMapping(label.getShortName());
             }
             if (bookString != null) {
                 int index = text.indexOf(bookString);
@@ -284,6 +287,7 @@ public class LinkHandler {
         map.put("2.Ch", "2. Chr");
         map.put("1.Chr", "1. Chr");
         map.put("2.Chr", "2. Chr");
+        map.put("Matthaeus", "Matthäus");
         if (map.get(book) != null) {
             return map.get(book);
         } else {
