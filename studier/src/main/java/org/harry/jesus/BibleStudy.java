@@ -64,7 +64,7 @@ public class BibleStudy extends Application {
         //    root.getStylesheets().remove(0);
         //}
        //root.getStylesheets().add(css.getUrl());
-
+        root.getStylesheets().add(css.getUrl());
 
 
         return root;
@@ -81,7 +81,7 @@ public class BibleStudy extends Application {
 
     public static enum CSS {
 
-        BIBLE("for future use")
+        BIBLE(BibleStudy.class.getResource("/fxml/biblestudy.css").toExternalForm()),
         ;
 
 
