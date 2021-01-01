@@ -301,11 +301,19 @@ public class MainController {
 
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if (mouseEvent.getClickCount() == 1) {
+                if (mouseEvent.getClickCount() == 2) {
                     IndexRange range = area.getSelection();
                     Map.Entry<Integer, IndexRange> versPointer =
                             rendering.selectVerseByGivenRange(range);
-                    selectedVersesMap.put(versPointer.getKey(), versPointer.getValue());
+                    if (selectedVersesMap.get(versPointer.getKey()) != null) {
+                        selectedVersesMap.remove(versPointer.getKey());
+                        area.setStyle(versPointer.getValue().getStart(),
+                                versPointer.getValue().getEnd(),
+                                TextStyle.underline(false));
+
+                    } else {
+                        selectedVersesMap.put(versPointer.getKey(), versPointer.getValue());
+                    }
                 }
             }
         });

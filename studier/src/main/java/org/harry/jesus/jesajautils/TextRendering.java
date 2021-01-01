@@ -120,11 +120,6 @@ public class TextRendering {
             IndexRange compRange = entry.getValue();
             if (start >= compRange.getStart() && start <= compRange.getEnd()) {
                 this.area.setStyle(compRange.getStart(), compRange.getEnd(), TextStyle.underline(true));
-                Vers vers = new Vers();
-                vers.setBook(BigInteger.valueOf(actBookNo));
-                vers.setChapter(BigInteger.valueOf(actChapter));
-                vers.getVers().add(BigInteger.valueOf(entry.getKey()));
-                storeVersRendering(Arrays.asList(vers), null);
                 return entry;
             }
         }
