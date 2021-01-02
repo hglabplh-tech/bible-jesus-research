@@ -5,7 +5,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.harry.jesus</groupId>
-    <version>1.0</version>
+    <version>1.2-SNAPSHOT</version>
     <artifactId>harry-bible-study</artifactId>
 
     <properties>
