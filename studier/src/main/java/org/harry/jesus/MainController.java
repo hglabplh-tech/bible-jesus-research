@@ -208,13 +208,6 @@ public class MainController {
             loadHighlightsAndRender();
             showRoot();
             initMediaView();
-            List<String> fonts = Font.getFamilies();
-            Optional<String> optFont = fonts.stream().filter(e -> e.contains("Tempus")).findFirst();
-            if (optFont.isPresent()) {
-                String text = area.getText();
-                TextStyle style = TextStyle.fontFamily(optFont.get()).updateFontSize(12);
-                area.setStyle(0, text.length() -1, style);
-            }
             System.out.println("second");
         }
     }
@@ -567,6 +560,10 @@ public class MainController {
     @FXML
     public void settings(ActionEvent event) {
         new SettingsDialog().showAppSettingsDialog();
+        if (rendering == null) {
+            rendering = new TextRendering(utils, this.area, actBookLabel, actChapter);
+        }
+        rendering.setAreaText(new StringBuffer(area.getText()));
     }
 
     @FXML

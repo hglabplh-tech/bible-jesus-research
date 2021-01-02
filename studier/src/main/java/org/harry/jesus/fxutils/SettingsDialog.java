@@ -209,7 +209,7 @@ public class SettingsDialog {
         return box;
     }
 
-    private void setPreview(FoldableStyledArea area, TextStyle style,
+    public static TextStyle setPreview(FoldableStyledArea area, TextStyle style,
                             String font, Integer fontSize) {
         String text = area.getText();
         TextStyle tempStyle = style;
@@ -219,7 +219,6 @@ public class SettingsDialog {
         area.setBackground(backGround);
         tempStyle = tempStyle.updateFontFamily(font).updateFontSize(fontSize);
         area.setStyle(0, text.length(), tempStyle);
-
-
+        return tempStyle;
     }
 }

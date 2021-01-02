@@ -5,9 +5,11 @@ import javafx.scene.control.IndexRange;
 import javafx.scene.paint.Color;
 import jesus.harry.org.versnotes._1.Vers;
 import org.fxmisc.richtext.model.TwoDimensional;
+import org.harry.jesus.fxutils.SettingsDialog;
 import org.harry.jesus.jesajautils.BibleTextUtils.BookLink;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.TextStyle;
+import org.harry.jesus.synchjeremia.ApplicationProperties;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
 import org.jetbrains.annotations.NotNull;
 
@@ -204,13 +206,9 @@ public class TextRendering {
      * set the area text with it's styles
      * @param strContent the actual content
      */
-    private void setAreaText(StringBuffer strContent) {
+    public void setAreaText(StringBuffer strContent) {
         area.replaceText(strContent.toString());
-        area.setStyle(0, strContent.toString().length(), TextStyle.bold(false)
-                .updateTextColor(Color.BLACK)
-                .updateItalic(false)
-                .updateBackgroundColor(Color.WHITE)
-        );
+        refreshAreaStyle(area);
         for (Map.Entry<IndexRange, TextStyle> entry : renderMap.entrySet()) {
             IndexRange range = entry.getKey();
             TextStyle style = entry.getValue();
@@ -225,6 +223,15 @@ public class TextRendering {
                             TextStyle.backgroundColor(Color.web(versInfo.getValue())));
             }
         }
+    }
+
+    public static void refreshAreaStyle(FoldableStyledArea textArea) {
+       Integer fontSize = ApplicationProperties.getFontSize();
+       Optional<String> fontFamily = ApplicationProperties.getFontFamily();
+       TextStyle theStyle = ApplicationProperties.getShape();
+       if (fontFamily.isPresent()) {
+           SettingsDialog.setPreview(textArea, theStyle, fontFamily.get(), fontSize);
+       }
     }
 
 
