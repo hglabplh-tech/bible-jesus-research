@@ -27,6 +27,8 @@ public class TextStyle {
         private final Codec<Optional<Color>> OPT_COLOR_CODEC =
                 Codec.optionalCodec(Codec.COLOR_CODEC);
 
+
+
         @Override
         public String getName() {
             return "text-style";
@@ -98,6 +100,8 @@ public class TextStyle {
             return (i < 0) ? Optional.empty() : Optional.of(i);
         }
     };
+
+
 
     public static TextStyle bold(boolean bold) { return EMPTY.updateBold(bold); }
     public static TextStyle italic(boolean italic) { return EMPTY.updateItalic(italic); }
@@ -294,5 +298,13 @@ public class TextStyle {
 
     public TextStyle updateBackgroundColor(Color backgroundColor) {
         return new TextStyle(bold, italic, underline, strikethrough, fontSize, fontFamily, textColor, Optional.of(backgroundColor));
+    }
+
+    public Optional<Color> getTextColor() {
+        return textColor;
+    }
+
+    public Optional<Color> getBackgroundColor() {
+        return backgroundColor;
     }
 }

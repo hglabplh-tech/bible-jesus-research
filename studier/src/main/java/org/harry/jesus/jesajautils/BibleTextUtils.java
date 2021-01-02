@@ -9,6 +9,7 @@ import javafx.scene.control.IndexRange;
 import jesus.harry.org.versnotes._1.Vers;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
+import org.harry.jesus.synchjeremia.ApplicationProperties;
 import org.harry.jesus.synchjeremia.BibleRef;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
 import org.jetbrains.annotations.NotNull;
@@ -60,7 +61,7 @@ public class BibleTextUtils {
             reader.close();
 
             File biblePath = new File(BibleThreadPool.getContext()
-                    .getSettings().getProperty(BibleThreadPool.BIBLE_XML_PATH,
+                    .getSettings().getProperty(ApplicationProperties.BIBLE_XML_PATH,
                             System.getProperty("user.home")));
             BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
             loadBiblesDownLoaded(biblePath, context);

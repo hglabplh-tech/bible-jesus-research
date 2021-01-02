@@ -20,6 +20,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.web.HTMLEditor;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -47,6 +48,7 @@ import org.harry.jesus.jesajautils.editor.HTMLToPDF;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 import org.harry.jesus.jesajautils.fulltext.StatisticsCollector;
 
+import org.harry.jesus.synchjeremia.ApplicationProperties;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
 import org.harry.jesus.synchjeremia.SynchThread;
 import org.jetbrains.annotations.NotNull;
@@ -168,9 +170,9 @@ public class MainController {
         SynchThread.loadRendering(context);
         SynchThread.loadNotes(context);
         SynchThread.loadHighlights(context);
-        SynchThread.loadApplicationProperties();
+        ApplicationProperties.loadApplicationProperties();
         String mediaPath = context.getSettings()
-                .getProperty(BibleThreadPool.AUDIO_PATH, System.getProperty("user.home")
+                .getProperty(ApplicationProperties.AUDIO_PATH, System.getProperty("user.home")
                         + File.separator
                         + "bibleStudyAudio"
                 );
@@ -185,7 +187,7 @@ public class MainController {
         searchOptions.getSelectionModel().select(0);
         actBookLabel = utils.getBookLabels().get(0);
         actBook = utils.getBookLabelAsClass(actBookLabel);
-        context.addSetting(BibleThreadPool.AUDIO_PATH, mediaPath);
+        context.addSetting(ApplicationProperties.AUDIO_PATH, mediaPath);
         noteList = context.getNoteList();
         verseKeys = context.getVerseKeys();
         highlights = context.getHighlights();
@@ -206,12 +208,19 @@ public class MainController {
             loadHighlightsAndRender();
             showRoot();
             initMediaView();
+            List<String> fonts = Font.getFamilies();
+            Optional<String> optFont = fonts.stream().filter(e -> e.contains("Tempus")).findFirst();
+            if (optFont.isPresent()) {
+                String text = area.getText();
+                TextStyle style = TextStyle.fontFamily(optFont.get()).updateFontSize(12);
+                area.setStyle(0, text.length() -1, style);
+            }
             System.out.println("second");
         }
     }
 
     private void initMediaView() {
-        String mediaPath = context.getSettings().getProperty(BibleThreadPool.AUDIO_PATH);
+        String mediaPath = context.getSettings().getProperty(ApplicationProperties.AUDIO_PATH);
         this.playBible = new PlayBible(mediaPath
                 , chapterPlayView);
         BibleTextUtils.BookLink link =
@@ -557,7 +566,7 @@ public class MainController {
 
     @FXML
     public void settings(ActionEvent event) {
-        SettingsDialog.showAppSettingsDialog();
+        new SettingsDialog().showAppSettingsDialog();
     }
 
     @FXML

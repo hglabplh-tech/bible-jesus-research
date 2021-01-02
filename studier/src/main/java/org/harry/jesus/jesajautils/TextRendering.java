@@ -15,29 +15,72 @@ import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import java.util.*;
 
+/**
+ * This class is fr the rendering (setting styles to the whole text or to areas of the text)
+ * of the text area for the displayed chapter
+ * @author Harald Glab-Plhak
+ */
 public class TextRendering {
 
+    /**
+     * the text utils
+     */
     private final BibleTextUtils bibleUtils;
+
+    /**
+     * The text area
+     */
     private final FoldableStyledArea area;
 
+    /**
+     * The map holding the index ranges/verses for the text
+     */
     private Map<Integer, IndexRange> chapterMap = new LinkedHashMap<>();
 
+    /**
+     * The map holds the style of the different verses
+     */
     private Map<IndexRange, TextStyle> renderMap = new LinkedHashMap<>();
 
-    private Map<BigInteger,Map<Integer, IndexRange>> book = new LinkedHashMap<>();
-
+    /**
+     * The list for the notes in the chapter
+     */
     private List<String> notes = new ArrayList<>();
 
     private Integer lastPosINBuffer = 0;
 
+    /**
+     * The maximal width of the text
+     */
     private static final int TEXT_WIDTH = 160;
 
+    /**
+     * The label of the actual bible book
+     */
     private final String actBookLabel;
+
+    /**
+     * The book number
+     */
     private final Integer actBookNo;
+
+    /**
+     * The actual displayed chapter
+     */
     private final Integer actChapter;
 
 
-    public TextRendering(BibleTextUtils bibleUtils, FoldableStyledArea area, String actBookLabel, Integer actChapter) {
+    /**
+     * The Ctor for the rendering
+     * @param bibleUtils the text utils class instance
+     * @param area the text area
+     * @param actBookLabel the actual book label
+     * @param actChapter the actual chapter
+     */
+    public TextRendering(BibleTextUtils bibleUtils,
+                         FoldableStyledArea area,
+                         String actBookLabel,
+                         Integer actChapter) {
         this.bibleUtils = bibleUtils;
         this.area = area;
         this.actBookLabel = actBookLabel;
@@ -46,7 +89,12 @@ public class TextRendering {
         this.actChapter = actChapter;
     }
 
-    public static void storeVersRendering(List<Vers> versList, Color choosenColor) {
+    /**
+     * store the color for a vers
+     * @param versList the list of verses affected
+     * @param chosenColor the chosen color
+     */
+    public static void storeVersRendering(List<Vers> versList, Color chosenColor) {
         BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
         for (Vers actVers : versList) {
             Tuple<Integer, Integer> key =
@@ -54,8 +102,8 @@ public class TextRendering {
                             actVers.getChapter().intValue());
             Map<Integer, String> renderVersMap = new LinkedHashMap<>();
             Color color;
-            if (choosenColor != null) {
-                color = choosenColor;
+            if (chosenColor != null) {
+                color = chosenColor;
             } else {
                 color = Color.YELLOWGREEN;
             }
@@ -74,13 +122,27 @@ public class TextRendering {
         }
     }
 
+    /**
+     * clear the rendering map
+     */
     public void clearRendering() {
         renderMap.clear();
     }
+
+    /**
+     * get the notes inside the chapter
+     * @return the notes list
+     */
     public List<String> getNotes() {
         return notes;
     }
 
+    /**
+     * render the links
+     * @param bible the bible
+     * @param links the links
+     * @return the content returned
+     */
     public String render(XMLBIBLE bible, List<BookLink> links) {
         StringBuffer strContent = new StringBuffer();
         Integer start = 0;
@@ -97,6 +159,13 @@ public class TextRendering {
 
     }
 
+    /**
+     *
+     * @param bible the bible
+     * @param bookLabel the book label
+     * @param chapterNo the chapter number
+     * @return rendering ok ?
+     */
     public boolean render(XMLBIBLE bible, String bookLabel, Integer chapterNo) {
         boolean chapterFound = false;
         Optional<BIBLEBOOK> book = this.bibleUtils.getBookByLabel(bible, bookLabel);
@@ -113,6 +182,11 @@ public class TextRendering {
         return chapterFound;
     }
 
+    /**
+     * This method selects a verse by the given ÄIndexRange in the text
+     * @param range the range by which we search for the verse in the text
+     * @return the selected the entry for the verse
+     */
     public Map.Entry<Integer, IndexRange> selectVerseByGivenRange(IndexRange range) {
         int start = range.getStart();
 
@@ -126,6 +200,10 @@ public class TextRendering {
         return null;
     }
 
+    /**
+     * set the area text with it's styles
+     * @param strContent the actual content
+     */
     private void setAreaText(StringBuffer strContent) {
         area.replaceText(strContent.toString());
         area.setStyle(0, strContent.toString().length(), TextStyle.bold(false)

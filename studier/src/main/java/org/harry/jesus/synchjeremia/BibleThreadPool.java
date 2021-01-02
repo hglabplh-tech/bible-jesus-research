@@ -14,11 +14,6 @@ public class BibleThreadPool {
 
     public static final ThreadLocal<ThreadBean> contexts = new ThreadLocal<>();
 
-    public static final String AUDIO_PATH = "com.harry.jesus.apath";
-
-    public static final String BIBLE_XML_PATH = "com.harry.jesus.biblespath";
-
-
 
     static  {
         ThreadBean context = new ThreadBean();

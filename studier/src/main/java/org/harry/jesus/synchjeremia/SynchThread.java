@@ -1,13 +1,11 @@
 package org.harry.jesus.synchjeremia;
 
 import javafx.application.Platform;
-import javafx.scene.paint.Color;
 import org.harry.jesus.danielpersistence.PersistenceLayer;
 import org.harry.jesus.jesajautils.Tuple;
 import org.pmw.tinylog.Logger;
 
 import java.io.*;
-import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -32,7 +30,7 @@ public class SynchThread extends TimerTask {
 
     private static final File highlightsXML;
 
-    private static final File appProps;
+    public  static final File appProps;
 
     private static Timer timer = new Timer();
 
@@ -59,7 +57,7 @@ public class SynchThread extends TimerTask {
                 storeRendering(context);
                 storeNotes(context);
                 storeHighlights(context);
-                storeApplicationProperties();
+                ApplicationProperties.storeApplicationProperties();
             }
 
 
@@ -141,26 +139,4 @@ public class SynchThread extends TimerTask {
         }
     }
 
-    public static void storeApplicationProperties() {
-        try {
-
-            BibleThreadPool.getContext().getSettings().store(new FileOutputStream(appProps)
-                    , "Bible Study Properties");
-
-        } catch (IOException  ex) {
-            Logger.trace(ex);
-            Logger.trace("Error storing properties: " + ex.getMessage());
-        }
-    }
-
-    public static void loadApplicationProperties() {
-        try {
-            if (appProps.exists()) {
-                BibleThreadPool.getContext().getSettings().load(new FileInputStream(appProps));
-            }
-        } catch (IOException  ex) {
-            Logger.trace(ex);
-            Logger.trace("Error loading properties: " + ex.getMessage());
-        }
-    }
 }

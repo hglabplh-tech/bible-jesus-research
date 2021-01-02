@@ -1,14 +1,12 @@
 package org.harry.jesus;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
+import org.harry.jesus.synchjeremia.ApplicationProperties;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
 import org.harry.jesus.synchjeremia.SynchThread;
 import org.pmw.tinylog.Configurator;
@@ -18,9 +16,6 @@ import org.pmw.tinylog.writers.ConsoleWriter;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
-import java.util.Properties;
-
 
 
 /**
@@ -47,7 +42,7 @@ public class BibleStudy extends Application {
             SynchThread.storeRendering(BibleThreadPool.getContext());
             SynchThread.storeNotes(BibleThreadPool.getContext());
             SynchThread.storeHighlights(BibleThreadPool.getContext());
-            SynchThread.storeApplicationProperties();
+            ApplicationProperties.storeApplicationProperties();
             System.exit(0);
         });
         scene = new Scene(loadFXML("main", CSS.BIBLE));
