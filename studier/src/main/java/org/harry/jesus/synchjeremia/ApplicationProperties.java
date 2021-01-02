@@ -20,6 +20,10 @@ public class ApplicationProperties {
             .updateTextColor(Color.LIGHTGREEN);
     public static final TextStyle heikeShape = TextStyle.backgroundColor(Color.RED)
             .updateTextColor(Color.WHITE);
+    public static final TextStyle joshiShape = TextStyle.backgroundColor(Color.WHITE)
+            .updateTextColor(Color.BLUE);
+    public static final TextStyle harryShape = TextStyle.backgroundColor(Color.LIGHTGREY)
+            .updateTextColor(Color.BLACK);
     public static final String AUDIO_PATH = "com.harry.jesus.apath";
     public static final String BIBLE_XML_PATH = "com.harry.jesus.biblespath";
     public static final String APP_FONT = "com.harry.jesus.font";
@@ -34,6 +38,8 @@ public class ApplicationProperties {
       shapeMap.put("Black Shape",blackShape);
       shapeMap.put("Old Dos Shape",oldDosShape);
       shapeMap.put("Heike's Shape",heikeShape);
+      shapeMap.put("Joshi's Shape",joshiShape);
+      shapeMap.put("Harry's Shape",harryShape);
     }
 
     public static void storeApplicationProperties() {
