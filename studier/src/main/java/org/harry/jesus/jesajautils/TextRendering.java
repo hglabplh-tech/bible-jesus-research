@@ -217,12 +217,23 @@ public class TextRendering {
         Tuple<Integer, Integer> key = new Tuple<>(actBookNo, actChapter);
         Map<Integer, String> value = BibleThreadPool.getContext().getRenderMap().get(key);
         if (value != null) {
+
             for (Map.Entry<Integer, String> versInfo : value.entrySet()) {
                 IndexRange range = chapterMap.get(versInfo.getKey());
-                    this.area.setStyle(range.getStart(), range.getEnd(),
-                            TextStyle.backgroundColor(Color.web(versInfo.getValue())));
+                setRangeColor(versInfo.getValue(), range);
             }
         }
+    }
+
+    public void setRangeColor(String color, IndexRange range) {
+        Integer fontSize = ApplicationProperties.getFontSize();
+        Optional<String> fontFamily = ApplicationProperties.getFontFamily();
+        TextStyle appStyle = ApplicationProperties.getShape();
+        TextStyle theStyle = TextStyle.backgroundColor(Color.web(color))
+                .updateFontFamily(fontFamily.get())
+                .updateTextColor(appStyle.getTextColor().get())
+                .updateFontSize(fontSize);
+        this.area.setStyle(range.getStart(), range.getEnd(), theStyle);
     }
 
     public static void refreshAreaStyle(FoldableStyledArea textArea) {

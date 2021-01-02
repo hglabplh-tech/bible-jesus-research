@@ -20,7 +20,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.web.HTMLEditor;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -554,6 +553,17 @@ public class MainController {
         }
         booksTree.refresh();
         return null;
+    }
+
+    @FXML
+    public void about(ActionEvent event) {
+
+    }
+
+    @FXML
+    public void appHelp(ActionEvent event) {
+
+        HelpDialog.showHelp("/AppHelp.txt");
     }
 
 

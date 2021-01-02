@@ -21,7 +21,7 @@ public class ApplicationProperties {
     public static final TextStyle heikeShape = TextStyle.backgroundColor(Color.RED)
             .updateTextColor(Color.WHITE);
     public static final TextStyle joshiShape = TextStyle.backgroundColor(Color.WHITE)
-            .updateTextColor(Color.BLUE);
+            .updateTextColor(Color.DARKBLUE);
     public static final TextStyle harryShape = TextStyle.backgroundColor(Color.LIGHTGREY)
             .updateTextColor(Color.BLACK);
     public static final String AUDIO_PATH = "com.harry.jesus.apath";
