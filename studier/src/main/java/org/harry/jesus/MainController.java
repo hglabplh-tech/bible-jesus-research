@@ -166,6 +166,7 @@ public class MainController {
         bibles.getSelectionModel().selectFirst();
 
 
+
         SynchThread.loadRendering(context);
         SynchThread.loadNotes(context);
         SynchThread.loadHighlights(context);
@@ -261,6 +262,8 @@ public class MainController {
         bibles.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                ViewKonkordanzDialog.showKonkordanzDialog(utils,
+                        area);
                 selectedIndex = t1.intValue();
                 selected = utils.getBibles().get(t1.intValue());
                 TreeItem<String> root = buildBooksTree();
