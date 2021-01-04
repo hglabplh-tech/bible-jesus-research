@@ -44,7 +44,7 @@ public class HTMLRendering {
                                                List<TItem> items) {
         int index = 0;
         for (TItem item: items) {
-            htmlBuffer.append("<<H5 id=\"" +
+            htmlBuffer.append("<H5 id=\"" +
                     item.getId()
                     +  "\">"
                     + item.getId()
@@ -91,7 +91,7 @@ public class HTMLRendering {
                     );
                 } else if (jaxbElement.getName().getLocalPart().equals("see")) {
                     SeeType see = (SeeType)jaxbElement.getValue();
-
+                    buildSee(see, htmlBuffer);
                 } else if (thisContent instanceof BibLinkType) {
                     BibLinkType bibleLink = (BibLinkType) thisContent;
                     Logger.trace("BibLink: ["
@@ -113,7 +113,7 @@ public class HTMLRendering {
     public static void buildSee(SeeType see, StringBuffer htmlBuffer) {
         String target = see.getTarget();
         if (target.equals("x-self")) {
-            htmlBuffer.append("<p><A href=\"http://_self/#"
+            htmlBuffer.append("<p>See: <A href=\"http://_self/#"
                     + see.getContent()
                     + "\">"
                     + see.getContent()

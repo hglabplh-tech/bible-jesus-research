@@ -61,6 +61,8 @@ public class ViewAccordanceDialog {
                 } catch (IOException ex) {
                     htmlBuffer.append("<p><h1>Accordance not available yet</h1></p>");
                 }
+            } else {
+                htmlBuffer.append("<p><h1>Accordance not available yet</h1></p>");
             }
             Scene secondScene = new Scene(loadFXML("accordanceViewer", utils,
                     area, htmlBuffer.toString()));
