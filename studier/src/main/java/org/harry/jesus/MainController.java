@@ -18,6 +18,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
@@ -166,6 +168,7 @@ public class MainController {
         bibles.getSelectionModel().selectFirst();
 
 
+        VBox.setVgrow(mainTabPane, Priority.ALWAYS);
 
         SynchThread.loadRendering(context);
         SynchThread.loadNotes(context);
@@ -482,8 +485,7 @@ public class MainController {
         this.borderPane = (BorderPane) parent;
         area = new FoldableStyledArea();
         chapterReader = new VirtualizedScrollPane(area);
-        chapterReader.setMinSize(750, 500);
-        chapterReader.setMaxSize(750, 500);
+        chapterReader.setMinSize(1000, 600);
     }
 
     private void showRoot() {
@@ -547,16 +549,16 @@ public class MainController {
             for (JAXBElement<BIBLEBOOK> book : books) {
                 theBooks.add(book.getValue());
             }
-            int index = 0;
+
             for (BIBLEBOOK theBook : theBooks) {
-                String label = utils.getBookLabels().get(index);
+                String label = utils.getBookLabels().get(theBook.getBnumber().intValue() - 1);
                 TreeItem item = new TreeItem(label);
                 root.getChildren().add(item);
                 for (JAXBElement<CHAPTER> chapter : theBook.getCHAPTER()) {
                     TreeItem<String> cItem = new TreeItem<>(chapter.getValue().getCnumber().toString());
                     item.getChildren().add(cItem);
                 }
-                index++;
+
             }
             return root;
         }

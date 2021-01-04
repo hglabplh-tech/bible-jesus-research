@@ -53,6 +53,7 @@ public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
         try {
             System.out.println(bibleLink);
             List<BibleTextUtils.BookLink> links = LinkHandler.parseLinks(utils, bibleLink);
+
             BibleTextUtils.BookLink link = links.get(0);
             TextRendering rendering = new TextRendering(utils, area, link.getBookLabel(), link.getChapter());
             rendering.render(utils.getBibles().get(2),link.getBookLabel(), link.getChapter() );

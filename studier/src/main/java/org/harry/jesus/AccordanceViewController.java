@@ -2,6 +2,10 @@ package org.harry.jesus;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.codefx.libfx.control.webview.WebViews;
@@ -17,11 +21,19 @@ import java.nio.charset.Charset;
 
 public class AccordanceViewController {
 
+
+
+    @FXML
+    StackPane stackPane;
+
     @FXML
     WebView konkordanzViewer;
 
     @FXML
     public void initialize() {
+
+        VBox.setVgrow(stackPane, Priority.ALWAYS);
+
 
     }
 
