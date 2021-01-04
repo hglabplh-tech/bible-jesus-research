@@ -1,5 +1,7 @@
 package org.harry.jesus.fxutils;
 
+import javafx.scene.control.IndexRange;
+import javafx.scene.paint.Color;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.codefx.libfx.control.webview.WebViewHyperlinkListener;
@@ -57,6 +59,8 @@ public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
             BibleTextUtils.BookLink link = links.get(0);
             TextRendering rendering = new TextRendering(utils, area, link.getBookLabel(), link.getChapter());
             rendering.render(utils.getBibles().get(2),link.getBookLabel(), link.getChapter() );
+            IndexRange range = rendering.getChapterMap().get(link.getVerses().get(0));
+            rendering.selectVerseColorByGivenRange(range, Color.CORAL);
         } catch (Exception e) {
             e.printStackTrace();
         }

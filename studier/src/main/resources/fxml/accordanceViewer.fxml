@@ -5,11 +5,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
-<VBox maxHeight="-Infinity" maxWidth="-Infinity"
-      minHeight="-Infinity" minWidth="-Infinity"
-      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.harry.jesus.AccordanceViewController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.harry.jesus.AccordanceViewController">
    <children>
       <StackPane fx:id="stackPane" prefHeight="700.0" prefWidth="900.0">
          <children>
@@ -17,5 +13,10 @@
          </children>
       </StackPane>
       <Button fx:id="closeWin" mnemonicParsing="false" onAction="#closeWin" text="Close" />
+      <Button fx:id="search" mnemonicParsing="false" onAction="#search" text="Search">
+         <graphic>
+            <TextField fx:id="searchInput" promptText="search Term"/>
+         </graphic>
+      </Button>
    </children>
 </VBox>

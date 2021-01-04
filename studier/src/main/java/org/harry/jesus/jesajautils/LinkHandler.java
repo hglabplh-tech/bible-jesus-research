@@ -287,7 +287,6 @@ public class LinkHandler {
         map.put("2.Ch", "2. Chr");
         map.put("1.Chr", "1. Chr");
         map.put("2.Chr", "2. Chr");
-        map.put("Matthaeus", "Matthäus");
         if (map.get(book) != null) {
             return map.get(book);
         } else {

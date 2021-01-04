@@ -91,6 +91,9 @@ public class TextRendering {
         this.actChapter = actChapter;
     }
 
+    public Map<Integer, IndexRange> getChapterMap() {
+        return Collections.unmodifiableMap(chapterMap);
+    }
     /**
      * store the color for a vers
      * @param versList the list of verses affected
@@ -196,6 +199,26 @@ public class TextRendering {
             IndexRange compRange = entry.getValue();
             if (start >= compRange.getStart() && start <= compRange.getEnd()) {
                 this.area.setStyle(compRange.getStart(), compRange.getEnd(), TextStyle.underline(true));
+                return entry;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * This method selects a verse by the given ÄIndexRange in the text
+     * @param range the range by which we search for the verse in the text
+     * @return the selected the entry for the verse
+     */
+    public Map.Entry<Integer, IndexRange> selectVerseColorByGivenRange(IndexRange range, Color color) {
+        int start = range.getStart();
+
+        for (Map.Entry<Integer, IndexRange> entry: this.chapterMap.entrySet()) {
+            IndexRange compRange = entry.getValue();
+            if (start >= compRange.getStart() && start <= compRange.getEnd()) {
+                TextStyle style = this.area.getInitialTextStyle();
+                style = style.updateBackgroundColor(color);
+                this.area.setStyle(compRange.getStart(), compRange.getEnd(), style);
                 return entry;
             }
         }

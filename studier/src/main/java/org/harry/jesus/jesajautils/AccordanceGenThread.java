@@ -39,7 +39,7 @@ public class AccordanceGenThread extends Thread {
         StringBuffer html = HTMLRendering.buildAccordance(utils, accordance);
         try {
             FileOutputStream outStream = new FileOutputStream(outFile);
-            outStream.write(html.toString().getBytes(StandardCharsets.UTF_8));
+            outStream.write(html.toString().getBytes());
             outStream.close();
             Logger.trace("Ready build accordance file: " + outFile.getAbsolutePath());
         } catch (IOException ex) {
