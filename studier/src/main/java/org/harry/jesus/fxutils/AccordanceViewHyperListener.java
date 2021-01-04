@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.harry.jesus.fxutils.WebViewHyperListener.getRealBibleLink;
 
-public class KonkordanzViewHyperListener implements WebViewHyperlinkListener {
+public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
 
     private final BibleTextUtils utils;
 
@@ -23,7 +23,7 @@ public class KonkordanzViewHyperListener implements WebViewHyperlinkListener {
 
     private final WebView view;
 
-    public KonkordanzViewHyperListener(BibleTextUtils utils, FoldableStyledArea area, WebView view) {
+    public AccordanceViewHyperListener(BibleTextUtils utils, FoldableStyledArea area, WebView view) {
         this.utils = utils;
         this.area = area;
         this.view = view;

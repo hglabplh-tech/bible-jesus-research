@@ -1,5 +1,6 @@
 package org.harry.jesus.jesajautils;
 
+import generated.Dictionary;
 import generated.XMLBIBLE;
 import org.harry.jesus.synchjeremia.BibleRef;
 import org.tinylog.Logger;
@@ -34,5 +35,30 @@ public class BibleReader {
             throw new IllegalStateException("bible not loaded", ex);
         }
     }
+
+    public static Dictionary loadBibleAccordance(InputStream stream)  {
+        JAXBContext jaxbContext;
+
+
+        try {
+            Logger.trace("About to unmarshall.....");
+            jaxbContext = JAXBContext.newInstance(Dictionary.class);
+            Unmarshaller umarshall  = jaxbContext.createUnmarshaller();
+            Logger.trace("About to unmarshall unmarshaller created.....");
+            Dictionary root = (Dictionary) umarshall.unmarshal(stream);
+            Logger.trace("About to unmarshall ok.....");
+
+
+            System.out.println(root.getINFORMATION().getTitleOrCreatorOrDescription());
+            stream.close();
+            return root;
+        }
+        catch (Exception ex) {
+            Logger.trace("bible not loaded error ->: " + ex.getMessage());
+            Logger.trace(ex);
+            throw new IllegalStateException("bible not loaded", ex);
+        }
+    }
+
 
 }

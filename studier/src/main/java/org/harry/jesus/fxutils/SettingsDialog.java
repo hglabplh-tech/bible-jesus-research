@@ -12,13 +12,11 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import jesus.harry.org.versnotes._1.Note;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.TextStyle;
 import org.harry.jesus.synchjeremia.ApplicationProperties;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
-import sun.nio.ch.AbstractPollArrayWrapper;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.Optional;
@@ -61,6 +59,8 @@ public class SettingsDialog {
         grid.setPadding(new Insets(20, 150, 10, 10));
         Label bibleDirLab = new Label("Bible Source Bible Directory:");
         TextField bibleDirField = new TextField();
+        Label accordanceDirLab = new Label("Bible Accordance Source Directory:");
+        TextField accordanceField = new TextField();
         Label mediaDirLab = new Label("Play Bible Directory:");
         TextField mediaDirField = new TextField();
 
@@ -70,25 +70,42 @@ public class SettingsDialog {
         String audioPath = ApplicationProperties.getApplicationMediaDir();
         mediaDirField.setText(audioPath);
         Button getMediaDirButton = new Button("Get Media Directory");
-        Button getBibleDirButton = new Button("Get Media Directory");
+        Button getBibleDirButton = new Button("Get Bible Directory");
+        Button getAccordanceDirButton = new Button("Get Accordance Directory");
         getBibleDirButton.addEventHandler(ActionEvent.ACTION, new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                String biblePath = JesusMisc.showOpenDialogString(event, dialog.getDialogPane());
-                biblePath = biblePath.substring(0, biblePath.lastIndexOf(File.separator));
-                mediaDirField.setText(biblePath);
-                ApplicationProperties.setApplicationBiblesDir(biblePath);
-                ApplicationProperties.storeApplicationProperties();
+                Optional<String> path = JesusMisc.showDirectorySelector(dialog.getDialogPane());
+                if (path.isPresent()) {
+                    String biblePath = path.get();
+                    bibleDirField.setText(biblePath);
+                    ApplicationProperties.setApplicationBiblesDir(biblePath);
+                    ApplicationProperties.storeApplicationProperties();
+                }
+            }
+        });
+        getAccordanceDirButton.addEventHandler(ActionEvent.ACTION, new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Optional<String> path = JesusMisc.showDirectorySelector(dialog.getDialogPane());
+                if (path.isPresent()) {
+                    String biblePath = path.get();
+                    accordanceField.setText(biblePath);
+                    ApplicationProperties.setApplicationAccordanceDir(biblePath);
+                    ApplicationProperties.storeApplicationProperties();
+                }
             }
         });
         getMediaDirButton.addEventHandler(ActionEvent.ACTION, new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                String path = JesusMisc.showOpenDialogString(event, dialog.getDialogPane());
-                path = path.substring(0, path.lastIndexOf(File.separator));
-                mediaDirField.setText(path);
-                ApplicationProperties.setApplicationMediaDir(path);
-                ApplicationProperties.storeApplicationProperties();
+                Optional<String> path = JesusMisc.showDirectorySelector(dialog.getDialogPane());
+                if (path.isPresent()) {
+                    String selectedPath = path.get();
+                    mediaDirField.setText(selectedPath);
+                    ApplicationProperties.setApplicationMediaDir(selectedPath);
+                    ApplicationProperties.storeApplicationProperties();
+                }
             }
         });
 
@@ -97,13 +114,7 @@ public class SettingsDialog {
          */
         Label fontLabel = new Label("Select default Font");
         ChoiceBox<String> fontBox = makeFontBox();
-        ChoiceBox<Integer> fontSizeBox = new ChoiceBox<>();
-        fontSizeBox.getItems().add(8);
-        fontSizeBox.getItems().add(10);
-        fontSizeBox.getItems().add(12);
-        fontSizeBox.getItems().add(14);
-        fontSizeBox.getItems().add(16);
-        fontSizeBox.getItems().add(18);
+        ChoiceBox<Integer> fontSizeBox = getFontSizeChoiceBox();
         fontSizeBox.getSelectionModel().select(ApplicationProperties.getFontSize());
         Label shapeLabel = new Label("Select default Shape");
         ChoiceBox<String> shapeBox = makeShapeBox();
@@ -113,15 +124,18 @@ public class SettingsDialog {
         grid.add(bibleDirLab, 0, 0);
         grid.add(bibleDirField, 1, 0);
         grid.add(getBibleDirButton, 2, 0);
-        grid.add(mediaDirLab, 0, 1);
-        grid.add(mediaDirField, 1, 1);
-        grid.add(getMediaDirButton, 2, 1);
-        grid.add(fontLabel, 0, 2);
-        grid.add(fontBox, 1, 2);
-        grid.add(fontSizeBox, 2, 2);
-        grid.add(shapeLabel, 0, 3);
-        grid.add(shapeBox, 1, 3);
-        grid.add(area, 2, 3);
+        grid.add(accordanceDirLab, 0, 1);
+        grid.add(accordanceField, 1, 1);
+        grid.add(getAccordanceDirButton, 2, 1);
+        grid.add(mediaDirLab, 0, 2);
+        grid.add(mediaDirField, 1, 2);
+        grid.add(getMediaDirButton, 2, 2);
+        grid.add(fontLabel, 0, 3);
+        grid.add(fontBox, 1, 3);
+        grid.add(fontSizeBox, 2, 3);
+        grid.add(shapeLabel, 0, 4);
+        grid.add(shapeBox, 1, 4);
+        grid.add(area, 2, 4);
         setPreview(area, ApplicationProperties.getShape(),
                 ApplicationProperties.getFontFamily().get(),
                 ApplicationProperties.getFontSize());
@@ -190,6 +204,18 @@ public class SettingsDialog {
 
         dialog.showAndWait();
 
+    }
+
+    @NotNull
+    private ChoiceBox<Integer> getFontSizeChoiceBox() {
+        ChoiceBox<Integer> fontSizeBox = new ChoiceBox<>();
+        fontSizeBox.getItems().add(8);
+        fontSizeBox.getItems().add(10);
+        fontSizeBox.getItems().add(12);
+        fontSizeBox.getItems().add(14);
+        fontSizeBox.getItems().add(16);
+        fontSizeBox.getItems().add(18);
+        return fontSizeBox;
     }
 
     private ChoiceBox<String> makeFontBox() {

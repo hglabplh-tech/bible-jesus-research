@@ -2,6 +2,7 @@ package org.harry.jesus;
 
 import generated.BIBLEBOOK;
 import generated.CHAPTER;
+import generated.Dictionary;
 import generated.XMLBIBLE;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -36,10 +37,7 @@ import org.harry.jesus.danielpersistence.PersistenceLayer;
 import org.harry.jesus.fxutils.*;
 import org.harry.jesus.fxutils.media.MediaControl;
 import org.harry.jesus.fxutils.media.PlayBible;
-import org.harry.jesus.jesajautils.BibleTextUtils;
-import org.harry.jesus.jesajautils.HTMLRendering;
-import org.harry.jesus.jesajautils.LinkHandler;
-import org.harry.jesus.jesajautils.TextRendering;
+import org.harry.jesus.jesajautils.*;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.ParStyle;
 import org.harry.jesus.jesajautils.browse.TextStyle;
@@ -56,6 +54,7 @@ import org.tinylog.Logger;
 //import org.reactfx.util.Either;
 
 
+import javax.swing.text.html.Option;
 import javax.xml.bind.JAXBElement;
 import java.io.*;
 import java.math.BigInteger;
@@ -154,6 +153,7 @@ public class MainController {
     private MediaControl mediaControl;
 
 
+    private Optional<Tuple<String, Dictionary>> optAccordance = Optional.empty();
 
     @FXML
     public void initialize() {
@@ -209,6 +209,9 @@ public class MainController {
             showRoot();
             initMediaView();
             System.out.println("second");
+            utils.loadAccordancesDownLoaded(
+                    new File(ApplicationProperties.getApplicationAccordanceDir()),
+                    context);
         }
     }
 
@@ -262,10 +265,13 @@ public class MainController {
         bibles.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                ViewKonkordanzDialog.showKonkordanzDialog(utils,
-                        area);
                 selectedIndex = t1.intValue();
                 selected = utils.getBibles().get(t1.intValue());
+                optAccordance = utils.getAccordance(selected);
+                if (optAccordance.isPresent()) {
+                    ViewAccordanceDialog.showAccordanceDialog(utils,
+                            area, optAccordance.get().getFirst());
+                }
                 TreeItem<String> root = buildBooksTree();
                 showChapter();
                 BibleTextUtils.BookLink link =
@@ -651,7 +657,7 @@ public class MainController {
 
     @FXML
     public void openPlan(ActionEvent event) {
-        InputStream input = JesusMisc.showOpenDialog(event, notesTable);
+        InputStream input = JesusMisc.showOpenDialog(notesTable);
         planDays = PersistenceLayer.loadPlan(input);
         String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, planDays.getDay().get(0).getVerses());
         setPlanOutputSelected(planDays.getDay().get(0), versHtml);
@@ -664,7 +670,7 @@ public class MainController {
 
     @FXML
     public void savePlan(ActionEvent event) {
-        OutputStream os = JesusMisc.showSaveDialog(event, notesTable);
+        OutputStream os = JesusMisc.showSaveDialog(notesTable);
         PersistenceLayer.storePlan(planDays, os);
     }
 
@@ -727,7 +733,7 @@ public class MainController {
     @FXML
     public void loadDev(ActionEvent event) {
         byte [] buffer = new byte[4096];
-        InputStream stream = JesusMisc.showOpenDialog(event, notesTable);
+        InputStream stream = JesusMisc.showOpenDialog(notesTable);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             int read = stream.read(buffer);
@@ -744,7 +750,7 @@ public class MainController {
 
     @FXML
     public void saveDev(ActionEvent event) {
-        OutputStream os = JesusMisc.showSaveDialog(event, notesTable);
+        OutputStream os = JesusMisc.showSaveDialog(notesTable);
         String htmlText = devotionalEdit.getHtmlText();
         try {
             PrintWriter writer = new PrintWriter(os);
@@ -877,7 +883,7 @@ public class MainController {
 
     @FXML
     public void loadSearch(ActionEvent event) {
-        InputStream is = JesusMisc.showOpenDialog(event, notesTable);
+        InputStream is = JesusMisc.showOpenDialog(notesTable);
         try {
             ObjectInputStream objIN = new ObjectInputStream(is);
             this.verseKeys = (List<BibleFulltextEngine.BibleTextKey>)objIN.readObject();
@@ -898,7 +904,7 @@ public class MainController {
 
     @FXML
     public void saveSearch(ActionEvent event) {
-        OutputStream os = JesusMisc.showSaveDialog(event, notesTable);
+        OutputStream os = JesusMisc.showSaveDialog(notesTable);
         try {
             ObjectOutputStream objOut = new ObjectOutputStream(os);
             objOut.writeObject(this.verseKeys);
@@ -912,7 +918,7 @@ public class MainController {
     @FXML
     public void toPDF(ActionEvent event) {
         String htmlText = devotionalEdit.getHtmlText();
-        OutputStream pdfOut = JesusMisc.showSaveDialog(event, notesTable);
+        OutputStream pdfOut = JesusMisc.showSaveDialog(notesTable);
         HTMLToPDF.convertTo(htmlText, pdfOut);
     }
 
@@ -927,7 +933,7 @@ public class MainController {
 
     @FXML
     public void loadNotes(ActionEvent event) {
-        InputStream input = JesusMisc.showOpenDialog(event, notesTable);
+        InputStream input = JesusMisc.showOpenDialog(notesTable);
         Versnotes notes = PersistenceLayer.loadNotes(input);
         noteList.getVersenote().addAll(notes.getVersenote());
 
@@ -1010,7 +1016,7 @@ public class MainController {
 
     @FXML
     public void saveNotes(ActionEvent event) {
-        OutputStream os = JesusMisc.showSaveDialog(event, notesTable);
+        OutputStream os = JesusMisc.showSaveDialog(notesTable);
         PersistenceLayer.storeNotes(noteList, os);
     }
 

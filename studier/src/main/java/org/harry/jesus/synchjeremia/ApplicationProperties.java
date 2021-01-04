@@ -26,6 +26,7 @@ public class ApplicationProperties {
             .updateTextColor(Color.BLACK);
     public static final String AUDIO_PATH = "com.harry.jesus.apath";
     public static final String BIBLE_XML_PATH = "com.harry.jesus.biblespath";
+    public static final String ACCORDANCE_XML_PATH = "com.harry.jesus.accordancepath";
     public static final String APP_FONT = "com.harry.jesus.font";
     public static final String APP_FONT_SIZE = "com.harry.jesus.fontsize";
     public static final String APP_SHAPE = "com.harry.jesus.shape";
@@ -78,6 +79,11 @@ public class ApplicationProperties {
                 System.getProperty("user.home") + "/bibleStudyXmlPath");
     }
 
+    public static String getApplicationAccordanceDir() {
+        return getSettings().getProperty(ACCORDANCE_XML_PATH,
+                System.getProperty("user.home") + "/bibleStudyXmlPath/accordance");
+    }
+
     public static String getApplicationMediaDir() {
         return getSettings().getProperty(AUDIO_PATH,
                 System.getProperty("user.home") + "/bibleStudyAudio");
@@ -86,6 +92,11 @@ public class ApplicationProperties {
     public static void setApplicationBiblesDir(String dir) {
         getSettings().setProperty(BIBLE_XML_PATH, dir);
     }
+
+    public static void setApplicationAccordanceDir(String dir) {
+        getSettings().setProperty(ACCORDANCE_XML_PATH, dir);
+    }
+
 
     public static void setApplicationMediaDir(String dir) {
         getSettings().setProperty(AUDIO_PATH, dir);

@@ -3,6 +3,7 @@ package org.harry.jesus.jesajautils;
 import com.google.common.io.LineReader;
 import generated.BIBLEBOOK;
 import generated.CHAPTER;
+import generated.Dictionary;
 import generated.VERS;
 import generated.XMLBIBLE;
 import javafx.scene.control.IndexRange;
@@ -45,7 +46,12 @@ public class BibleTextUtils {
 
     List<BibleBookInstance> bibleInstances = new ArrayList<>();
     List<XMLBIBLE> bibles = new ArrayList<>();
+    List<Tuple<String, Dictionary>> accordances = new ArrayList<>();
     List<String> bookLabels = new ArrayList<>();
+
+    Map<Integer, BookLabel> bookLabMap = new LinkedHashMap<>();
+
+    private  AccordanceUtil accUtil = null;
 
 
     public BibleTextUtils() {
@@ -59,17 +65,30 @@ public class BibleTextUtils {
                 line = lreader.readLine();
             }
             reader.close();
-
-            File biblePath = new File(BibleThreadPool.getContext()
-                    .getSettings().getProperty(ApplicationProperties.BIBLE_XML_PATH,
-                            System.getProperty("user.home")));
+            buidBookLabMap();
+            File biblePath = new File(ApplicationProperties.getApplicationBiblesDir());
+            File accordancePath = new File(ApplicationProperties.getApplicationAccordanceDir());
             BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
             loadBiblesDownLoaded(biblePath, context);
-            // loadInternal();
+            //loadAccordancesDownLoaded(accordancePath,context);
+            accUtil = new AccordanceUtil(accordances);
+
 
         } catch (Exception ex) {
             Logger.trace("Exception occured loading bibles");
         }
+    }
+
+    private void buidBookLabMap() {
+        for (String label: bookLabels) {
+            BookLabel labAsClass = getBookLabelAsClass(label);
+            Integer book = Integer.parseInt(label.split(",")[0]);
+            this.bookLabMap.put(book, labAsClass);
+        }
+    }
+
+    public Map<Integer, BookLabel> getBookLabMap() {
+        return bookLabMap;
     }
 
     private void loadBiblesDownLoaded(File biblePath, BibleThreadPool.ThreadBean context) {
@@ -86,6 +105,34 @@ public class BibleTextUtils {
             context.getBibleRefList().add(newRef);
         }
         loadBiblesFromRef(context.getBibleRefList());
+    }
+
+    public void loadAccordancesDownLoaded(File accordancePath, BibleThreadPool.ThreadBean context) {
+        for (File accordanceFile : accordancePath.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                if (name.contains(".xml")) {
+                    return true;
+                }
+                return false;
+            }
+        })) {
+            try {
+                InputStream bibleIN = new FileInputStream(accordanceFile);
+                Dictionary actAccordance = BibleReader.loadBibleAccordance(bibleIN);
+                String fileName = accordanceFile.getName();
+                fileName = fileName.substring(0, fileName.indexOf(".xml"));
+                accordances.add(new Tuple<>(fileName, actAccordance));
+                AccordanceGenThread thread =
+                        new AccordanceGenThread(this,
+                                actAccordance, fileName, accordancePath);
+                thread.start();
+            } catch(IOException ex) {
+                Logger.trace(ex);
+                Logger.trace("Load error during loading accordances", ex.getMessage());
+            }
+        }
+
     }
 
     private void loadInternal() {
@@ -111,6 +158,20 @@ public class BibleTextUtils {
             }
         }
 
+    }
+
+    public Optional<Tuple<String, Dictionary>> getAccordance(XMLBIBLE selected) {
+        if (accUtil != null) {
+            for (Tuple<String, Dictionary> dictTuple: this.accordances) {
+                Optional<Tuple<String, Dictionary>> dictOpt =  accUtil
+                        .findAccordance(dictTuple.getSecond(),
+                        selected.getINFORMATION().getValue());
+                if (dictOpt.isPresent()) {
+                    return dictOpt;
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     public String generateVersEntry(BibleFulltextEngine.BibleTextKey key,

@@ -2,19 +2,17 @@ package org.harry.jesus.fxutils;
 
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import org.pmw.tinylog.Logger;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.Optional;
 
 public class JesusMisc {
-    public static OutputStream showSaveDialog(ActionEvent event, Node node) {
+    public static OutputStream showSaveDialog(Node node) {
         FileChooser fDialog = new FileChooser();
         fDialog.setTitle("Select Path");
         fDialog.getExtensionFilters()
@@ -38,7 +36,7 @@ public class JesusMisc {
         return null;
     }
 
-    public static InputStream showOpenDialog(ActionEvent event, Node node) {
+    public static InputStream showOpenDialog(Node node) {
         FileChooser fDialog = new FileChooser();
         fDialog.setTitle("Select Path");
         File currentDir = new File(System.getProperty("user.home", "C:\\")).getAbsoluteFile();
@@ -57,7 +55,7 @@ public class JesusMisc {
         return null;
     }
 
-    public static String showOpenDialogString(ActionEvent event, Node node) {
+    public static String showOpenDialogString(Node node) {
         FileChooser fDialog = new FileChooser();
         fDialog.setTitle("Select Path");
         File currentDir = new File(System.getProperty("user.home", "C:\\")).getAbsoluteFile();
@@ -69,5 +67,21 @@ public class JesusMisc {
             return file.getAbsolutePath();
         }
         return System.getProperty("usert.home");
+    }
+
+    public static Optional<String> showDirectorySelector(Node node) {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("JavaFX Projects");
+        File defaultDirectory = new File(System.getProperty("user.home", "C:\\"));
+        chooser.setInitialDirectory(defaultDirectory);
+        Window parent = node.getScene().getWindow();
+        File selectedDirectory = chooser.showDialog(parent);
+        if (selectedDirectory != null) {
+            Optional<String> selectedDirectoryOpt =
+                    Optional.of(selectedDirectory.getAbsolutePath());
+            return selectedDirectoryOpt;
+        } else {
+            return Optional.empty();
+        }
     }
 }
