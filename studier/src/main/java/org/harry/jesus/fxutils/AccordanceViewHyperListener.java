@@ -9,7 +9,7 @@ import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.LinkHandler;
 import org.harry.jesus.jesajautils.TextRendering;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
-import org.jetbrains.annotations.NotNull;
+
 
 import javax.swing.event.HyperlinkEvent;
 import java.net.URL;
@@ -58,7 +58,8 @@ public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
 
             BibleTextUtils.BookLink link = links.get(0);
             TextRendering rendering = new TextRendering(utils, area, link.getBookLabel(), link.getChapter());
-            rendering.render(utils.getBibles().get(2),link.getBookLabel(), link.getChapter() );
+            rendering.render(utils.getBibleInstances().get(0).getBible(),
+                    link.getBookLabel(), link.getChapter() );
             IndexRange range = rendering.getChapterMap().get(link.getVerses().get(0));
             rendering.selectVerseColorByGivenRange(range, Color.CORAL);
         } catch (Exception e) {

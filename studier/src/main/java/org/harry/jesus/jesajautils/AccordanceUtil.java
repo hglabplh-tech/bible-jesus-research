@@ -17,7 +17,7 @@ public class AccordanceUtil {
     }
 
 
-    public String getIdFromInfo(TINFORMATION info) {
+    public static String getIdFromInfo(TINFORMATION info) {
         List<JAXBElement<?>> elements =
                 info.getTitleOrCreatorOrDescription();
         for (JAXBElement<?> element: elements) {
@@ -31,7 +31,7 @@ public class AccordanceUtil {
 
     }
 
-    public String getIdFromBibleInfo(INFORMATION info) {
+    public static String getIdFromBibleInfo(INFORMATION info) {
         List<JAXBElement<?>> elements =
                 info.getTitleOrCreatorOrDescription();
         for (JAXBElement<?> element: elements) {

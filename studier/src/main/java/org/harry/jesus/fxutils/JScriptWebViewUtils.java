@@ -1,5 +1,6 @@
 package org.harry.jesus.fxutils;
 
+import com.sun.javafx.webkit.Accessor;
 import com.sun.webkit.WebPage;
 import javafx.scene.web.WebEngine;
 import org.pmw.tinylog.Logger;
@@ -10,11 +11,12 @@ public class JScriptWebViewUtils {
 
     public static void highlight(WebEngine engine, String text) {
         try {
-            Field pageField = engine.getClass().getDeclaredField("page");
-            pageField.setAccessible(true);
+            WebPage page = Accessor.getPageFor(engine);
+          //  Field pageField = engine.getClass().getDeclaredField("page");
+           // pageField.setAccessible(true);
 
 
-            WebPage page = (com.sun.webkit.WebPage) pageField.get(engine);
+            //WebPage page = (com.sun.webkit.WebPage) pageField.get(engine);
             page.find(text, true, true, false);
         } catch(Exception ex) {
             Logger.trace(ex);

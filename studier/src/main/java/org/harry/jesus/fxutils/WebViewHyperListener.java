@@ -5,7 +5,7 @@ import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.LinkHandler;
 import org.harry.jesus.jesajautils.TextRendering;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
-import org.jetbrains.annotations.NotNull;
+
 
 import javax.swing.event.HyperlinkEvent;
 import java.net.URL;
@@ -30,14 +30,15 @@ public class WebViewHyperListener implements WebViewHyperlinkListener {
             List<BibleTextUtils.BookLink> links = LinkHandler.parseLinks(utils, href);
             BibleTextUtils.BookLink link = links.get(0);
             TextRendering rendering = new TextRendering(utils, area, link.getBookLabel(), link.getChapter());
-            rendering.render(utils.getBibles().get(2),link.getBookLabel(), link.getChapter() );
+            rendering.render(utils.getBibleInstances().get(0).getBible(),
+                    link.getBookLabel(), link.getChapter() );
         } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    @NotNull
+
     public static String getRealBibleLink(String href) {
         href = href.replace("http://bible/", "");
         href = href.replace("\\", " ");

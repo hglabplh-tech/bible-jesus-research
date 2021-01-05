@@ -10,10 +10,11 @@ import javafx.scene.control.IndexRange;
 import jesus.harry.org.versnotes._1.Vers;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
+import org.harry.jesus.synchjeremia.AccordanceRef;
 import org.harry.jesus.synchjeremia.ApplicationProperties;
 import org.harry.jesus.synchjeremia.BibleRef;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
-import org.jetbrains.annotations.NotNull;
+
 import org.pmw.tinylog.Logger;
 
 import javax.xml.bind.JAXBElement;
@@ -22,36 +23,12 @@ import java.math.BigInteger;
 import java.util.*;
 
 public class BibleTextUtils {
-    public final static List<String> bibleFnames = Arrays.asList(
-            "bible_luther1912.xml",
-            "SF_2012-08-14_DEUTSCH_LUT_1545_LH_(LUTHER 1545 (LETZTE HAND)).xml",
-            "SF_2009-01-20_GER_ELB1905_(ELBERFELDER 1905).xml",
-            "SF_2014-09-30_GER_NEU_(NEUE EVANGELISTISCHE ÜBERSETZUNG (NEÜ)).xml",
-            "SF_2015-08-16_ENG_NHEBYHWH_(NEW HEART ENGLISH BIBLE (YHWH)).xml",
-            "SF_2009-01-20_SPA_RVA_(REINA VALERA 1989).xml",
-            "SF_2009-01-20_ENG_UKJV_(UPDATED KING JAMES VERSION).xml"
 
-    );
-
-    List<String> bibleHashes = Arrays.asList(
-            "d78b23abc90a1e9fd44ef796953ea552b0f8e2f0d15cc96b04217ba11e436f0d",
-            "66fe26a722e9fb908e1baf631ea7bc9cd8e9366f4afe65994e4042421728ea3a",
-            "336b9137ecb8fda38688c408d7dc6d4c36f4caa5a3a2599ac200c9ab8d198abf",
-            "fa192749106f8ba3a27552f394d01a11904488cfb269c8244313c1170c096938",
-            "faba332e53dd17ead43106aabe4ab4605dcb3b0a8b10040d670fca913680bf83",
-            "6e4a8381e4377f54e29d592eafeba72a92fe0b8384bdd598e6fd52c258eb4cd4",
-            "ca6d02c950945462d543dd6a85e3c46e52321c646abe2dd204088f2449d9bbfc");
-
-    public final static List<Integer> fuzzyIndex = Arrays.asList(3);
 
     List<BibleBookInstance> bibleInstances = new ArrayList<>();
-    List<XMLBIBLE> bibles = new ArrayList<>();
-    List<Tuple<String, Dictionary>> accordances = new ArrayList<>();
     List<String> bookLabels = new ArrayList<>();
 
     Map<Integer, BookLabel> bookLabMap = new LinkedHashMap<>();
-
-    private  AccordanceUtil accUtil = null;
 
 
     public BibleTextUtils() {
@@ -71,7 +48,7 @@ public class BibleTextUtils {
             BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
             loadBiblesDownLoaded(biblePath, context);
             //loadAccordancesDownLoaded(accordancePath,context);
-            accUtil = new AccordanceUtil(accordances);
+
 
 
         } catch (Exception ex) {
@@ -117,61 +94,46 @@ public class BibleTextUtils {
                 return false;
             }
         })) {
-            try {
-                InputStream bibleIN = new FileInputStream(accordanceFile);
-                Dictionary actAccordance = BibleReader.loadBibleAccordance(bibleIN);
-                String fileName = accordanceFile.getName();
-                fileName = fileName.substring(0, fileName.indexOf(".xml"));
-                accordances.add(new Tuple<>(fileName, actAccordance));
-                AccordanceGenThread thread =
-                        new AccordanceGenThread(this,
-                                actAccordance, fileName, accordancePath);
-                thread.start();
-            } catch(IOException ex) {
-                Logger.trace(ex);
-                Logger.trace("Load error during loading accordances", ex.getMessage());
+
+            Tuple<Dictionary, String> actAccordance = BibleReader.loadBibleAccordance(accordanceFile);
+            String fileName = accordanceFile.getName();
+            fileName = fileName.substring(0, fileName.indexOf(".xml"));
+            AccordanceRef accRef = new AccordanceRef()
+                    .setHashValue(actAccordance.getSecond())
+                    .setFilename(fileName)
+                    .setPathToBook(accordanceFile.getAbsolutePath());
+            AccordanceUtil util = new AccordanceUtil(
+                    Arrays.asList(new Tuple<String, Dictionary>(fileName, actAccordance.getFirst())));
+            Optional <BibleBookInstance> instance = bibleInstances.stream().filter(e -> {
+                Optional<Tuple<String,Dictionary>> opt = util.findAccordance(actAccordance.getFirst(),
+                        e.getBible().getINFORMATION().getValue());
+                return opt.isPresent();
+                    }).findFirst();
+            if (instance.isPresent()) {
+                instance.get().setOptDictAccRefTuple(actAccordance.getFirst(), accRef);
             }
+            AccordanceGenThread thread =
+                    new AccordanceGenThread(this,
+                            actAccordance.getFirst(), fileName, accordancePath);
+            thread.start();
+
         }
 
     }
 
-    private void loadInternal() {
-        for (String bibleName: bibleFnames) {
-            InputStream bibleIN = BibleTextUtils.class.getResourceAsStream("/" + bibleName);
-            XMLBIBLE actBible = BibleReader.loadBible(bibleIN);
-            bibles.add(actBible);
-
-        }
-    }
 
     private void loadBiblesFromRef(List<BibleRef> references) {
 
         for (BibleRef ref : references) {
-            try {
-                InputStream bibleIN = new FileInputStream(ref.getPathToBook());
-                XMLBIBLE actBible = BibleReader.loadBible(bibleIN);
-                bibles.add(actBible);
-                bibleInstances.add(new BibleBookInstance(ref, actBible));
-            } catch(IOException ex) {
-                Logger.trace(ex);
-                Logger.trace("Load error during loading bibles", ex.getMessage());
-            }
-        }
-
+            Tuple<XMLBIBLE, String> actBible = BibleReader.loadBible(new File(ref.getPathToBook()));
+            ref.setBibleName(AccordanceUtil
+                    .getIdFromBibleInfo(actBible
+                            .getFirst()
+                            .getINFORMATION()
+                            .getValue())).setHashValue(actBible.getSecond());
+            bibleInstances.add(new BibleBookInstance(ref, actBible.getFirst()));
     }
 
-    public Optional<Tuple<String, Dictionary>> getAccordance(XMLBIBLE selected) {
-        if (accUtil != null) {
-            for (Tuple<String, Dictionary> dictTuple: this.accordances) {
-                Optional<Tuple<String, Dictionary>> dictOpt =  accUtil
-                        .findAccordance(dictTuple.getSecond(),
-                        selected.getINFORMATION().getValue());
-                if (dictOpt.isPresent()) {
-                    return dictOpt;
-                }
-            }
-        }
-        return Optional.empty();
     }
 
     public String generateVersEntry(BibleFulltextEngine.BibleTextKey key,
@@ -250,7 +212,6 @@ public class BibleTextUtils {
         }
     }
 
-    @NotNull
     public static Vers generateVers(BookLabel actBook, Integer actChapter,
                                     FoldableStyledArea area, Map<Integer, IndexRange> selectedVersesMap,
                                     Integer versNo) {
@@ -264,7 +225,7 @@ public class BibleTextUtils {
         return vers;
     }
 
-    @NotNull
+
     public static Vers generateVerses(BibleTextUtils utils, BookLabel actBook, Integer actChapter,
                                       FoldableStyledArea area, Map<Integer, IndexRange> selectedVersesMap) {
         Vers vers = new Vers();
@@ -299,26 +260,10 @@ public class BibleTextUtils {
 
     public List<String> getBibleInfos() {
         List<String> result = new ArrayList<>();
-        for (XMLBIBLE bible: bibles) {
-            result.add(bible.getBiblename());
+        for (BibleBookInstance inst : bibleInstances) {
+            result.add(inst.getBible().getBiblename());
         }
         return result;
-    }
-
-    public List<XMLBIBLE> getBibles() {
-        return this.bibles;
-    }
-
-    public List<String> getBibleHashes() {
-        return this.bibleHashes;
-    }
-
-    public static List<String> getBibleFnames() {
-        return bibleFnames;
-    }
-
-    public static List<Integer> getFuzzyIndex() {
-        return fuzzyIndex;
     }
 
     public List<BibleBookInstance> getBibleInstances() {
@@ -520,7 +465,9 @@ public class BibleTextUtils {
 
         private final BibleRef bibleRef;
 
-        private XMLBIBLE bible;
+        private final XMLBIBLE bible;
+
+        private Optional<Tuple<Dictionary, AccordanceRef>> optDictAccRefTuple = Optional.empty();
 
         public BibleBookInstance(BibleRef bibleRef, XMLBIBLE bible) {
             this.bibleRef = bibleRef;
@@ -533,6 +480,16 @@ public class BibleTextUtils {
 
         public XMLBIBLE getBible() {
             return bible;
+        }
+
+        public Optional<Tuple<Dictionary, AccordanceRef>> getOptDictAccRefTuple() {
+            return optDictAccRefTuple;
+        }
+
+        public BibleBookInstance setOptDictAccRefTuple(Dictionary dictionary,
+                                                       AccordanceRef accRef) {
+            this.optDictAccRefTuple = Optional.of(new Tuple<>(dictionary, accRef));
+            return this;
         }
     }
 }

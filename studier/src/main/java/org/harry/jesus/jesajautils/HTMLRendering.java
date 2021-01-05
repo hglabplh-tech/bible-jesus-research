@@ -77,31 +77,45 @@ public class HTMLRendering {
 
     public static void buildAccParagraphEntryHTML(BibleTextUtils utils,
                                                   StringBuffer htmlBuffer,
-                                                  TParagraph paragraph) {
+                                                 TParagraph paragraph) {
+        int indexHyper = 0;
         List<Serializable> objects = paragraph.getContent();
         for  (Serializable pContent: paragraph.getContent()) {
             if (pContent instanceof JAXBElement) {
+
                 JAXBElement jaxbElement = (JAXBElement)pContent;
                 Object thisContent = ((JAXBElement)pContent).getValue();
                 if (jaxbElement.getName().getLocalPart().equals("title")) {
+                    indexHyper = 0;
                     String title = (String) thisContent;
                     htmlBuffer.append("<p>description title: "
                             + title
                             + "</p>\n"
                     );
                 } else if (jaxbElement.getName().getLocalPart().equals("see")) {
+                    indexHyper = 0;
                     SeeType see = (SeeType)jaxbElement.getValue();
                     buildSee(see, htmlBuffer);
                 } else if (thisContent instanceof BibLinkType) {
+                    indexHyper = 0;
                     BibLinkType bibleLink = (BibLinkType) thisContent;
                     Logger.trace("BibLink: ["
                             + bibleLink.getBn() + ","
                             + bibleLink.getCn1() + ","
                             + bibleLink.getVn1() + "]\n");
                 } else if (thisContent instanceof RefLinkType){
+                    if (indexHyper == 0) {
+                        htmlBuffer.append("<p>");
+                    } else if ((indexHyper % 5) == 0) {
+                        htmlBuffer.append("<br>");
+                    } else {
+                        htmlBuffer.append(" , ");
+                    }
+
                     RefLinkType refLink = (RefLinkType) thisContent;
                     String mScope = refLink.getMscope();
                     createAccBibleLink(utils, htmlBuffer, mScope);
+                    indexHyper++;
                 } else if (thisContent instanceof String) {
                     Logger.trace("String content: " + thisContent);
                 }
@@ -136,7 +150,7 @@ public class HTMLRendering {
                 + "," + verse.toString()
                 + "]";
         generateHyperLink(htmlBuffer, theFinal);
-        htmlBuffer.append('\n');
+
 
     }
 
@@ -185,10 +199,12 @@ public class HTMLRendering {
                     String versText = mapEntry.getValue();
                     vers.setVtext(versText);
                     BibleTextUtils.BookLabel labelClass = new BibleTextUtils.BookLabel(link.getBookLabel());
+                    htmlContent.append("<p>");
                     generateHyperLink(htmlContent, "[" + labelClass.getLongName()
                             + " " + link.getChapter()
                             + "," + versNo
                             + "]");
+                    htmlContent.append("</p>");
                     renderVers(htmlContent, versText);
 
 
@@ -208,7 +224,7 @@ public class HTMLRendering {
         href = href.replace("[", "opstart");
         href = href.replace("]", "opend");
 
-        buffer.append("<p><a href=\"" + href + "\">" + link + "</a></p>");
+        buffer.append("<a href=\"" + href + "\">" + link + "</a>");
         return buffer.toString();
     }
 

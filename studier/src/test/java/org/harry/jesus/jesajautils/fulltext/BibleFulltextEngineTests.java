@@ -10,7 +10,7 @@ public class BibleFulltextEngineTests {
 
     @Test
     public void simpleSearch() {
-        XMLBIBLE bible = BibleFulltextEngine.getUtil().getBibles().get(2);
+        XMLBIBLE bible = BibleFulltextEngine.getUtil().getBibleInstances().get(2).getBible();
         BibleFulltextEngine engine = new BibleFulltextEngine(bible);
         StatisticsCollector collector = new StatisticsCollector();
         Map<BibleFulltextEngine.BibleTextKey, String> hits =
@@ -21,7 +21,7 @@ public class BibleFulltextEngineTests {
 
     @Test
     public void patternSearch() {
-        XMLBIBLE bible = BibleFulltextEngine.getUtil().getBibles().get(2);
+        XMLBIBLE bible = BibleFulltextEngine.getUtil().getBibleInstances().get(2).getBible();
         BibleFulltextEngine engine = new BibleFulltextEngine(bible);
         StatisticsCollector collector = new StatisticsCollector();
         Map<BibleFulltextEngine.BibleTextKey, String> hits =
@@ -33,7 +33,7 @@ public class BibleFulltextEngineTests {
 
     @Test
     public void patternFuzzySearch() {
-        XMLBIBLE bible = BibleFulltextEngine.getUtil().getBibles().get(2);
+        XMLBIBLE bible = BibleFulltextEngine.getUtil().getBibleInstances().get(2).getBible();
         BibleFulltextEngine engine = new BibleFulltextEngine(bible);
         StatisticsCollector collector = new StatisticsCollector();
         Map<BibleFulltextEngine.BibleTextKey, String> hits =

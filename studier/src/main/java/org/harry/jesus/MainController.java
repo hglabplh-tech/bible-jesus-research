@@ -47,10 +47,10 @@ import org.harry.jesus.jesajautils.editor.HTMLToPDF;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 import org.harry.jesus.jesajautils.fulltext.StatisticsCollector;
 
+import org.harry.jesus.synchjeremia.AccordanceRef;
 import org.harry.jesus.synchjeremia.ApplicationProperties;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
 import org.harry.jesus.synchjeremia.SynchThread;
-import org.jetbrains.annotations.NotNull;
 import org.tinylog.Logger;
 
 //import org.reactfx.util.Either;
@@ -155,7 +155,7 @@ public class MainController {
     private MediaControl mediaControl;
 
 
-    private Optional<Tuple<String, Dictionary>> optAccordance = Optional.empty();
+    private Optional<Tuple<Dictionary, AccordanceRef>> optAccordance = Optional.empty();
 
     @FXML
     public void initialize() {
@@ -181,8 +181,8 @@ public class MainController {
                 );
         utils = new BibleTextUtils();
         selected = null;
-        if (utils.getBibles().size() > 0) {
-            selected = utils.getBibles().get(0);
+        if (utils.getBibleInstances().size() > 0) {
+            selected = utils.getBibleInstances().get(0).getBible();
         }
         searchOptions.getItems().addAll(SearchOptions.SIMPLE,
                 SearchOptions.EXACT,
@@ -269,11 +269,14 @@ public class MainController {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
                 selectedIndex = t1.intValue();
-                selected = utils.getBibles().get(t1.intValue());
-                optAccordance = utils.getAccordance(selected);
+                BibleTextUtils.BibleBookInstance instance = utils.getBibleInstances().get(t1.intValue());
+                selected = instance.getBible();
+
+                optAccordance = instance.getOptDictAccRefTuple();
+
                 if (optAccordance.isPresent()) {
                     ViewAccordanceDialog.showAccordanceDialog(utils,
-                            area, optAccordance.get().getFirst());
+                            area, optAccordance.get().getSecond().getFilename());
                 }
                 TreeItem<String> root = buildBooksTree();
                 showChapter();
@@ -611,8 +614,7 @@ public class MainController {
     @FXML
     public void bibleInfo(ActionEvent event) {
         int index = bibles.getSelectionModel().getSelectedIndex();
-        BibleInfoDialog.callBibleInfoDialog(utils.getBibles().get(index)
-                ,utils.getBibleHashes().get(index));
+        BibleInfoDialog.callBibleInfoDialog(utils.getBibleInstances().get(index));
     }
 
     @FXML
@@ -976,7 +978,7 @@ public class MainController {
         }
     }
 
-    @NotNull
+
     private NoteTabEntry getNoteTabEntry(Note newNote) {
         List<Vers> versList = newNote.getVerslink();
         String color = versList.get(0).getBackcolor();
@@ -1011,7 +1013,7 @@ public class MainController {
         }
     }
 
-    @NotNull
+
     private HighlightsEntry getHighlightsEntry(Vers newVers) {
         String color = newVers.getBackcolor();
         Color noteColor;
