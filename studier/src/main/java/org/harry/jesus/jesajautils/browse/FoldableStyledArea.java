@@ -1,7 +1,9 @@
 package org.harry.jesus.jesajautils.browse;
 import javafx.scene.Node;
 import javafx.scene.control.IndexRange;
+import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
+import javafx.scene.web.WebEngine;
 import org.fxmisc.richtext.GenericStyledArea;
 import org.fxmisc.richtext.StyledTextArea;
 import org.fxmisc.richtext.TextExt;
@@ -21,6 +23,9 @@ public class FoldableStyledArea extends GenericStyledArea<ParStyle, Either<Strin
     private final static TextOps<String, TextStyle> styledTextOps = SegmentOps.styledTextOps();
     private final static LinkedImageOps<TextStyle> linkedImageOps = new LinkedImageOps<>();
 
+    private Optional<WebEngine> webOpt = Optional.empty();
+
+    private Optional<TextField> searchInput = Optional.empty();
 
 
     public FoldableStyledArea()
@@ -43,6 +48,21 @@ public class FoldableStyledArea extends GenericStyledArea<ParStyle, Either<Strin
 
 
 
+    public void setLinkedWebEngine(WebEngine engine) {
+        webOpt = Optional.of(engine);
+    }
+
+    public Optional<WebEngine> getLinkedWebEngine() {
+        return webOpt;
+    }
+
+    public void setLinkedSearchTextField(TextField searchField) {
+        searchInput = Optional.of(searchField);
+    }
+
+    public Optional<TextField> getLinkedSearchTextField() {
+        return searchInput;
+    }
     public UnaryOperator<ParStyle> getAddFoldStyle() {
         return pstyle -> pstyle.updateFold( true );
     }

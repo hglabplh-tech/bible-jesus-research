@@ -46,7 +46,8 @@ public class AccordanceViewController {
         WebEngine engine = konkordanzViewer.getEngine();
         engine.setJavaScriptEnabled(true);
         engine.loadContent(html);
-
+        area.setLinkedSearchTextField(searchInput);
+        area.setLinkedWebEngine(konkordanzViewer.getEngine());
         WebViews.addHyperlinkListener(konkordanzViewer,
                 new AccordanceViewHyperListener(utils, area, konkordanzViewer), HyperlinkEvent.EventType.ACTIVATED);
 

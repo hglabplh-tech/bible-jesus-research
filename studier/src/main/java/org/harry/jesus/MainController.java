@@ -347,6 +347,27 @@ public class MainController {
     private void initAreaContextMenu() {
         ContextMenu contMenu = new ContextMenu();
         MenuItem mItem = new MenuItem();
+        mItem.setText("Search accordance Selected word");
+        contMenu.getItems().add(mItem);
+        mItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+
+                Optional<WebEngine> optEngine = area.getLinkedWebEngine();
+                Optional<TextField> optSearch = area.getLinkedSearchTextField();
+                String text = area.getSelectedText();
+                if (optSearch.isPresent()) {
+                    optSearch.get().setText(text);
+                }
+                if (optEngine.isPresent()) {
+                    JScriptWebViewUtils.highlight(optEngine.get(), text);
+                }
+
+
+                }
+
+        });
+        mItem = new MenuItem();
         mItem.setText("Highlight selected Verses");
         contMenu.getItems().add(mItem);
         mItem.setOnAction(new EventHandler<ActionEvent>() {
