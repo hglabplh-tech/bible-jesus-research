@@ -1,6 +1,7 @@
 package org.harry.jesus.fxutils;
 
 
+import generated.XMLBIBLE;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -13,10 +14,8 @@ import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.pmw.tinylog.Logger;
 
-import javax.swing.event.HyperlinkEvent;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Optional;
 
 /**
  * Class for a Store Password Diialog to store passwords for sites.
@@ -31,12 +30,14 @@ public class ReadLinksDialog {
 
      *
      */
-    public static void showReadLinkDialog(BibleTextUtils utils, FoldableStyledArea area, String htmlText) {
+    public static void showReadLinkDialog(BibleTextUtils utils,
+                                          FoldableStyledArea area, String htmlText,
+                                          XMLBIBLE selected) {
 
         Stage stage = new Stage();
         stage.setTitle("Second Stage");
         try {
-            Scene secondScene = new Scene(loadFXML("linkReader", utils, area, htmlText));
+            Scene secondScene = new Scene(loadFXML("linkReader", utils, area, htmlText, selected));
             stage.setScene(secondScene);
             stage.show();
         } catch (Exception ex) {
@@ -45,13 +46,14 @@ public class ReadLinksDialog {
         }
     }
 
-    public static Parent loadFXML(String fxml, BibleTextUtils utils, FoldableStyledArea area, String htmlText) throws IOException {
+    public static Parent loadFXML(String fxml, BibleTextUtils utils, FoldableStyledArea area,
+                                  String htmlText, XMLBIBLE selected) throws IOException {
         URL resourceURL = BibleStudy.class.getResource("/fxml/" + fxml + ".fxml");
         fxmlLoader = new FXMLLoader(resourceURL);
 
         Pane root = (Pane) fxmlLoader.load();
         LinkReaderController controller = (LinkReaderController)fxmlLoader.getController();
-        controller.setWebViewListener(utils, area, htmlText);
+        controller.setWebViewListener(utils, area, htmlText, selected);
         return root;
     }
 }

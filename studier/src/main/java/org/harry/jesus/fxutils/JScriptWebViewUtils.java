@@ -9,22 +9,13 @@ import java.lang.reflect.Field;
 
 public class JScriptWebViewUtils {
 
-    public static void highlight(WebEngine engine, String text) {
+    public static void findString(WebEngine engine, String text) {
         try {
             WebPage page = Accessor.getPageFor(engine);
-          //  Field pageField = engine.getClass().getDeclaredField("page");
-           // pageField.setAccessible(true);
-
-
-            //WebPage page = (com.sun.webkit.WebPage) pageField.get(engine);
             page.find(text, true, true, false);
         } catch(Exception ex) {
             Logger.trace(ex);
             Logger.trace("Highlight failes with: " + ex.getMessage());
         }
-    }
-
-    public static  void removeHighlight(WebEngine engine) {
-        engine.executeScript("$('body').removeHighlight()");
     }
 }

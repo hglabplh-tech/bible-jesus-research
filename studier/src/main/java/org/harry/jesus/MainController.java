@@ -56,7 +56,6 @@ import org.tinylog.Logger;
 //import org.reactfx.util.Either;
 
 
-import javax.swing.text.html.Option;
 import javax.xml.bind.JAXBElement;
 import java.io.*;
 import java.math.BigInteger;
@@ -276,7 +275,9 @@ public class MainController {
 
                 if (optAccordance.isPresent()) {
                     ViewAccordanceDialog.showAccordanceDialog(utils,
-                            area, optAccordance.get().getSecond().getFilename());
+                            area,
+                            optAccordance.get().getSecond().getFilename(),
+                            selected);
                 }
                 TreeItem<String> root = buildBooksTree();
                 showChapter();
@@ -363,7 +364,7 @@ public class MainController {
                     optSearch.get().setText(text);
                 }
                 if (optEngine.isPresent()) {
-                    JScriptWebViewUtils.highlight(optEngine.get(), text);
+                    JScriptWebViewUtils.findString(optEngine.get(), text);
                 }
 
 
@@ -559,7 +560,7 @@ public class MainController {
 
     private void showLink(List<BibleTextUtils.BookLink> links) {
         String htmlText = HTMLRendering.renderLink(utils, selected, links);
-        ReadLinksDialog.showReadLinkDialog(utils, area, htmlText);
+        ReadLinksDialog.showReadLinkDialog(utils, area, htmlText, selected);
     }
 
 

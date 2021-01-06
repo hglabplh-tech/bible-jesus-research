@@ -1,9 +1,9 @@
 package org.harry.jesus;
 
+import generated.XMLBIBLE;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -16,11 +16,6 @@ import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 
 import javax.swing.event.HyperlinkEvent;
-import java.awt.*;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
 
 public class AccordanceViewController {
 
@@ -42,14 +37,14 @@ public class AccordanceViewController {
 
     }
 
-    public void setWebViewListener(BibleTextUtils utils, FoldableStyledArea area, String html) {
+    public void setWebViewListener(BibleTextUtils utils, FoldableStyledArea area, String html, XMLBIBLE selected) {
         WebEngine engine = konkordanzViewer.getEngine();
         engine.setJavaScriptEnabled(true);
         engine.loadContent(html);
         area.setLinkedSearchTextField(searchInput);
         area.setLinkedWebEngine(konkordanzViewer.getEngine());
         WebViews.addHyperlinkListener(konkordanzViewer,
-                new AccordanceViewHyperListener(utils, area, konkordanzViewer), HyperlinkEvent.EventType.ACTIVATED);
+                new AccordanceViewHyperListener(utils, area, konkordanzViewer, selected), HyperlinkEvent.EventType.ACTIVATED);
 
     }
 
@@ -60,7 +55,7 @@ public class AccordanceViewController {
     @FXML
     public void search(ActionEvent event) {
         String searchText = searchInput.getText();
-        JScriptWebViewUtils.highlight(konkordanzViewer.getEngine(), searchText);
+        JScriptWebViewUtils.findString(konkordanzViewer.getEngine(), searchText);
     }
 
     public static class Controller {

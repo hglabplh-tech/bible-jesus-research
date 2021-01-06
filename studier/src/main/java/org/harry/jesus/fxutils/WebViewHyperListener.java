@@ -1,5 +1,6 @@
 package org.harry.jesus.fxutils;
 
+import generated.XMLBIBLE;
 import org.codefx.libfx.control.webview.WebViewHyperlinkListener;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.LinkHandler;
@@ -17,9 +18,12 @@ public class WebViewHyperListener implements WebViewHyperlinkListener {
 
     private final FoldableStyledArea area;
 
-    public WebViewHyperListener (BibleTextUtils utils, FoldableStyledArea area) {
+    private final XMLBIBLE selected;
+
+    public WebViewHyperListener (BibleTextUtils utils, FoldableStyledArea area,  XMLBIBLE selected) {
         this.utils = utils;
         this.area = area;
+        this.selected = selected;
     }
     @Override
     public boolean hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
@@ -30,7 +34,7 @@ public class WebViewHyperListener implements WebViewHyperlinkListener {
             List<BibleTextUtils.BookLink> links = LinkHandler.parseLinks(utils, href);
             BibleTextUtils.BookLink link = links.get(0);
             TextRendering rendering = new TextRendering(utils, area, link.getBookLabel(), link.getChapter());
-            rendering.render(utils.getBibleInstances().get(0).getBible(),
+            rendering.render(selected,
                     link.getBookLabel(), link.getChapter() );
         } catch (Exception e) {
             e.printStackTrace();

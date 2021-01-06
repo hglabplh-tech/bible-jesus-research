@@ -1,5 +1,6 @@
 package org.harry.jesus.fxutils;
 
+import generated.XMLBIBLE;
 import javafx.scene.control.IndexRange;
 import javafx.scene.paint.Color;
 import javafx.scene.web.WebEngine;
@@ -25,10 +26,13 @@ public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
 
     private final WebView view;
 
-    public AccordanceViewHyperListener(BibleTextUtils utils, FoldableStyledArea area, WebView view) {
+    private final XMLBIBLE selected;
+
+    public AccordanceViewHyperListener(BibleTextUtils utils, FoldableStyledArea area, WebView view, XMLBIBLE selected) {
         this.utils = utils;
         this.area = area;
         this.view = view;
+        this.selected = selected;
     }
     @Override
     public boolean hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
@@ -58,7 +62,7 @@ public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
 
             BibleTextUtils.BookLink link = links.get(0);
             TextRendering rendering = new TextRendering(utils, area, link.getBookLabel(), link.getChapter());
-            rendering.render(utils.getBibleInstances().get(0).getBible(),
+            rendering.render(selected,
                     link.getBookLabel(), link.getChapter() );
             IndexRange range = rendering.getChapterMap().get(link.getVerses().get(0));
             rendering.selectVerseColorByGivenRange(range, Color.CORAL);

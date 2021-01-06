@@ -3,6 +3,7 @@ package org.harry.jesus.fxutils;
 
 import com.google.common.io.LineReader;
 import generated.Dictionary;
+import generated.XMLBIBLE;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -37,7 +38,7 @@ public class ViewAccordanceDialog {
      */
     public static void showAccordanceDialog(BibleTextUtils utils,
                                             FoldableStyledArea area,
-                                            String accFName) {
+                                            String accFName, XMLBIBLE selected) {
 
         Stage stage = new Stage();
         stage.setTitle("Second Stage");
@@ -65,7 +66,7 @@ public class ViewAccordanceDialog {
                 htmlBuffer.append("<p><h1>Accordance not available yet</h1></p>");
             }
             Scene secondScene = new Scene(loadFXML("accordanceViewer", utils,
-                    area, htmlBuffer.toString()));
+                    area, htmlBuffer.toString(), selected));
             stage.setScene(secondScene);
             stage.show();
         } catch (Exception ex) {
@@ -74,13 +75,17 @@ public class ViewAccordanceDialog {
         }
     }
 
-    public static Parent loadFXML(String fxml, BibleTextUtils utils, FoldableStyledArea area, String html) throws IOException {
+    public static Parent loadFXML(String fxml,
+                                  BibleTextUtils utils,
+                                  FoldableStyledArea area,
+                                  String html,
+                                  XMLBIBLE selected) throws IOException {
         URL resourceURL = BibleStudy.class.getResource("/fxml/" + fxml + ".fxml");
         fxmlLoader = new FXMLLoader(resourceURL);
 
         Pane root = (Pane) fxmlLoader.load();
         AccordanceViewController controller = (AccordanceViewController)fxmlLoader.getController();
-        controller.setWebViewListener(utils, area, html);
+        controller.setWebViewListener(utils, area, html, selected);
 
 
         return root;
