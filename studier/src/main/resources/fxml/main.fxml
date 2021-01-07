@@ -85,10 +85,10 @@
                                             </rowConstraints>
                                              <children>
                                                 <Button fx:id="prevChapter" mnemonicParsing="false" onAction="#prevChapter" text="&lt;--" />
-                                                <Button fx:id="linkBack" mnemonicParsing="false" onAction="#linkBack" text="Back from link" GridPane.columnIndex="1" />
                                                 <Button fx:id="nextChapter" mnemonicParsing="false" onAction="#nextChapter" text="--&gt;" GridPane.columnIndex="2" />
                                                 <TextField fx:id="chapterTitle" editable="false" promptText="Chapter:" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                                 <MediaView fx:id="chapterPlayView" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.rowSpan="2" />
+                                                <ChoiceBox fx:id="history" prefWidth="150.0" GridPane.columnIndex="1" />
                                              </children>
                                           </GridPane>
                                        </top>

@@ -43,6 +43,7 @@ public class BibleStudy extends Application {
         stage.setOnCloseRequest(event -> {
             System.out.println("Stage is closing");
             SynchThread.storeRendering(BibleThreadPool.getContext());
+            SynchThread.storeHistory(BibleThreadPool.getContext());
             SynchThread.storeNotes(BibleThreadPool.getContext());
             SynchThread.storeHighlights(BibleThreadPool.getContext());
             ApplicationProperties.storeApplicationProperties();

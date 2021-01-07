@@ -50,6 +50,8 @@ public class BibleThreadPool {
 
         Map<Tuple<Integer, Integer>, Map<Integer, String>> renderMap = new LinkedHashMap<>();
 
+        List<HistoryEntry> history = new ArrayList<>();
+
         public List<BibleFulltextEngine.BibleTextKey> getVerseKeys() {
             return verseKeys;
         }
@@ -92,6 +94,14 @@ public class BibleThreadPool {
 
         public List<BibleRef> getBibleRefList() {
             return bibleRefList;
+        }
+
+        public List<HistoryEntry> getHistory() {
+            return history;
+        }
+
+        public void addHistoryEntry(HistoryEntry entry) {
+            history.add(0, entry);
         }
     }
 }

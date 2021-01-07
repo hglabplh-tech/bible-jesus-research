@@ -405,13 +405,17 @@ public class BibleTextUtils {
         return buffer.toString();
     }
 
-    public static class BookLink {
+    public static class BookLink implements Serializable {
 
         private final String bookLabel;
 
         private final Integer chapter;
 
         private final List<Integer> verses;
+
+        public BookLink(String bookLabel, Integer chapter) {
+            this(bookLabel, chapter, Arrays.asList(1));
+        }
 
         public BookLink(String bookLabel, Integer chapter, List<Integer> verses) {
             this.bookLabel = bookLabel;
@@ -433,6 +437,37 @@ public class BibleTextUtils {
 
         public List<Integer> getVerses() {
             return verses;
+        }
+
+        @Override
+        public String toString() {
+            StringBuffer buffer = new StringBuffer();
+            List<Integer> versList = this.getVerses();
+            String vers = new Integer(1).toString();
+            if (versList.size() != 0) {
+                vers = versList.get(0).toString();
+            } else {
+
+            }
+            buffer.append("[")
+                    .append(this.getBookLabelClass().longName)
+                    .append(" " + this.getChapter())
+                    .append("," + vers)
+                    .append("]");
+            return buffer.toString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof BookLink)) return false;
+            BookLink bookLink = (BookLink) o;
+            return getBookLabel().equals(bookLink.getBookLabel()) && getChapter().equals(bookLink.getChapter()) && getVerses().equals(bookLink.getVerses());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(getBookLabel(), getChapter(), getVerses());
         }
     }
 

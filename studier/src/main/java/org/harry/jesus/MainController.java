@@ -44,10 +44,7 @@ import org.harry.jesus.jesajautils.editor.HTMLToPDF;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 import org.harry.jesus.jesajautils.fulltext.StatisticsCollector;
 
-import org.harry.jesus.synchjeremia.AccordanceRef;
-import org.harry.jesus.synchjeremia.ApplicationProperties;
-import org.harry.jesus.synchjeremia.BibleThreadPool;
-import org.harry.jesus.synchjeremia.SynchThread;
+import org.harry.jesus.synchjeremia.*;
 import org.tinylog.Logger;
 
 //import org.reactfx.util.Either;
@@ -69,6 +66,9 @@ public class MainController {
 
     @FXML
     ListView<String> bibles;
+
+    @FXML
+    ChoiceBox<HistoryEntry> history;
 
     @FXML
     ListView<String> footerNotes;
@@ -167,6 +167,11 @@ public class MainController {
         VBox.setVgrow(mainTabPane, Priority.ALWAYS);
 
         SynchThread.loadRendering(context);
+        SynchThread.loadHistory(context);
+        history.getItems().addAll(context.getHistory());
+        if (history.getItems().size() > 0) {
+            history.getSelectionModel().select(0);
+        }
         SynchThread.loadNotes(context);
         SynchThread.loadHighlights(context);
         ApplicationProperties.loadApplicationProperties();
@@ -298,6 +303,17 @@ public class MainController {
             }
 
         });
+
+        history.getSelectionModel().selectedIndexProperty().addListener(
+                new ChangeListener<Number>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Number> observable,
+                                        Number oldValue, Number newValue) {
+                        HistoryEntry entry = history.getItems().get(newValue.intValue());
+                        BibleTextUtils.BookLink link = entry.getBookLink();
+                        jumpToBookAndChapter(link.getBookLabel(), link.getChapter());
+                    }
+                });
 
 
         area.addEventHandler(BibleStudy.SET_LINK_EVENT, event -> {
@@ -536,6 +552,14 @@ public class MainController {
 
     private boolean showChapter() {
         rendering = new TextRendering(utils, this.area, actBookLabel, actChapter);
+        HistoryEntry entry = new HistoryEntry(new BibleTextUtils.BookLink(actBookLabel, actChapter));
+        if (!context.getHistory().contains(entry)) {
+            context.addHistoryEntry(entry);
+        }
+        if (!history.getItems().contains(entry)) {
+            history.getItems().add(0, entry);
+            history.getSelectionModel().select(entry);
+        }
         boolean found = fillChapterText();
         return found;
     }
@@ -906,11 +930,6 @@ public class MainController {
         if (!found) {
 
         }
-    }
-
-    @FXML
-    public void linkBack(ActionEvent event) {
-        showChapter();
     }
 
     @FXML

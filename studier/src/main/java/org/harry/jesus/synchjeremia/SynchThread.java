@@ -6,6 +6,7 @@ import org.harry.jesus.jesajautils.Tuple;
 import org.pmw.tinylog.Logger;
 
 import java.io.*;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -20,11 +21,15 @@ public class SynchThread extends TimerTask {
 
     private static final String RENDER_OBJ = "render.obj";
 
+    private static final String HISTORY_OBJ = "history.obj";
+
     private static final String SETTINGS_PROP = "application.properties";
 
     private static final File appDir;
 
     private static final File renderObj;
+
+    private static final File historyObj;
 
     private static final File notesXML;
 
@@ -42,6 +47,7 @@ public class SynchThread extends TimerTask {
             appDir.mkdirs();
         }
         renderObj = new File(appDir, RENDER_OBJ);
+        historyObj = new File(appDir, HISTORY_OBJ);
         notesXML = new File(appDir, NOTES_XML);
         highlightsXML = new File(appDir, HIGHLIGHT_XML);
         appProps = new File(appDir, SETTINGS_PROP);
@@ -135,6 +141,34 @@ public class SynchThread extends TimerTask {
                 }
             } catch (IOException | ClassNotFoundException ex) {
                 Logger.trace("Error storing rendering" + ex.getMessage());
+            }
+        }
+    }
+
+    public static void storeHistory(BibleThreadPool.ThreadBean context) {
+        synchronized(SynchThread.class)  {
+            try {
+                FileOutputStream stream = new FileOutputStream(historyObj);
+                ObjectOutputStream objStream = new ObjectOutputStream(stream);
+                objStream.writeObject(context.getHistory());
+                objStream.close();
+            } catch (IOException ex) {
+                Logger.trace("Error storing history" + ex.getMessage());
+            }
+        }
+    }
+
+    public static void loadHistory(BibleThreadPool.ThreadBean context) {
+        synchronized(SynchThread.class)  {
+            try {
+                if (historyObj.exists()) {
+                    FileInputStream stream = new FileInputStream(historyObj);
+                    ObjectInputStream objStream = new ObjectInputStream(stream);
+                    context.getHistory().addAll((List<HistoryEntry>) objStream.readObject());
+                    objStream.close();
+                }
+            } catch (IOException | ClassNotFoundException ex) {
+                Logger.trace("Error storing history" + ex.getMessage());
             }
         }
     }

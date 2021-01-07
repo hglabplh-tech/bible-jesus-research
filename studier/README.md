@@ -17,10 +17,23 @@ chapters even of NT while reading. For this you need downloads
 from https://diehoerbibel.com/downloads/
 I will explain this when the version is more than DRAFT
 I written this application to thank our Lord for his
-word and to praise the Lord by delivering his word in 
-an electronic format to more people.
+word and to praise the Lord by delivering a possibility to read the bible 
+in a electronic format which is especially developed for writing bible-software.
 Praise our Lord Jesus
 The bibles are interpreted with the zefanja.xsd.
+The bibles cannot be delivered with the software so you have to download bibles 
+in zefanja xml format and place them in a directory
+On the page  I will give you as my preferred link 
+there are also concordances (accordances) for a few
+bible versions this files can be downloaded and put 
+into ANOTHER directory (may be sub-directory) then the bibles
+If you start first with a concordance the thing will be rendered to 
+html this can take an hour for this files are very great. After that
+the concordance can be used in the program. After the first startup you have to 
+define the settings for the paths under study -> settings
+Here is the preferred link I can not supply you with 
+versions in cause of the copy right.
+https://de.osdn.net/projects/sfnet_zefania-sharp/releases/
 
 Kind regards and be blessed and not at all stressed
 
