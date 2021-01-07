@@ -4,14 +4,13 @@ import generated.*;
 import javafx.scene.control.IndexRange;
 import javafx.scene.paint.Color;
 import jesus.harry.org.versnotes._1.Vers;
-import org.fxmisc.richtext.model.TwoDimensional;
 import org.harry.jesus.fxutils.SettingsDialog;
 import org.harry.jesus.jesajautils.BibleTextUtils.BookLink;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.TextStyle;
 import org.harry.jesus.synchjeremia.ApplicationProperties;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
-import org.jetbrains.annotations.NotNull;
+
 
 import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
@@ -190,15 +189,16 @@ public class TextRendering {
     /**
      * This method selects a verse by the given ÄIndexRange in the text
      * @param range the range by which we search for the verse in the text
+     * @param toggler
      * @return the selected the entry for the verse
      */
-    public Map.Entry<Integer, IndexRange> selectVerseByGivenRange(IndexRange range) {
+    public Map.Entry<Integer, IndexRange> selectVerseByGivenRange(IndexRange range, Boolean toggler) {
         int start = range.getStart();
 
         for (Map.Entry<Integer, IndexRange> entry: this.chapterMap.entrySet()) {
             IndexRange compRange = entry.getValue();
             if (start >= compRange.getStart() && start <= compRange.getEnd()) {
-                this.area.setStyle(compRange.getStart(), compRange.getEnd(), TextStyle.underline(true));
+                refreshAreaStyle(area, compRange, toggler);
                 return entry;
             }
         }
@@ -231,7 +231,7 @@ public class TextRendering {
      */
     public void setAreaText(StringBuffer strContent) {
         area.replaceText(strContent.toString());
-        refreshAreaStyle(area);
+        refreshAreaStyle(area, null, false);
         for (Map.Entry<IndexRange, TextStyle> entry : renderMap.entrySet()) {
             IndexRange range = entry.getKey();
             TextStyle style = entry.getValue();
@@ -259,12 +259,19 @@ public class TextRendering {
         this.area.setStyle(range.getStart(), range.getEnd(), theStyle);
     }
 
-    public static void refreshAreaStyle(FoldableStyledArea textArea) {
+    public static void refreshAreaStyle(FoldableStyledArea textArea, IndexRange range, Boolean toggle) {
        Integer fontSize = ApplicationProperties.getFontSize();
        Optional<String> fontFamily = ApplicationProperties.getFontFamily();
        TextStyle theStyle = ApplicationProperties.getShape();
-       if (fontFamily.isPresent()) {
-           SettingsDialog.setPreview(textArea, theStyle, fontFamily.get(), fontSize);
+       if (range == null) {
+           if (fontFamily.isPresent()) {
+               SettingsDialog.setPreview(textArea, theStyle, fontFamily.get(), fontSize);
+           }
+       } else {
+           TextStyle underLined = theStyle.updateUnderline(toggle);
+           if (fontFamily.isPresent()) {
+               SettingsDialog.setPreview(textArea, underLined, fontFamily.get(), fontSize, range);
+           }
        }
     }
 
@@ -344,7 +351,7 @@ public class TextRendering {
         }
     }
 
-    @NotNull
+
     private Integer setVerseRangeToChapterMap(Integer start, StringBuffer strContent, VERS thing) {
         IndexRange range = new IndexRange(start, strContent.toString().length() - 1);
         this.chapterMap.put(thing.getVnumber().intValue(), range);

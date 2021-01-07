@@ -2,8 +2,6 @@ package org.harry.jesus.fxutils;
 
 
 import com.google.common.io.LineReader;
-import generated.Dictionary;
-import generated.XMLBIBLE;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -12,7 +10,6 @@ import javafx.stage.Stage;
 import org.harry.jesus.BibleStudy;
 import org.harry.jesus.AccordanceViewController;
 import org.harry.jesus.jesajautils.BibleTextUtils;
-import org.harry.jesus.jesajautils.HTMLRendering;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.synchjeremia.ApplicationProperties;
 import org.pmw.tinylog.Logger;
@@ -38,7 +35,7 @@ public class ViewAccordanceDialog {
      */
     public static void showAccordanceDialog(BibleTextUtils utils,
                                             FoldableStyledArea area,
-                                            String accFName, XMLBIBLE selected) {
+                                            String accFName) {
 
         Stage stage = new Stage();
         stage.setTitle("Second Stage");
@@ -66,7 +63,7 @@ public class ViewAccordanceDialog {
                 htmlBuffer.append("<p><h1>Accordance not available yet</h1></p>");
             }
             Scene secondScene = new Scene(loadFXML("accordanceViewer", utils,
-                    area, htmlBuffer.toString(), selected));
+                    area, htmlBuffer.toString()));
             stage.setScene(secondScene);
             stage.show();
         } catch (Exception ex) {
@@ -78,14 +75,13 @@ public class ViewAccordanceDialog {
     public static Parent loadFXML(String fxml,
                                   BibleTextUtils utils,
                                   FoldableStyledArea area,
-                                  String html,
-                                  XMLBIBLE selected) throws IOException {
+                                  String html) throws IOException {
         URL resourceURL = BibleStudy.class.getResource("/fxml/" + fxml + ".fxml");
         fxmlLoader = new FXMLLoader(resourceURL);
 
         Pane root = (Pane) fxmlLoader.load();
         AccordanceViewController controller = (AccordanceViewController)fxmlLoader.getController();
-        controller.setWebViewListener(utils, area, html, selected);
+        controller.setWebViewListener(utils, area, html);
 
 
         return root;

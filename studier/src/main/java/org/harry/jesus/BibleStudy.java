@@ -1,11 +1,13 @@
 package org.harry.jesus;
 
 import javafx.application.Application;
+import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.harry.jesus.fxutils.SetLinkEvent;
 import org.harry.jesus.synchjeremia.ApplicationProperties;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
 import org.harry.jesus.synchjeremia.SynchThread;
@@ -23,6 +25,7 @@ import java.net.URL;
  */
 public class BibleStudy extends Application {
 
+    public static EventType<SetLinkEvent> SET_LINK_EVENT = new EventType<>("SET_LINK_EVENT");
     private static Scene scene;
 
     public static FXMLLoader fxmlLoader = null;

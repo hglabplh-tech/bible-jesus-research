@@ -423,6 +423,10 @@ public class BibleTextUtils {
             return bookLabel;
         }
 
+        public BookLabel getBookLabelClass() {
+            return new BookLabel(bookLabel);
+        }
+
         public Integer getChapter() {
             return chapter;
         }

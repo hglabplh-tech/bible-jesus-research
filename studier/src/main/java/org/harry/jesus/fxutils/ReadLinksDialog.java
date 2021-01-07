@@ -1,7 +1,6 @@
 package org.harry.jesus.fxutils;
 
 
-import generated.XMLBIBLE;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -31,13 +30,12 @@ public class ReadLinksDialog {
      *
      */
     public static void showReadLinkDialog(BibleTextUtils utils,
-                                          FoldableStyledArea area, String htmlText,
-                                          XMLBIBLE selected) {
+                                          FoldableStyledArea area, String htmlText) {
 
         Stage stage = new Stage();
         stage.setTitle("Second Stage");
         try {
-            Scene secondScene = new Scene(loadFXML("linkReader", utils, area, htmlText, selected));
+            Scene secondScene = new Scene(loadFXML("linkReader", utils, area, htmlText));
             stage.setScene(secondScene);
             stage.show();
         } catch (Exception ex) {
@@ -47,13 +45,13 @@ public class ReadLinksDialog {
     }
 
     public static Parent loadFXML(String fxml, BibleTextUtils utils, FoldableStyledArea area,
-                                  String htmlText, XMLBIBLE selected) throws IOException {
+                                  String htmlText) throws IOException {
         URL resourceURL = BibleStudy.class.getResource("/fxml/" + fxml + ".fxml");
         fxmlLoader = new FXMLLoader(resourceURL);
 
         Pane root = (Pane) fxmlLoader.load();
         LinkReaderController controller = (LinkReaderController)fxmlLoader.getController();
-        controller.setWebViewListener(utils, area, htmlText, selected);
+        controller.setWebViewListener(utils, area, htmlText);
         return root;
     }
 }

@@ -15,11 +15,8 @@ import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.*;
 
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
@@ -248,19 +245,7 @@ public class MainController {
                             bookLabel = value;
                         }
                         if (utils.getBookLabels().contains(bookLabel)) {
-                        Optional<BIBLEBOOK> book = utils.getBookByLabel(selected, bookLabel);
-                        if (book.isPresent()) {
-                            actBookLabel = bookLabel;
-                            actBook = utils.getBookLabelAsClass(bookLabel);
-                            actChapter = chapter;
-                            showChapter();
-                            BibleTextUtils.BookLink link =
-                                    new BibleTextUtils.BookLink(actBookLabel, actChapter, Arrays.asList(1));
-                            if (playBible != null) {
-                                playBible.stopChapter();
-                            }
-                            initMediaView();
-                        }
+                            jumpToBookAndChapter(bookLabel, chapter);
                         }
                     }
                 });
@@ -276,8 +261,8 @@ public class MainController {
                 if (optAccordance.isPresent()) {
                     ViewAccordanceDialog.showAccordanceDialog(utils,
                             area,
-                            optAccordance.get().getSecond().getFilename(),
-                            selected);
+                            optAccordance.get().getSecond().getFilename()
+                    );
                 }
                 TreeItem<String> root = buildBooksTree();
                 showChapter();
@@ -314,6 +299,13 @@ public class MainController {
 
         });
 
+
+        area.addEventHandler(BibleStudy.SET_LINK_EVENT, event -> {
+            BibleTextUtils.BookLink link = event.getLink();
+            jumpToBookAndChapter(link.getBookLabel(), link.getChapter());
+            IndexRange range = rendering.getChapterMap().get(link.getVerses().get(0));
+            rendering.selectVerseColorByGivenRange(range, Color.CORAL);
+        });
         area.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
             @Override
@@ -321,12 +313,10 @@ public class MainController {
                 if (mouseEvent.getClickCount() == 2) {
                     IndexRange range = area.getSelection();
                     Map.Entry<Integer, IndexRange> versPointer =
-                            rendering.selectVerseByGivenRange(range);
+                            rendering.selectVerseByGivenRange(range, true);
                     if (selectedVersesMap.get(versPointer.getKey()) != null) {
-                        selectedVersesMap.remove(versPointer.getKey());
-                        area.setStyle(versPointer.getValue().getStart(),
-                                versPointer.getValue().getEnd(),
-                                TextStyle.underline(false));
+                        selectedVersesMap.remove(versPointer.getKey(), versPointer.getValue());
+                        rendering.selectVerseByGivenRange(range, false);
 
                     } else {
                         selectedVersesMap.put(versPointer.getKey(), versPointer.getValue());
@@ -334,6 +324,22 @@ public class MainController {
                 }
             }
         });
+    }
+
+    private void jumpToBookAndChapter(String bookLabel, int chapter) {
+        Optional<BIBLEBOOK> book = utils.getBookByLabel(selected, bookLabel);
+        if (book.isPresent()) {
+            actBookLabel = bookLabel;
+            actBook = utils.getBookLabelAsClass(bookLabel);
+            actChapter = chapter;
+            showChapter();
+            BibleTextUtils.BookLink link =
+                    new BibleTextUtils.BookLink(actBookLabel, actChapter, Arrays.asList(1));
+            if (playBible != null) {
+                playBible.stopChapter();
+            }
+            initMediaView();
+        }
     }
 
     private void setPlanOutputSelected(Day theDay, String versHtml) {
@@ -510,7 +516,7 @@ public class MainController {
         this.borderPane = (BorderPane) parent;
         area = new FoldableStyledArea();
         chapterReader = new VirtualizedScrollPane(area);
-        chapterReader.setMinSize(1000, 600);
+        chapterReader.setPrefSize(900, 650);
     }
 
     private void showRoot() {
@@ -560,7 +566,7 @@ public class MainController {
 
     private void showLink(List<BibleTextUtils.BookLink> links) {
         String htmlText = HTMLRendering.renderLink(utils, selected, links);
-        ReadLinksDialog.showReadLinkDialog(utils, area, htmlText, selected);
+        ReadLinksDialog.showReadLinkDialog(utils, area, htmlText);
     }
 
 

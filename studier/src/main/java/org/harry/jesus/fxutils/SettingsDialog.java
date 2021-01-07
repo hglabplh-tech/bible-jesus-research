@@ -16,7 +16,6 @@ import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.TextStyle;
 import org.harry.jesus.synchjeremia.ApplicationProperties;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.Optional;
@@ -206,7 +205,6 @@ public class SettingsDialog {
 
     }
 
-    @NotNull
     private ChoiceBox<Integer> getFontSizeChoiceBox() {
         ChoiceBox<Integer> fontSizeBox = new ChoiceBox<>();
         fontSizeBox.getItems().add(8);
@@ -237,6 +235,12 @@ public class SettingsDialog {
 
     public static TextStyle setPreview(FoldableStyledArea area, TextStyle style,
                             String font, Integer fontSize) {
+
+        return setPreview(area, style, font, fontSize, null);
+    }
+
+    public static TextStyle setPreview(FoldableStyledArea area, TextStyle style,
+                                       String font, Integer fontSize, IndexRange range) {
         String text = area.getText();
         TextStyle tempStyle = style;
         Color backColor = tempStyle.getBackgroundColor().orElse(Color.WHITE);
@@ -244,7 +248,11 @@ public class SettingsDialog {
         Background backGround = new Background(fill);
         area.setBackground(backGround);
         tempStyle = tempStyle.updateFontFamily(font).updateFontSize(fontSize);
-        area.setStyle(0, text.length(), tempStyle);
+        if (range == null) {
+            area.setStyle(0, text.length(), tempStyle);
+        } else {
+            area.setStyle(range.getStart(), range.getEnd(), tempStyle);
+        }
         return tempStyle;
     }
 }

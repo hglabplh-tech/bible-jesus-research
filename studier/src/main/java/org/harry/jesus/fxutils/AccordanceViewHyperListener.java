@@ -26,13 +26,11 @@ public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
 
     private final WebView view;
 
-    private final XMLBIBLE selected;
 
-    public AccordanceViewHyperListener(BibleTextUtils utils, FoldableStyledArea area, WebView view, XMLBIBLE selected) {
+    public AccordanceViewHyperListener(BibleTextUtils utils, FoldableStyledArea area, WebView view) {
         this.utils = utils;
         this.area = area;
         this.view = view;
-        this.selected = selected;
     }
     @Override
     public boolean hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
@@ -59,13 +57,9 @@ public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
         try {
             System.out.println(bibleLink);
             List<BibleTextUtils.BookLink> links = LinkHandler.parseLinks(utils, bibleLink);
-
             BibleTextUtils.BookLink link = links.get(0);
-            TextRendering rendering = new TextRendering(utils, area, link.getBookLabel(), link.getChapter());
-            rendering.render(selected,
-                    link.getBookLabel(), link.getChapter() );
-            IndexRange range = rendering.getChapterMap().get(link.getVerses().get(0));
-            rendering.selectVerseColorByGivenRange(range, Color.CORAL);
+            SetLinkEvent event = new SetLinkEvent(link);
+            this.area.fireEvent(event);
         } catch (Exception e) {
             e.printStackTrace();
         }
