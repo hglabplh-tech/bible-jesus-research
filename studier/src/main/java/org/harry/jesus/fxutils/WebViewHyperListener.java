@@ -4,6 +4,7 @@ import org.codefx.libfx.control.webview.WebViewHyperlinkListener;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.LinkHandler;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
+import org.pmw.tinylog.Logger;
 
 
 import javax.swing.event.HyperlinkEvent;
@@ -32,8 +33,9 @@ public class WebViewHyperListener implements WebViewHyperlinkListener {
             BibleTextUtils.BookLink link = links.get(0);
             SetLinkEvent event = new SetLinkEvent(link);
             this.area.fireEvent(event);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            Logger.trace(ex);
+            Logger.trace("cannot send Link Event");
         }
         return false;
     }

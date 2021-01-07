@@ -94,6 +94,15 @@ public class FoldableStyledArea extends GenericStyledArea<ParStyle, Either<Strin
         }
     }
 
+    public void setParVisableSelection() {
+        IndexRange selection = this.getSelection();
+        int startPar = this.offsetToPosition(selection.getStart(), Bias.Forward).getMajor();
+        int endPar = this.offsetToPosition(selection.getEnd(), Bias.Backward).getMajor();
+        for(int i = startPar; i <= endPar; ++i) {
+            this.showParagraphAtTop(i);
+        }
+    }
+
     private void updateParagraphStyleInSelection(ParStyle mixin) {
         updateParagraphStyleInSelection(style -> style.updateWith(mixin));
     }

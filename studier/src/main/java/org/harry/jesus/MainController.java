@@ -212,11 +212,14 @@ public class MainController {
             loadHighlightsAndRender();
             showRoot();
             initMediaView();
-            System.out.println("second");
             utils.loadAccordancesDownLoaded(
                     new File(ApplicationProperties.getApplicationAccordanceDir()),
                     context);
+        } else {
+            new SettingsDialog().showAppSettingsDialog();
+            System.exit(0);
         }
+
     }
 
     private void initMediaView() {
@@ -319,8 +322,7 @@ public class MainController {
         area.addEventHandler(BibleStudy.SET_LINK_EVENT, event -> {
             BibleTextUtils.BookLink link = event.getLink();
             jumpToBookAndChapter(link.getBookLabel(), link.getChapter());
-            IndexRange range = rendering.getChapterMap().get(link.getVerses().get(0));
-            rendering.selectVerseColorByGivenRange(range, Color.CORAL);
+            setSelectedVersVisible(link);
         });
         area.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
@@ -340,6 +342,27 @@ public class MainController {
                 }
             }
         });
+    }
+
+    private void setSelectedVersVisible(BibleTextUtils.BookLink link) {
+        IndexRange range = rendering.getChapterMap().get(link.getVerses().get(0));
+        rendering.selectVerseColorByGivenRange(range, Color.CORAL);
+        jumpToVers(range);
+    }
+
+    private void jumpToVers(IndexRange range) {
+        area.selectRange(range.getStart(), range.getEnd());
+        area.setParVisableSelection();
+    }
+
+    private void fireLinkEvent(BibleTextUtils.BookLink link) {
+        try {
+            SetLinkEvent event = new SetLinkEvent(link);
+            this.area.fireEvent(event);
+        } catch (Exception ex) {
+            org.pmw.tinylog.Logger.trace(ex);
+            org.pmw.tinylog.Logger.trace("cannot send Link Event");
+        }
     }
 
     private void jumpToBookAndChapter(String bookLabel, int chapter) {
@@ -707,7 +730,10 @@ public class MainController {
         actChapter = vers.getChapter().intValue();
         actBookLabel = utils.getBookLabels().get(vers.getBook().intValue() - 1);
         actBook = new BibleTextUtils.BookLabel(actBookLabel);
-        showChapter();
+        List<Integer> array = new ArrayList<>();
+        vers.getVers().forEach(e -> array.add(e.intValue()));
+        BibleTextUtils.BookLink link = new BibleTextUtils.BookLink(actBookLabel, actChapter, array);
+        fireLinkEvent(link);
         mainTabPane.getSelectionModel().select(readBible);
     }
 

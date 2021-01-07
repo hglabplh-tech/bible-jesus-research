@@ -51,7 +51,7 @@ public class ViewAccordanceDialog {
                     LineReader reader = new LineReader(readable);
                     while(true) {
                         String line = reader.readLine();
-                        if (line == null || line.isEmpty()) {
+                        if (line == null) {
                             break;
                         }
                         htmlBuffer.append(line);

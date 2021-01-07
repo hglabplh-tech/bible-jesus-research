@@ -66,7 +66,12 @@ public class HTMLRendering {
                                 }
                             }
                             htmlBuffer.append("<p> Title: " + titleBuffer.toString() + "</p>\n");
+                    }  else if (((JAXBElement) object).getName().getLocalPart().equals("reflink")) {
+                        RefLinkType refLink = (RefLinkType) (((JAXBElement) object).getValue());
+                        String mScope = refLink.getMscope();
+                        createAccBibleLink(utils, htmlBuffer, mScope);
                     }
+
 
                 }
             }
@@ -83,8 +88,8 @@ public class HTMLRendering {
         for  (Serializable pContent: paragraph.getContent()) {
             if (pContent instanceof JAXBElement) {
 
-                JAXBElement jaxbElement = (JAXBElement)pContent;
-                Object thisContent = ((JAXBElement)pContent).getValue();
+                JAXBElement jaxbElement = (JAXBElement) pContent;
+                Object thisContent = ((JAXBElement) pContent).getValue();
                 if (jaxbElement.getName().getLocalPart().equals("title")) {
                     indexHyper = 0;
                     String title = (String) thisContent;
@@ -94,7 +99,7 @@ public class HTMLRendering {
                     );
                 } else if (jaxbElement.getName().getLocalPart().equals("see")) {
                     indexHyper = 0;
-                    SeeType see = (SeeType)jaxbElement.getValue();
+                    SeeType see = (SeeType) jaxbElement.getValue();
                     buildSee(see, htmlBuffer);
                 } else if (thisContent instanceof BibLinkType) {
                     indexHyper = 0;
@@ -103,7 +108,7 @@ public class HTMLRendering {
                             + bibleLink.getBn() + ","
                             + bibleLink.getCn1() + ","
                             + bibleLink.getVn1() + "]\n");
-                } else if (thisContent instanceof RefLinkType){
+                } else if (thisContent instanceof RefLinkType) {
                     if (indexHyper == 0) {
                         htmlBuffer.append("<p>");
                     } else if ((indexHyper % 5) == 0) {
@@ -116,9 +121,10 @@ public class HTMLRendering {
                     String mScope = refLink.getMscope();
                     createAccBibleLink(utils, htmlBuffer, mScope);
                     indexHyper++;
-                } else if (thisContent instanceof String) {
-                    Logger.trace("String content: " + thisContent);
                 }
+
+            } else if (pContent instanceof String) {
+                htmlBuffer.append(pContent);
             }
         }
 
@@ -139,15 +145,18 @@ public class HTMLRendering {
                                             String mScope) {
         String [] parts = mScope.split(";");
         Integer book = Integer.parseInt(parts[0]);
-        Integer chapter = Integer.parseInt(parts[1]);
-        Integer verse = Integer.parseInt(parts[2]);
+        String chapter = parts[1];
+        String verse = "1";
+        if (parts.length == 3) {
+            verse = parts[2];
+        }
         BibleTextUtils.BookLabel link  = utils.getBookLabMap().get(book);
         String longName = link.getLongName();
         String theFinal = "["
                 + longName
                 + " "
                 + chapter.toString()
-                + "," + verse.toString()
+                + "," + verse
                 + "]";
         generateHyperLink(htmlBuffer, theFinal);
 
