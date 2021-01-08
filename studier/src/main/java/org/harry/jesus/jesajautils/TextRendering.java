@@ -126,6 +126,48 @@ public class TextRendering {
         }
     }
 
+    public void showBibleInfo(XMLBIBLE bible) {
+        StringBuffer textBuffer = new StringBuffer();
+        textBuffer.append("Bible Book Information\n\n\n");
+        IndexRange titleRange = new IndexRange(0, textBuffer.toString().length());
+        INFORMATION info = (INFORMATION)bible.getINFORMATION().getValue();
+        for (JAXBElement element : info.getTitleOrCreatorOrDescription()) {
+
+            if (element.getName().getLocalPart().equals("title")) {
+                
+            } else if (element.getName().getLocalPart().equals("creator")) {
+                textBuffer.append("\ncreator: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("description")) {
+                textBuffer.append("\ndescription: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("publisher")) {
+                textBuffer.append("\npublisher: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("date")) {
+                textBuffer.append("\ndate: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("subject")) {
+                textBuffer.append("\nsubject: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("contributors")) {
+                textBuffer.append("\ncontributors: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("type")) {
+                textBuffer.append("\ntype: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("identifier")) {
+                textBuffer.append("\nidentifier: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("format")) {
+                textBuffer.append("\nformat: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("source")) {
+                textBuffer.append("\nsource: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("language")) {
+                textBuffer.append("\nlanguage: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("coverage")) {
+                textBuffer.append("\ncoverage: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("rights")) {
+                textBuffer.append("\nrights: " + element.getValue());
+            }
+        }
+        area.replaceText(textBuffer.toString());
+        area.setStyle(titleRange.getStart(), titleRange.getEnd(), TextStyle.bold(true)
+                .updateFontSize(14).updateItalic(true).updateFontFamily("Times New Roman"));
+    }
+
     /**
      * clear the rendering map
      */

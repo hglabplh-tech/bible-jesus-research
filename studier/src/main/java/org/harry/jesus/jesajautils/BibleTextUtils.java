@@ -311,6 +311,8 @@ public class BibleTextUtils {
         return result;
     }
 
+
+
     public List<BIBLEBOOK> getBooks(XMLBIBLE bible) {
         List<BIBLEBOOK> result = new ArrayList<>();
         for (JAXBElement<BIBLEBOOK> xmlBook: bible.getBIBLEBOOK()) {

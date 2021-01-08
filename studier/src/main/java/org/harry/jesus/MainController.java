@@ -248,19 +248,26 @@ public class MainController {
 
                     @Override
                     public void changed(ObservableValue<? extends TreeItem<String>> observableValue, TreeItem<String> old_val, TreeItem<String> new_val) {
-                        String value = new_val.getValue();
-                        String regex = "[0-9]+";
+                        if (new_val != null) {
+                            String value = new_val.getValue();
+                            if (value.equals("Book Information")) {
+                                rendering = new TextRendering(utils, area, actBookLabel, actChapter);
+                                rendering.showBibleInfo(selected);
+                                return;
+                            }
+                            String regex = "[0-9]+";
 
-                        String bookLabel = "";
-                        int chapter = 1;
-                        if (value.matches(regex)) {
-                            bookLabel = new_val.getParent().getValue();
-                            chapter = Integer.valueOf(value, 10);
-                        } else {
-                            bookLabel = value;
-                        }
-                        if (utils.getBookLabels().contains(bookLabel)) {
-                            jumpToBookAndChapter(bookLabel, chapter);
+                            String bookLabel = "";
+                            int chapter = 1;
+                            if (value.matches(regex)) {
+                                bookLabel = new_val.getParent().getValue();
+                                chapter = Integer.valueOf(value, 10);
+                            } else {
+                                bookLabel = value;
+                            }
+                            if (utils.getBookLabels().contains(bookLabel)) {
+                                jumpToBookAndChapter(bookLabel, chapter);
+                            }
                         }
                     }
                 });
@@ -624,6 +631,8 @@ public class MainController {
             TreeItem<String> root = new TreeItem<>();
             root.setValue("The books");
             booksTree.setRoot(root);
+            TreeItem item = new TreeItem("Book Information");
+            root.getChildren().add(item);
             theBooks.clear();
             List<JAXBElement<BIBLEBOOK>> books = selected.getBIBLEBOOK();
             for (JAXBElement<BIBLEBOOK> book : books) {
@@ -632,7 +641,7 @@ public class MainController {
 
             for (BIBLEBOOK theBook : theBooks) {
                 String label = utils.getBookLabels().get(theBook.getBnumber().intValue() - 1);
-                TreeItem item = new TreeItem(label);
+                item = new TreeItem(label);
                 root.getChildren().add(item);
                 for (JAXBElement<CHAPTER> chapter : theBook.getCHAPTER()) {
                     TreeItem<String> cItem = new TreeItem<>(chapter.getValue().getCnumber().toString());
