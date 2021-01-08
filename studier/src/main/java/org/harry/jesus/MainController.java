@@ -108,6 +108,10 @@ public class MainController {
 
     @FXML MediaView chapterPlayView;
 
+    @FXML Button prevChapter;
+
+    @FXML Button nextChapter;
+
     @FXML ChoiceBox<BibleTextUtils.DictionaryInstance> dictionaries;
 
     BorderPane borderPane = null;
@@ -585,25 +589,27 @@ public class MainController {
 
     private boolean fillChapterText() {
         boolean found = rendering.render(selected, actBookLabel, actChapter);
-        footerNotes.getItems().clear();
-        footerNotes.getItems().addAll(rendering.getNotes());
-        footerNotes.getItems().add("Fuzzy Link matches -->");
-        for (String note : rendering.getNotes()) {
-            String links = "";
-            try {
-                links = LinkHandler.generateLinksFuzzy(utils, note);
-            } catch (Exception ex) {
-                Logger.trace("Something went wrong with fuzzy!!! This feature has to be enhanced");
+        if (found) {
+            footerNotes.getItems().clear();
+            footerNotes.getItems().addAll(rendering.getNotes());
+            footerNotes.getItems().add("Fuzzy Link matches -->");
+            for (String note : rendering.getNotes()) {
+                String links = "";
+                try {
+                    links = LinkHandler.generateLinksFuzzy(utils, note);
+                } catch (Exception ex) {
+                    Logger.trace("Something went wrong with fuzzy!!! This feature has to be enhanced");
+                }
+                if (!links.isEmpty()) {
+                    footerNotes.getItems().add(links);
+                }
             }
-            if (!links.isEmpty()) {
-                footerNotes.getItems().add(links);
-            }
+            String[] splitted = actBookLabel.split(",");
+            selectedVersesMap.clear();
+            rendering.clearRendering();
+            chapterTitle.setText("Book: " + splitted[1] + " Chapter: " + actChapter);
+            initMediaView();
         }
-
-        String [] splitted = actBookLabel.split(",");
-        selectedVersesMap.clear();
-        rendering.clearRendering();
-        chapterTitle.setText("Book: " + splitted[1] + " Chapter: " + actChapter);
         return found;
     }
 
@@ -803,10 +809,22 @@ public class MainController {
 
     @FXML
     public void prevChapter(ActionEvent event) {
+        nextChapter.setDisable(false);
         actChapter = actChapter - 1;
         boolean found = showChapter();
         if (!found) {
-
+            int index = utils.getBookLabels().indexOf(actBookLabel);
+            index--;
+            if (index >= 0) {
+                actBookLabel = utils.getBookLabels().get(index);
+                actChapter  = selected.getBIBLEBOOK().get(index).getValue().getCHAPTER().size();
+                found = showChapter();
+                if (!found) {
+                    prevChapter.setDisable(true);
+                }
+            } else {
+                prevChapter.setDisable(true);
+            }
         }
     }
 
@@ -949,10 +967,22 @@ public class MainController {
 
     @FXML
     public void nextChapter(ActionEvent event) {
+        prevChapter.setDisable(false);
         actChapter = actChapter + 1;
         boolean found = showChapter();
         if (!found) {
-
+            int index = utils.getBookLabels().indexOf(actBookLabel);
+            index++;
+            if (index < 66) {
+                actBookLabel = utils.getBookLabels().get(index);
+                actChapter = 1;
+                found = showChapter();
+                if (!found) {
+                    nextChapter.setDisable(true);
+                }
+            } else {
+                nextChapter.setDisable(true);
+            }
         }
     }
 
