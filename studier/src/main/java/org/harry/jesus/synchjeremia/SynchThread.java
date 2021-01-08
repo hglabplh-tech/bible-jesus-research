@@ -13,7 +13,7 @@ import java.util.TimerTask;
 
 public class SynchThread extends TimerTask {
 
-    private static final String APP_DIR = System.getProperty("user.home") + "/.bibleStudy";
+    public static final String APP_DIR = System.getProperty("user.home") + "/.bibleStudy";
 
     private static final String NOTES_XML = "notes.xml";
 
@@ -25,7 +25,7 @@ public class SynchThread extends TimerTask {
 
     private static final String SETTINGS_PROP = "application.properties";
 
-    private static final File appDir;
+    public  static final File appDir;
 
     private static final File renderObj;
 

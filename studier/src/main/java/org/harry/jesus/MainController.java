@@ -218,9 +218,6 @@ public class MainController {
                     new File(ApplicationProperties.getApplicationAccordanceDir()),
                     context);
             dictionaries.getItems().addAll(utils.getDictInstances());
-            if (dictionaries.getItems().size() > 0) {
-                dictionaries.getSelectionModel().select(0);
-            }
         } else {
             new SettingsDialog().showAppSettingsDialog();
             System.exit(0);

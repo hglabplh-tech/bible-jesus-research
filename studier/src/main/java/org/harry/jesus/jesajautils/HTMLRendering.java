@@ -176,6 +176,10 @@ public class HTMLRendering {
         if (target != null && !target.isEmpty()) {
             createAccBibleLink(utils, htmlBuffer, target);
         }
+        String content = refLink.getContent();
+        if (content != null && !content.isEmpty()) {
+            htmlBuffer.append("<br>" + content);
+        }
     }
 
     public static void buildSee(SeeType see, StringBuffer htmlBuffer) {
@@ -192,21 +196,25 @@ public class HTMLRendering {
     public static void createAccBibleLink(BibleTextUtils utils, StringBuffer htmlBuffer,
                                             String mScope) {
         String [] parts = mScope.split(";");
-        Integer book = Integer.parseInt(parts[0]);
-        String chapter = parts[1];
-        String verse = "1";
-        if (parts.length == 3) {
-            verse = parts[2];
+        if (parts.length > 1) {
+            Integer book = Integer.parseInt(parts[0]);
+            String chapter = parts[1];
+            String verse = "1";
+            if (parts.length == 3) {
+                verse = parts[2];
+            }
+            BibleTextUtils.BookLabel link = utils.getBookLabMap().get(book);
+            String longName = link.getLongName();
+            String theFinal = "["
+                    + longName
+                    + " "
+                    + chapter.toString()
+                    + "," + verse
+                    + "]";
+            generateHyperLink(htmlBuffer, theFinal);
+        } else {
+            htmlBuffer.append("#target#");
         }
-        BibleTextUtils.BookLabel link  = utils.getBookLabMap().get(book);
-        String longName = link.getLongName();
-        String theFinal = "["
-                + longName
-                + " "
-                + chapter.toString()
-                + "," + verse
-                + "]";
-        generateHyperLink(htmlBuffer, theFinal);
 
 
     }

@@ -14,10 +14,13 @@ import org.harry.jesus.synchjeremia.SynchThread;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Level;
 import org.pmw.tinylog.writers.ConsoleWriter;
+import org.pmw.tinylog.writers.FileWriter;
 
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Locale;
 
 
 /**
@@ -37,7 +40,15 @@ public class BibleStudy extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        Configurator.defaultConfig().level(Level.TRACE).writer(new ConsoleWriter()).activate();
+        Configurator.defaultConfig().level(Level.TRACE)
+                .level(Level.TRACE)
+                .locale(Locale.ENGLISH)
+                .writingThread(true)
+                .writer(
+                        new FileWriter(
+                                new File(SynchThread.appDir, "application.log")
+                                        .getAbsolutePath()));
+
 
         stage.setOnCloseRequest(event -> {
             System.out.println("Stage is closing");
