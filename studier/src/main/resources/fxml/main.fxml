@@ -89,6 +89,7 @@
                                                 <TextField fx:id="chapterTitle" editable="false" promptText="Chapter:" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                                 <MediaView fx:id="chapterPlayView" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.rowSpan="2" />
                                                 <ChoiceBox fx:id="history" prefWidth="150.0" GridPane.columnIndex="1" />
+                                                <ChoiceBox fx:id="dictionaries" prefHeight="31.0" prefWidth="386.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                              </children>
                                           </GridPane>
                                        </top>

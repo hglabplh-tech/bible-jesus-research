@@ -11,6 +11,7 @@ import javafx.scene.web.WebView;
 import org.codefx.libfx.control.webview.WebViews;
 import org.harry.jesus.fxutils.AccordanceViewHyperListener;
 import org.harry.jesus.fxutils.JScriptWebViewUtils;
+import org.harry.jesus.fxutils.SearchDictEvent;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 
@@ -33,6 +34,13 @@ public class AccordanceViewController {
 
         VBox.setVgrow(stackPane, Priority.ALWAYS);
 
+        searchInput.addEventHandler(SearchDictEvent.SEARCH_DICT_EVENT,
+                event -> {
+                    searchInput.setText(event.getQuery());
+                    JScriptWebViewUtils.findString(konkordanzViewer.getEngine(),
+                            event.getQuery());
+                });
+
 
     }
 
@@ -40,8 +48,7 @@ public class AccordanceViewController {
         WebEngine engine = konkordanzViewer.getEngine();
         engine.setJavaScriptEnabled(true);
         engine.loadContent(html);
-        area.setLinkedSearchTextField(searchInput);
-        area.setLinkedWebEngine(konkordanzViewer.getEngine());
+        area.addLinkedSearchTextField(searchInput);
         WebViews.addHyperlinkListener(konkordanzViewer,
                 new AccordanceViewHyperListener(utils, area, konkordanzViewer), HyperlinkEvent.EventType.ACTIVATED);
 

@@ -8,10 +8,13 @@ import org.fxmisc.richtext.GenericStyledArea;
 import org.fxmisc.richtext.StyledTextArea;
 import org.fxmisc.richtext.TextExt;
 import org.fxmisc.richtext.model.*;
+import org.harry.jesus.fxutils.SearchDictEvent;
 import org.harry.jesus.jesajautils.browse.ParStyle;
 import org.harry.jesus.jesajautils.browse.TextStyle;
 import org.reactfx.util.Either;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -23,9 +26,7 @@ public class FoldableStyledArea extends GenericStyledArea<ParStyle, Either<Strin
     private final static TextOps<String, TextStyle> styledTextOps = SegmentOps.styledTextOps();
     private final static LinkedImageOps<TextStyle> linkedImageOps = new LinkedImageOps<>();
 
-    private Optional<WebEngine> webOpt = Optional.empty();
-
-    private Optional<TextField> searchInput = Optional.empty();
+    private List<TextField> searchInputFields = new ArrayList<>();
 
 
     public FoldableStyledArea()
@@ -46,22 +47,20 @@ public class FoldableStyledArea extends GenericStyledArea<ParStyle, Either<Strin
         );
     }
 
-
-
-    public void setLinkedWebEngine(WebEngine engine) {
-        webOpt = Optional.of(engine);
+    public void emitSearxchToAll() {
+        String query = this.getSelectedText();
+        SearchDictEvent event = new SearchDictEvent(query);
+        for(TextField field : getLinkedSearchTextFields()) {
+            field.fireEvent(event);
+        }
     }
 
-    public Optional<WebEngine> getLinkedWebEngine() {
-        return webOpt;
+    public void addLinkedSearchTextField(TextField searchField) {
+        searchInputFields.add(searchField);
     }
 
-    public void setLinkedSearchTextField(TextField searchField) {
-        searchInput = Optional.of(searchField);
-    }
-
-    public Optional<TextField> getLinkedSearchTextField() {
-        return searchInput;
+    public List<TextField> getLinkedSearchTextFields() {
+        return searchInputFields;
     }
     public UnaryOperator<ParStyle> getAddFoldStyle() {
         return pstyle -> pstyle.updateFold( true );

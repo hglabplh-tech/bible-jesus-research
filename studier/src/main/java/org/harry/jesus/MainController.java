@@ -108,6 +108,8 @@ public class MainController {
 
     @FXML MediaView chapterPlayView;
 
+    @FXML ChoiceBox<BibleTextUtils.DictionaryInstance> dictionaries;
+
     BorderPane borderPane = null;
 
     BibleTextUtils utils;
@@ -215,6 +217,10 @@ public class MainController {
             utils.loadAccordancesDownLoaded(
                     new File(ApplicationProperties.getApplicationAccordanceDir()),
                     context);
+            dictionaries.getItems().addAll(utils.getDictInstances());
+            if (dictionaries.getItems().size() > 0) {
+                dictionaries.getSelectionModel().select(0);
+            }
         } else {
             new SettingsDialog().showAppSettingsDialog();
             System.exit(0);
@@ -265,13 +271,6 @@ public class MainController {
                 selected = instance.getBible();
 
                 optAccordance = instance.getOptDictAccRefTuple();
-
-                if (optAccordance.isPresent()) {
-                    ViewAccordanceDialog.showAccordanceDialog(utils,
-                            area,
-                            optAccordance.get().getSecond().getFilename()
-                    );
-                }
                 TreeItem<String> root = buildBooksTree();
                 showChapter();
                 BibleTextUtils.BookLink link =
@@ -318,8 +317,19 @@ public class MainController {
                     }
                 });
 
+        dictionaries.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue,
+                                Number newValue) {
+                BibleTextUtils.DictionaryInstance entry =
+                        dictionaries.getItems().get(newValue.intValue());
+                ViewAccordanceDialog.showAccordanceDialog(utils, area,
+                        entry.getDictionaryRef().getFilename());
+            }
+        });
 
-        area.addEventHandler(BibleStudy.SET_LINK_EVENT, event -> {
+
+        area.addEventHandler(SetLinkEvent.SET_LINK_EVENT, event -> {
             BibleTextUtils.BookLink link = event.getLink();
             jumpToBookAndChapter(link.getBookLabel(), link.getChapter());
             setSelectedVersVisible(link);
@@ -401,19 +411,8 @@ public class MainController {
         mItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-
-                Optional<WebEngine> optEngine = area.getLinkedWebEngine();
-                Optional<TextField> optSearch = area.getLinkedSearchTextField();
-                String text = area.getSelectedText();
-                if (optSearch.isPresent()) {
-                    optSearch.get().setText(text);
-                }
-                if (optEngine.isPresent()) {
-                    JScriptWebViewUtils.findString(optEngine.get(), text);
-                }
-
-
-                }
+                area.emitSearxchToAll();
+            }
 
         });
         mItem = new MenuItem();
@@ -705,7 +704,9 @@ public class MainController {
         actChapter = textKey.getChapter();
         actBookLabel = utils.getBookLabels().get(textKey.getBook() - 1);
         actBook = new BibleTextUtils.BookLabel(actBookLabel);
-        showChapter();
+        BibleTextUtils.BookLink link = new BibleTextUtils.BookLink(actBookLabel,
+                actChapter, Arrays.asList(textKey.getVers()));
+        fireLinkEvent(link);
         mainTabPane.getSelectionModel().select(readBible);
     }
 

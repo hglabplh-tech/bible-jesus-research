@@ -26,6 +26,7 @@ public class BibleTextUtils {
 
 
     List<BibleBookInstance> bibleInstances = new ArrayList<>();
+    List<DictionaryInstance> dictInstances = new ArrayList<>();
     List<String> bookLabels = new ArrayList<>();
 
     Map<Integer, BookLabel> bookLabMap = new LinkedHashMap<>();
@@ -112,6 +113,9 @@ public class BibleTextUtils {
             if (instance.isPresent()) {
                 instance.get().setOptDictAccRefTuple(actAccordance.getFirst(), accRef);
             }
+            String id = AccordanceUtil.getIdFromInfo(actAccordance.getFirst().getINFORMATION());
+            accRef.setDictionaryID(id);
+            dictInstances.add(new DictionaryInstance(accRef, actAccordance.getFirst()));
             AccordanceGenThread thread =
                     new AccordanceGenThread(this,
                             actAccordance.getFirst(), fileName, accordancePath);
@@ -126,7 +130,7 @@ public class BibleTextUtils {
 
         for (BibleRef ref : references) {
             Tuple<XMLBIBLE, String> actBible = BibleReader.loadBible(new File(ref.getPathToBook()));
-            ref.setBibleName(AccordanceUtil
+            ref.setBibleID(AccordanceUtil
                     .getIdFromBibleInfo(actBible
                             .getFirst()
                             .getINFORMATION()
@@ -267,7 +271,11 @@ public class BibleTextUtils {
     }
 
     public List<BibleBookInstance> getBibleInstances() {
-        return bibleInstances;
+        return Collections.unmodifiableList(bibleInstances);
+    }
+
+    public List<DictionaryInstance> getDictInstances() {
+        return Collections.unmodifiableList(dictInstances);
     }
 
     public List<String> getBibleBookInfo(XMLBIBLE bible) {
@@ -530,5 +538,32 @@ public class BibleTextUtils {
             this.optDictAccRefTuple = Optional.of(new Tuple<>(dictionary, accRef));
             return this;
         }
+    }
+
+
+    public static class DictionaryInstance {
+
+        private final AccordanceRef dictionaryRef;
+
+        private final Dictionary dictionary;
+
+        public DictionaryInstance(AccordanceRef dictionaryRef, Dictionary dictionary) {
+            this.dictionaryRef = dictionaryRef;
+            this.dictionary = dictionary;
+        }
+
+        public AccordanceRef getDictionaryRef() {
+            return dictionaryRef;
+        }
+
+        public Dictionary getDictionary() {
+            return dictionary;
+        }
+
+        @Override
+        public String toString() {
+            return dictionaryRef.getFilename() + " : " + dictionaryRef.getDictionaryID();
+        }
+
     }
 }

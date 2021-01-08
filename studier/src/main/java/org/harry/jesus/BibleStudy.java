@@ -25,7 +25,6 @@ import java.net.URL;
  */
 public class BibleStudy extends Application {
 
-    public static EventType<SetLinkEvent> SET_LINK_EVENT = new EventType<>("SET_LINK_EVENT");
     private static Scene scene;
 
     public static FXMLLoader fxmlLoader = null;

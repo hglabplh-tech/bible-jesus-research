@@ -6,7 +6,7 @@ public class BibleRef {
 
     private String pathToBook = null;
 
-    private String bibleName = null;
+    private String bibleID = null;
 
     private String hashValue = null;
 
@@ -24,12 +24,12 @@ public class BibleRef {
         return this;
     }
 
-    public String getBibleName() {
-        return bibleName;
+    public String getBibleID() {
+        return bibleID;
     }
 
-    public BibleRef setBibleName(String bibleName) {
-        this.bibleName = bibleName;
+    public BibleRef setBibleID(String bibleID) {
+        this.bibleID = bibleID;
         return this;
     }
 
@@ -57,21 +57,21 @@ public class BibleRef {
         if (!(o instanceof BibleRef)) return false;
         BibleRef bibleRef = (BibleRef) o;
         return getPathToBook().equals(bibleRef.getPathToBook())
-                && getBibleName().equals(bibleRef.getBibleName())
+                && getBibleID().equals(bibleRef.getBibleID())
                 && getHashValue().equals(bibleRef.getHashValue())
                 && getFuzzyLinkSearch().equals(bibleRef.getFuzzyLinkSearch());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPathToBook(), getBibleName(), getHashValue(), getFuzzyLinkSearch());
+        return Objects.hash(getPathToBook(), getBibleID(), getHashValue(), getFuzzyLinkSearch());
     }
 
     @Override
     public String toString() {
         return "BibleRef{" +
                 "pathToBook='" + pathToBook + '\'' +
-                ", bibleName='" + bibleName + '\'' +
+                ", bibleName='" + bibleID + '\'' +
                 ", hashValue='" + hashValue + '\'' +
                 ", fuzzyLinkSearch=" + fuzzyLinkSearch +
                 '}';

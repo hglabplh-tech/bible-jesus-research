@@ -11,6 +11,8 @@ public class AccordanceRef {
 
     private String hashValue = null;
 
+    private String dictionaryID = null;
+
     public static final String FORMAT_XSD = "zefaniaDict.xsd";
 
     public String getPathToBook() {
@@ -48,16 +50,25 @@ public class AccordanceRef {
         return this;
     }
 
+    public String getDictionaryID() {
+        return dictionaryID;
+    }
+
+    public AccordanceRef setDictionaryID(String dictionaryID) {
+        this.dictionaryID = dictionaryID;
+        return this;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof AccordanceRef)) return false;
         AccordanceRef that = (AccordanceRef) o;
-        return getPathToBook().equals(that.getPathToBook()) && getFilename().equals(that.getFilename())  && getHashValue().equals(that.getHashValue());
+        return getPathToBook().equals(that.getPathToBook()) && Objects.equals(getFilename(), that.getFilename()) && Objects.equals(getHashValue(), that.getHashValue()) && getDictionaryID().equals(that.getDictionaryID());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPathToBook(), getFilename(), getHashValue());
+        return Objects.hash(getPathToBook(), getFilename(), getHashValue(), getDictionaryID());
     }
 }

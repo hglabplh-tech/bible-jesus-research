@@ -1,11 +1,9 @@
 package org.harry.jesus.fxutils;
 
 import generated.Dictionary;
-import generated.XMLBIBLE;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.Tuple;
 import org.harry.jesus.synchjeremia.AccordanceRef;
@@ -18,7 +16,7 @@ public class BibleInfoDialog {
         DialogPane pane = new DialogPane();
         ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         pane.getButtonTypes().addAll(saveButtonType, ButtonType.OK);
-        String bibleName = instance.getBibleRef().getBibleName();
+        String bibleName = instance.getBibleRef().getBibleID();
         String version =instance.getBible().getVersion();
 
         GridPane grid = new GridPane();

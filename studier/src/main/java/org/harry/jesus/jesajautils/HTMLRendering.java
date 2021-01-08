@@ -6,6 +6,7 @@ import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 import org.pmw.tinylog.Logger;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
@@ -17,12 +18,50 @@ public class HTMLRendering {
     public static StringBuffer buildAccordance(BibleTextUtils utils, Dictionary accordance) {
         StringBuffer htmlBuffer = new StringBuffer();
         buildAccHead(htmlBuffer);
+        buidAccordanceHeader(htmlBuffer, accordance);
         buildAccItemEntriesHTML(utils, htmlBuffer, accordance.getItem());
         buildAccFoot(htmlBuffer);
         Logger.trace(htmlBuffer.toString());
         return htmlBuffer;
     }
 
+    public static void buidAccordanceHeader(StringBuffer htmlBuffer, Dictionary accordance) {
+        htmlBuffer.append("<H1 id=\"header\">Dictionary</H1><hr><p><span style=\"font-size: small; font-family: &quot;Times New Roman&quot;;\">");
+        TINFORMATION dictionaryInfo = accordance.getINFORMATION();
+        for (JAXBElement element : dictionaryInfo.getTitleOrCreatorOrDescription()) {
+
+            if (element.getName().getLocalPart().equals("title")) {
+                htmlBuffer.append("<br>title: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("creator")) {
+                htmlBuffer.append("<br>creator: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("description")) {
+                htmlBuffer.append("<br>description: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("publisher")) {
+                htmlBuffer.append("<br>publisher: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("date")) {
+                htmlBuffer.append("<br>date: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("subject")) {
+                htmlBuffer.append("<br>subject: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("contributors")) {
+                htmlBuffer.append("<br>contributors: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("type")) {
+                htmlBuffer.append("<br>type: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("identifier")) {
+                htmlBuffer.append("<br>identifier: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("format")) {
+                htmlBuffer.append("<br>format: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("source")) {
+                htmlBuffer.append("<br>source: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("language")) {
+                htmlBuffer.append("<br>language: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("coverage")) {
+                htmlBuffer.append("<br>coverage: " + element.getValue());
+            } else if (element.getName().getLocalPart().equals("rights")) {
+                htmlBuffer.append("<br>rights: " + element.getValue());
+            }
+        }
+        htmlBuffer.append("</span></p><hr>");
+    }
     public static void buildAccHead(StringBuffer htmlBuffer) {
         htmlBuffer.append("<html>\n" +
                 " <head>\n" +
@@ -68,8 +107,7 @@ public class HTMLRendering {
                             htmlBuffer.append("<p> Title: " + titleBuffer.toString() + "</p>\n");
                     }  else if (((JAXBElement) object).getName().getLocalPart().equals("reflink")) {
                         RefLinkType refLink = (RefLinkType) (((JAXBElement) object).getValue());
-                        String mScope = refLink.getMscope();
-                        createAccBibleLink(utils, htmlBuffer, mScope);
+                        setRefLinkToBuffer(utils, htmlBuffer, refLink);
                     }
 
 
@@ -118,8 +156,7 @@ public class HTMLRendering {
                     }
 
                     RefLinkType refLink = (RefLinkType) thisContent;
-                    String mScope = refLink.getMscope();
-                    createAccBibleLink(utils, htmlBuffer, mScope);
+                    setRefLinkToBuffer(utils, htmlBuffer, refLink);
                     indexHyper++;
                 }
 
@@ -128,6 +165,17 @@ public class HTMLRendering {
             }
         }
 
+    }
+
+    private static void setRefLinkToBuffer(BibleTextUtils utils, StringBuffer htmlBuffer, RefLinkType refLink) {
+        String mScope = refLink.getMscope();
+        if (mScope != null && !mScope.isEmpty()) {
+            createAccBibleLink(utils, htmlBuffer, mScope);
+        }
+        String target = refLink.getTarget();
+        if (target != null && !target.isEmpty()) {
+            createAccBibleLink(utils, htmlBuffer, target);
+        }
     }
 
     public static void buildSee(SeeType see, StringBuffer htmlBuffer) {
