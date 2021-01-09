@@ -287,6 +287,7 @@ public class GenDictHTMLScene {
                 done = genDictionary(dictInstance, total, done);
             }
             updateProgress(total, total);
+            setLabelText(total, total);
             return dummy;
         }
 
