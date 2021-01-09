@@ -838,6 +838,12 @@ public class MainController {
     }
 
     @FXML
+    public void genDictHTML(ActionEvent event) {
+        String dictDir = ApplicationProperties.getApplicationAccordanceDir();
+        GenDictHTMLScene.generateDictHTML(utils, new File(dictDir));
+    }
+
+    @FXML
     public void loadDev(ActionEvent event) {
         byte [] buffer = new byte[4096];
         InputStream stream = JesusMisc.showOpenDialog(notesTable);

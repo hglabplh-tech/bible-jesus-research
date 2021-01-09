@@ -1,9 +1,6 @@
 package org.harry.jesus.fxutils;
 
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -40,11 +37,11 @@ public class HelpDialog {
                 ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
                 dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.OK);
 
-                Pane pane = dialog.getDialogPane();
+                DialogPane pane = dialog.getDialogPane();
                 HBox inner = new HBox();
                 inner.setMinWidth(980);
                 inner.setMinHeight(680);
-                pane.getChildren().add(inner);
+                pane.setContent(inner);
                 pane.setMinWidth(1000);
                 pane.setMinHeight(700);
                 TextArea viewer = new TextArea();

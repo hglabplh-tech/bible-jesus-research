@@ -282,7 +282,7 @@ public class HTMLRendering {
 
 
 
-    private static String generateHyperLink(StringBuffer buffer, String link) {
+    public static String generateHyperLink(StringBuffer buffer, String link) {
         String href = "http://bible/"+ link;
         href = href.replace(",", "/vers/");
         href = href.replace(" ", "\\");

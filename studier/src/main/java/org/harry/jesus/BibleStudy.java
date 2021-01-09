@@ -41,9 +41,8 @@ public class BibleStudy extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         Configurator.defaultConfig().level(Level.TRACE)
-                .level(Level.TRACE)
                 .locale(Locale.ENGLISH)
-                .writingThread(true)
+                .writer(new ConsoleWriter())
                 .writer(
                         new FileWriter(
                                 new File(SynchThread.appDir, "application.log")

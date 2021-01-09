@@ -38,7 +38,7 @@ public class ViewAccordanceDialog {
                                             String accFName) {
 
         Stage stage = new Stage();
-        stage.setTitle("Second Stage");
+        stage.setTitle("Dictionary View");
         try {
             String accDir = ApplicationProperties.getApplicationAccordanceDir();
             String fileName = accFName + ".html";

@@ -116,10 +116,10 @@ public class BibleTextUtils {
             String id = AccordanceUtil.getIdFromInfo(actAccordance.getFirst().getINFORMATION());
             accRef.setDictionaryID(id);
             dictInstances.add(new DictionaryInstance(accRef, actAccordance.getFirst()));
-            AccordanceGenThread thread =
+           /* AccordanceGenThread thread =
                     new AccordanceGenThread(this,
                             actAccordance.getFirst(), fileName, accordancePath);
-            thread.start();
+            thread.start(); */
 
         }
 
