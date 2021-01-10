@@ -35,6 +35,21 @@ Here is the preferred link I can not supply you with
 versions in cause of the copy right.
 https://de.osdn.net/projects/sfnet_zefania-sharp/releases/
 
+NEW: 
+
+- Bible information is now displayed and the Information header for the dictionaries also.
+- The generation of the dictionaries HTML is no more automatic
+you have to click the study menu and there is a menu-item
+  to generate the HTML files this is then done asynchronous
+  with progress display in a separate window
+- The configuration dialog is called automatic the first time you start the app
+After saving configuration the program exits and after second restart the settings are active
+
+THE PROJECT NEEDS A JAVA_HOME setting to a jre java 8
+  
+
+  
+
 Kind regards and be blessed and not at all stressed
 
 Harald Glab-Plhak

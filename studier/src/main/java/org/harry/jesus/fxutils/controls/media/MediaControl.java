@@ -30,7 +30,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.harry.jesus.fxutils.media;
+package org.harry.jesus.fxutils.controls.media;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;

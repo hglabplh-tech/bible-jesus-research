@@ -1,13 +1,11 @@
-package org.harry.jesus.fxutils.media;
+package org.harry.jesus.fxutils.controls.media;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.*;
 
 public class PlayMediaTest {
 

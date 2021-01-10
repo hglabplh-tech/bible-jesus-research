@@ -44,10 +44,10 @@ public class HelpDialog {
                 pane.setContent(inner);
                 pane.setMinWidth(1000);
                 pane.setMinHeight(700);
-                TextArea viewer = new TextArea();
+                WebView viewer = new WebView();
                 viewer.setMinWidth(980);
                 viewer.setMinHeight(650);
-                viewer.setText(htmlString);
+                viewer.getEngine().loadContent(htmlString);
                 inner.getChildren().add(viewer);
 
 

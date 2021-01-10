@@ -34,8 +34,10 @@ import org.fxmisc.richtext.GenericStyledArea;
 import org.fxmisc.richtext.model.*;
 import org.harry.jesus.danielpersistence.PersistenceLayer;
 import org.harry.jesus.fxutils.*;
-import org.harry.jesus.fxutils.media.MediaControl;
-import org.harry.jesus.fxutils.media.PlayBible;
+import org.harry.jesus.fxutils.controls.BibleStudyCompoundControl;
+import org.harry.jesus.fxutils.controls.HTMLEditorExt;
+import org.harry.jesus.fxutils.controls.media.MediaControl;
+import org.harry.jesus.fxutils.controls.media.PlayBible;
 import org.harry.jesus.jesajautils.*;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.ParStyle;
@@ -61,8 +63,7 @@ public class MainController {
     TabPane mainTabPane;
 
     @FXML Tab readBible;
-    @FXML
-    TextField chapterTitle;
+
 
     @FXML
     ListView<String> bibles;
@@ -82,9 +83,6 @@ public class MainController {
     @FXML
     ListView<String> resultlist;
 
-
-    @FXML
-    VirtualizedScrollPane<GenericStyledArea<ParStyle, String, TextStyle>> chapterReader;
 
     @FXML private TableView<NoteTabEntry> notesTable;
 
@@ -106,11 +104,8 @@ public class MainController {
     @FXML
     GridPane topGridPane;
 
-    @FXML MediaView chapterPlayView;
 
-    @FXML Button prevChapter;
 
-    @FXML Button nextChapter;
 
     @FXML ChoiceBox<BibleTextUtils.DictionaryInstance> dictionaries;
 
@@ -122,7 +117,7 @@ public class MainController {
 
     FoldableStyledArea area;
 
-    XMLBIBLE selected = null;
+
 
     private String actBookLabel;
 
@@ -134,7 +129,7 @@ public class MainController {
 
     BibleThreadPool.ThreadBean context = null;
 
-    Map<Integer, IndexRange> selectedVersesMap = new LinkedHashMap<>();
+
 
     List<BibleFulltextEngine.BibleTextKey> verseKeys;
 
@@ -156,28 +151,24 @@ public class MainController {
 
     private MediaControl mediaControl;
 
+    private BibleStudyCompoundControl bibleStudy;
 
-    private Optional<Tuple<Dictionary, AccordanceRef>> optAccordance = Optional.empty();
+
+
 
     @FXML
     public void initialize() {
-        initChapterReader();
-        initAreaContextMenu();
+        XMLBIBLE selected = null;
         printDev.setDisable(true);
         initListeners();
-
+        HTMLEditorExt editorExt = new HTMLEditorExt(devotionalEdit);
         context = BibleThreadPool.getContext();
-        bibles.getSelectionModel().selectFirst();
 
 
         VBox.setVgrow(mainTabPane, Priority.ALWAYS);
 
         SynchThread.loadRendering(context);
         SynchThread.loadHistory(context);
-        history.getItems().addAll(context.getHistory());
-        if (history.getItems().size() > 0) {
-            history.getSelectionModel().select(0);
-        }
         SynchThread.loadNotes(context);
         SynchThread.loadHighlights(context);
         ApplicationProperties.loadApplicationProperties();
@@ -205,23 +196,18 @@ public class MainController {
 
         TextOps<String, TextStyle> styledTextOps = SegmentOps.styledTextOps();
 
-        this.borderPane.setCenter(chapterReader);
-        List<String> bibleNames = utils.getBibleInfos();
 
-        for (String name: bibleNames) {
-            bibles.getItems().add(name);
-        }
 
-        TreeItem<String> root = buildBooksTree();
         if (selected != null) {
+            bibleStudy =
+                    new BibleStudyCompoundControl(utils, selected, utils.getBookLabels().get(0));
+
+            readBible.setContent(bibleStudy);
+            bibleStudy.setMinWidth(1198);
+            bibleStudy.setMinHeight(795);
             loadNotesAndRender();
             loadHighlightsAndRender();
-            showRoot();
-            initMediaView();
-            utils.loadAccordancesDownLoaded(
-                    new File(ApplicationProperties.getApplicationAccordanceDir()),
-                    context);
-            dictionaries.getItems().addAll(utils.getDictInstances());
+
         } else {
             new SettingsDialog().showAppSettingsDialog();
             System.exit(0);
@@ -229,84 +215,13 @@ public class MainController {
 
     }
 
-    private void initMediaView() {
-        String mediaPath = context.getSettings().getProperty(ApplicationProperties.AUDIO_PATH);
-        this.playBible = new PlayBible(mediaPath
-                , chapterPlayView);
-        BibleTextUtils.BookLink link =
-                new BibleTextUtils.BookLink(actBookLabel, actChapter, Arrays.asList(1));
-        MediaPlayer mp = playBible.playChapter(link);
-        if (mp != null) {
-            mediaControl = new MediaControl(mp, chapterPlayView);
-            topGridPane.add(mediaControl, 0, 1,1,2);
-        }
-    }
-
     private void initListeners() {
-        booksTree.getSelectionModel().selectedItemProperty()
-                .addListener(new ChangeListener<TreeItem<String>>() {
-
-                    @Override
-                    public void changed(ObservableValue<? extends TreeItem<String>> observableValue, TreeItem<String> old_val, TreeItem<String> new_val) {
-                        if (new_val != null) {
-                            String value = new_val.getValue();
-                            if (value.equals("Book Information")) {
-                                rendering = new TextRendering(utils, area, actBookLabel, actChapter);
-                                rendering.showBibleInfo(selected);
-                                return;
-                            }
-                            String regex = "[0-9]+";
-
-                            String bookLabel = "";
-                            int chapter = 1;
-                            if (value.matches(regex)) {
-                                bookLabel = new_val.getParent().getValue();
-                                chapter = Integer.valueOf(value, 10);
-                            } else {
-                                bookLabel = value;
-                            }
-                            if (utils.getBookLabels().contains(bookLabel)) {
-                                jumpToBookAndChapter(bookLabel, chapter);
-                            }
-                        }
-                    }
-                });
-        bibles.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                selectedIndex = t1.intValue();
-                BibleTextUtils.BibleBookInstance instance = utils.getBibleInstances().get(t1.intValue());
-                selected = instance.getBible();
-
-                optAccordance = instance.getOptDictAccRefTuple();
-                TreeItem<String> root = buildBooksTree();
-                showChapter();
-                BibleTextUtils.BookLink link =
-                        new BibleTextUtils.BookLink(actBookLabel, actChapter, Arrays.asList(1));
-                if (playBible != null) {
-                    playBible.stopChapter();
-                }
-                initMediaView();
-            }
-        });
-        footerNotes.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
-                String note = footerNotes.getItems().get(t1.intValue());
-                List<BibleTextUtils.BookLink> links = LinkHandler.parseLinks(utils, note);
-                if (links.size() > 0) {
-                    showLink(links);
-                }
-            }
-
-        });
-
         planList.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 editPlanDayIndex = newValue.intValue();
                 Day theDay = planDays.getDay().get(editPlanDayIndex);
-                String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
+                String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses());
                 setPlanOutputSelected(theDay, versHtml);
 
 
@@ -314,63 +229,7 @@ public class MainController {
 
         });
 
-        history.getSelectionModel().selectedIndexProperty().addListener(
-                new ChangeListener<Number>() {
-                    @Override
-                    public void changed(ObservableValue<? extends Number> observable,
-                                        Number oldValue, Number newValue) {
-                        HistoryEntry entry = history.getItems().get(newValue.intValue());
-                        BibleTextUtils.BookLink link = entry.getBookLink();
-                        jumpToBookAndChapter(link.getBookLabel(), link.getChapter());
-                    }
-                });
 
-        dictionaries.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue,
-                                Number newValue) {
-                BibleTextUtils.DictionaryInstance entry =
-                        dictionaries.getItems().get(newValue.intValue());
-                ViewAccordanceDialog.showAccordanceDialog(utils, area,
-                        entry.getDictionaryRef().getFilename());
-            }
-        });
-
-
-        area.addEventHandler(SetLinkEvent.SET_LINK_EVENT, event -> {
-            BibleTextUtils.BookLink link = event.getLink();
-            jumpToBookAndChapter(link.getBookLabel(), link.getChapter());
-            setSelectedVersVisible(link);
-        });
-        area.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                if (mouseEvent.getClickCount() == 2) {
-                    IndexRange range = area.getSelection();
-                    Map.Entry<Integer, IndexRange> versPointer =
-                            rendering.selectVerseByGivenRange(range, true);
-                    if (selectedVersesMap.get(versPointer.getKey()) != null) {
-                        selectedVersesMap.remove(versPointer.getKey(), versPointer.getValue());
-                        rendering.selectVerseByGivenRange(range, false);
-
-                    } else {
-                        selectedVersesMap.put(versPointer.getKey(), versPointer.getValue());
-                    }
-                }
-            }
-        });
-    }
-
-    private void setSelectedVersVisible(BibleTextUtils.BookLink link) {
-        IndexRange range = rendering.getChapterMap().get(link.getVerses().get(0));
-        rendering.selectVerseColorByGivenRange(range, Color.CORAL);
-        jumpToVers(range);
-    }
-
-    private void jumpToVers(IndexRange range) {
-        area.selectRange(range.getStart(), range.getEnd());
-        area.setParVisableSelection();
     }
 
     private void fireLinkEvent(BibleTextUtils.BookLink link) {
@@ -383,33 +242,7 @@ public class MainController {
         }
     }
 
-    private void jumpToBookAndChapter(String bookLabel, int chapter) {
-        Optional<BIBLEBOOK> book = utils.getBookByLabel(selected, bookLabel);
-        if (book.isPresent()) {
-            actBookLabel = bookLabel;
-            actBook = utils.getBookLabelAsClass(bookLabel);
-            actChapter = chapter;
-            showChapter();
-            BibleTextUtils.BookLink link =
-                    new BibleTextUtils.BookLink(actBookLabel, actChapter, Arrays.asList(1));
-            if (playBible != null) {
-                playBible.stopChapter();
-            }
-            initMediaView();
-        }
-    }
 
-    private void setPlanOutputSelected(Day theDay, String versHtml) {
-        WebEngine engine = devView.getEngine();
-        byte [] devBytes = theDay.getDevotional();
-        if (devBytes != null) {
-            String devotional = new String(Base64.getDecoder().decode(devBytes));
-            engine.loadContent(devotional);
-            devotionalEdit.setHtmlText(devotional);
-        }
-        engine = versesView.getEngine();
-        engine.loadContent(versHtml);
-    }
 
     private void initAreaContextMenu() {
         ContextMenu contMenu = new ContextMenu();
@@ -433,10 +266,11 @@ public class MainController {
                 highlightsTab.setEditable(false);
                 Optional<Color> resultColor = ColorDialog.callColorDialog();
                 List<Vers> versList = new ArrayList<>();
-                Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area, getSelectedMapSorted());
+                Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area,
+                        bibleStudy.getSelectedMapSorted());
                 if (resultColor.isPresent()) {
-                    for (Integer key: getSelectedMapSorted().keySet()) {
-                        IndexRange range = getSelectedMapSorted().get(key);
+                    for (Integer key: bibleStudy.getSelectedMapSorted().keySet()) {
+                        IndexRange range = bibleStudy.getSelectedMapSorted().get(key);
                         area.setStyle(range.getStart(),
                                 range.getEnd(),
                                 TextStyle.backgroundColor(resultColor.get()));
@@ -459,7 +293,8 @@ public class MainController {
             @Override
             public void handle(ActionEvent actionEvent) {
                 Note theNote = new Note();
-                Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area, getSelectedMapSorted());
+                Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area,
+                        bibleStudy.getSelectedMapSorted());
                 theNote.getVerslink().add(vers);
                 Optional<Color> resultColor = ColorDialog.callColorDialog();
 
@@ -482,7 +317,7 @@ public class MainController {
                     notesTable.getItems().add(entry);
                     List<Vers> versList = newNote.get().getVerslink();
                     for (BigInteger versNo: vers.getVers()) {
-                        IndexRange range = getSelectedMapSorted().get(versNo.intValue());
+                        IndexRange range = bibleStudy.getSelectedMapSorted().get(versNo.intValue());
                         area.setStyle(range.getStart(),
                                 range.getEnd(),
                                 TextStyle.backgroundColor(resultColor.get()));
@@ -507,10 +342,11 @@ public class MainController {
             public void handle(ActionEvent actionEvent) {
                 Note theNote = new Note();
 
-                Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area, getSelectedMapSorted());
+                Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area,
+                        bibleStudy.getSelectedMapSorted());
                 List<Vers> verses = new ArrayList<>();
                 verses.add(vers);
-                String versHtml = HTMLRendering.renderVerses(selected, utils, verses);
+                String versHtml = HTMLRendering.renderVerses(bibleStudy.getSelected(), utils, verses);
                 copyHtmlToClip(new StringBuffer(versHtml));
             }
         });
@@ -523,9 +359,10 @@ public class MainController {
             public void handle(ActionEvent actionEvent) {
                 List<Day> dayList = ensureFirstDay();
                 Day theDay = dayList.get(dayList.size() - 1);
-                Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area, getSelectedMapSorted());
+                Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area,
+                        bibleStudy.getSelectedMapSorted());
                 theDay.getVerses().add(vers);
-                String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
+                String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses());
                 setPlanOutputSelected(theDay, versHtml);
             }
 
@@ -533,6 +370,20 @@ public class MainController {
         contMenu.getItems().add(mItem);
         area.contextMenuObjectProperty().setValue(contMenu);
     }
+
+    private void setPlanOutputSelected(Day theDay, String versHtml) {
+        WebEngine engine = devView.getEngine();
+        byte [] devBytes = theDay.getDevotional();
+        if (devBytes != null) {
+            String devotional = new String(Base64.getDecoder().decode(devBytes));
+            engine.loadContent(devotional);
+            devotionalEdit.setHtmlText(devotional);
+        }
+        engine = versesView.getEngine();
+        engine.loadContent(versHtml);
+    }
+
+
 
     private List<Day> ensureFirstDay() {
         List<Day> dayList = planDays.getDay();
@@ -557,103 +408,7 @@ public class MainController {
         return newDay;
     }
 
-    private void initChapterReader() {
-        Parent parent = booksTree.getParent();
-        this.borderPane = (BorderPane) parent;
-        area = new FoldableStyledArea();
-        chapterReader = new VirtualizedScrollPane(area);
-        chapterReader.setPrefSize(900, 650);
-    }
 
-    private void showRoot() {
-        rendering = new TextRendering(utils, this.area, actBookLabel, actChapter);
-        fillTextArea();
-    }
-
-    private void fillTextArea() {
-        rendering.render(selected, utils.getBookLabels().get(0), actChapter);
-        actBookLabel = utils.getBookLabels().get(0);
-        actBook = utils.getBookLabelAsClass(actBookLabel);
-        footerNotes.getItems().clear();
-        footerNotes.getItems().addAll(rendering.getNotes());
-        String [] splitted = actBookLabel.split(",");
-        chapterTitle.setText("Book: " + splitted[1] + " Chapter: " + actChapter);
-    }
-
-    private boolean showChapter() {
-        rendering = new TextRendering(utils, this.area, actBookLabel, actChapter);
-        HistoryEntry entry = new HistoryEntry(new BibleTextUtils.BookLink(actBookLabel, actChapter));
-        if (!context.getHistory().contains(entry)) {
-            context.addHistoryEntry(entry);
-        }
-        if (!history.getItems().contains(entry)) {
-            history.getItems().add(0, entry);
-            history.getSelectionModel().select(entry);
-        }
-        boolean found = fillChapterText();
-        return found;
-    }
-
-    private boolean fillChapterText() {
-        boolean found = rendering.render(selected, actBookLabel, actChapter);
-        if (found) {
-            footerNotes.getItems().clear();
-            footerNotes.getItems().addAll(rendering.getNotes());
-            footerNotes.getItems().add("Fuzzy Link matches -->");
-            for (String note : rendering.getNotes()) {
-                String links = "";
-                try {
-                    links = LinkHandler.generateLinksFuzzy(utils, note);
-                } catch (Exception ex) {
-                    Logger.trace("Something went wrong with fuzzy!!! This feature has to be enhanced");
-                }
-                if (!links.isEmpty()) {
-                    footerNotes.getItems().add(links);
-                }
-            }
-            String[] splitted = actBookLabel.split(",");
-            selectedVersesMap.clear();
-            rendering.clearRendering();
-            chapterTitle.setText("Book: " + splitted[1] + " Chapter: " + actChapter);
-            initMediaView();
-        }
-        return found;
-    }
-
-    private void showLink(List<BibleTextUtils.BookLink> links) {
-        String htmlText = HTMLRendering.renderLink(utils, selected, links);
-        ReadLinksDialog.showReadLinkDialog(utils, area, htmlText);
-    }
-
-
-    private TreeItem<String> buildBooksTree() {
-        if (selected != null) {
-            TreeItem<String> root = new TreeItem<>();
-            root.setValue("The books");
-            booksTree.setRoot(root);
-            TreeItem item = new TreeItem("Book Information");
-            root.getChildren().add(item);
-            theBooks.clear();
-            List<JAXBElement<BIBLEBOOK>> books = selected.getBIBLEBOOK();
-            for (JAXBElement<BIBLEBOOK> book : books) {
-                theBooks.add(book.getValue());
-            }
-
-            for (BIBLEBOOK theBook : theBooks) {
-                String label = utils.getBookLabels().get(theBook.getBnumber().intValue() - 1);
-                item = new TreeItem(label);
-                root.getChildren().add(item);
-                for (JAXBElement<CHAPTER> chapter : theBook.getCHAPTER()) {
-                    TreeItem<String> cItem = new TreeItem<>(chapter.getValue().getCnumber().toString());
-                    item.getChildren().add(cItem);
-                }
-
-            }
-            return root;
-        }
-        booksTree.refresh();
-        return null;
-    }
 
     @FXML
     public void about(ActionEvent event) {
@@ -663,7 +418,7 @@ public class MainController {
     @FXML
     public void appHelp(ActionEvent event) {
 
-        HelpDialog.showHelp("/AppHelp.txt");
+        HelpDialog.showHelp("/AppHelp.html");
     }
 
 
@@ -685,7 +440,7 @@ public class MainController {
     @FXML
     public void search(ActionEvent event) {
         String pattern = query.getText();
-        BibleFulltextEngine engine = new BibleFulltextEngine(this.selected);
+        BibleFulltextEngine engine = new BibleFulltextEngine(bibleStudy.getSelected());
         StatisticsCollector collector = new StatisticsCollector();
         Map<BibleFulltextEngine.BibleTextKey, String> hits;
         if (searchOptions.getValue().equals(SearchOptions.SIMPLE)) {
@@ -754,7 +509,7 @@ public class MainController {
     public void openPlan(ActionEvent event) {
         InputStream input = JesusMisc.showOpenDialog(notesTable);
         planDays = PersistenceLayer.loadPlan(input);
-        String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, planDays.getDay().get(0).getVerses());
+        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, planDays.getDay().get(0).getVerses());
         setPlanOutputSelected(planDays.getDay().get(0), versHtml);
         for(Day day:planDays.getDay()) {
             planList.getItems().add(day.getTitle());
@@ -783,7 +538,7 @@ public class MainController {
         Day newDay = nextPlanDay();
         planList.getItems().add(newDay.getTitle());
         planDays.getDay().add(newDay);
-        String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, newDay.getVerses());
+        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, newDay.getVerses());
         setPlanOutputSelected(newDay, versHtml);
     }
 
@@ -802,7 +557,7 @@ public class MainController {
         vers.setVtext(resultlist.getItems().get(index));
         vers.getVers().add(BigInteger.valueOf(link.getVers()));
         theDay.getVerses().add(vers);
-        String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
+        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses());
         setPlanOutputSelected(theDay, versHtml);
     }
 
@@ -811,31 +566,11 @@ public class MainController {
         List<Day> dayList = ensureFirstDay();
         Day theDay = dayList.get(editPlanDayIndex);
         storeDevotional(theDay);
-        String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
+        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses());
         setPlanOutputSelected(theDay, versHtml);
     }
 
 
-    @FXML
-    public void prevChapter(ActionEvent event) {
-        nextChapter.setDisable(false);
-        actChapter = actChapter - 1;
-        boolean found = showChapter();
-        if (!found) {
-            int index = utils.getBookLabels().indexOf(actBookLabel);
-            index--;
-            if (index >= 0) {
-                actBookLabel = utils.getBookLabels().get(index);
-                actChapter  = selected.getBIBLEBOOK().get(index).getValue().getCHAPTER().size();
-                found = showChapter();
-                if (!found) {
-                    prevChapter.setDisable(true);
-                }
-            } else {
-                prevChapter.setDisable(true);
-            }
-        }
-    }
 
     @FXML
     public void genDictHTML(ActionEvent event) {
@@ -930,7 +665,7 @@ public class MainController {
         List<Day> dayList = ensureFirstDay();
         Day theDay = dayList.get(editPlanDayIndex);
         theDay.getVerses().add(vers);
-        String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
+        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses());
         setPlanOutputSelected(theDay, versHtml);
     }
 
@@ -948,7 +683,7 @@ public class MainController {
         BibleTextUtils.BookLink link =
                 new BibleTextUtils.BookLink(actBookLabel, actChapter, Arrays.asList(1));
         this.playBible = new PlayBible("C:\\Users\\haral\\biblebooks\\to_hear\\MP3"
-                , chapterPlayView);
+                , bibleStudy.getChapterPlayView());
         this.playBible.playChapter(link);
     }
 
@@ -959,9 +694,9 @@ public class MainController {
         Note note = noteList.getVersenote().get(row);
         String noteText = note.getNote();
         List<Vers> verses = note.getVerslink();
-        HTMLRendering.renderVerses(selected, utils,verses);
+        HTMLRendering.renderVerses(bibleStudy.getSelected(), utils,verses);
         StringBuffer htmlBuffer = new StringBuffer();
-        htmlBuffer.append(HTMLRendering.renderVerses(selected, utils,verses));
+        htmlBuffer.append(HTMLRendering.renderVerses(bibleStudy.getSelected(), utils,verses));
         htmlBuffer.append("<p>" + noteText + "<p>");
         copyHtmlToClip(htmlBuffer);
 
@@ -975,30 +710,8 @@ public class MainController {
         Day theDay = dayList.get(editPlanDayIndex);
         List<Vers> verses = note.getVerslink();
         theDay.getVerses().addAll(verses);
-        String versHtml = HTMLRendering.renderVersesASDoc(selected, utils, theDay.getVerses());
+        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses());
         setPlanOutputSelected(theDay, versHtml);
-    }
-
-
-    @FXML
-    public void nextChapter(ActionEvent event) {
-        prevChapter.setDisable(false);
-        actChapter = actChapter + 1;
-        boolean found = showChapter();
-        if (!found) {
-            int index = utils.getBookLabels().indexOf(actBookLabel);
-            index++;
-            if (index < 66) {
-                actBookLabel = utils.getBookLabels().get(index);
-                actChapter = 1;
-                found = showChapter();
-                if (!found) {
-                    nextChapter.setDisable(true);
-                }
-            } else {
-                nextChapter.setDisable(true);
-            }
-        }
     }
 
     @FXML
@@ -1088,11 +801,11 @@ public class MainController {
         notesTable.getSelectionModel().getSelectedItem();
         String bookLabel = utils.getBookLabels()
                 .get(newNote.getVerslink().get(0).getBook().intValue() - 1 );
-        Optional<BIBLEBOOK> book = utils.getBookByLabel(selected, bookLabel);
+        Optional<BIBLEBOOK> book = utils.getBookByLabel(bibleStudy.getSelected(), bookLabel);
         BibleTextUtils.BookLabel bookLabClass = null;
         if (book.isPresent()) {
             bookLabClass = utils.getBookLabelAsClass(bookLabel);
-            showChapter();
+            bibleStudy.showChapter();
         }
         NoteTabEntry entry = new NoteTabEntry(utils.generateVersLink(newNote.getVerslink(), bookLabClass),
                 newNote.getVerslink().get(0).getVtext()
@@ -1123,11 +836,11 @@ public class MainController {
         TextRendering.storeVersRendering(versList, noteColor);
         String bookLabel = utils.getBookLabels()
                 .get(newVers.getBook().intValue() - 1 );
-        Optional<BIBLEBOOK> book = utils.getBookByLabel(selected, bookLabel);
+        Optional<BIBLEBOOK> book = utils.getBookByLabel(bibleStudy.getSelected(), bookLabel);
         BibleTextUtils.BookLabel bookLabClass = null;
         if (book.isPresent()) {
             bookLabClass = utils.getBookLabelAsClass(bookLabel);
-            showChapter();
+            bibleStudy.showChapter();
         }
         HighlightsEntry entry = new HighlightsEntry(utils.generateVersLink(versList, bookLabClass),
                 newVers.getVtext());
@@ -1141,23 +854,6 @@ public class MainController {
     }
 
 
-    private Map<Integer, IndexRange> getSelectedMapSorted() {
-        List<Integer> sortedList = new ArrayList<>();
-        sortedList.addAll(selectedVersesMap.keySet());
-        Collections.sort(sortedList, new Comparator<Integer>() {
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                return o1.compareTo(o2);
-            }
-        });
-        Map<Integer, IndexRange> temp = new LinkedHashMap<>();
-        for (Integer no: sortedList) {
-            IndexRange range = selectedVersesMap.get(no);
-            temp.put(no, range);
-
-        }
-        return temp;
-    }
 
     public enum SearchOptions {
         SIMPLE,

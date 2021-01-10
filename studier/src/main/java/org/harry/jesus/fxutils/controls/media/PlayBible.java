@@ -1,4 +1,4 @@
-package org.harry.jesus.fxutils.media;
+package org.harry.jesus.fxutils.controls.media;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -8,7 +8,6 @@ import org.pmw.tinylog.Logger;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.List;
 import java.util.Optional;
 
 public class PlayBible {
