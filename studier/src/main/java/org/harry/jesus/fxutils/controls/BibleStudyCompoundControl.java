@@ -8,19 +8,13 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXML;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
-import javafx.scene.web.WebEngine;
-import jesus.harry.org.plan._1.Day;
-import jesus.harry.org.versnotes._1.Note;
-import jesus.harry.org.versnotes._1.Vers;
+import javafx.scene.web.WebView;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.GenericStyledArea;
 import org.harry.jesus.fxutils.*;
@@ -36,16 +30,20 @@ import org.tinylog.Logger;
 
 import javax.xml.bind.JAXBElement;
 import java.io.File;
-import java.math.BigInteger;
 import java.util.*;
 
 public class BibleStudyCompoundControl extends BorderPane {
 
-    private FoldableStyledArea area;
+    private FoldableStyledArea area = new FoldableStyledArea();
+
+    private WebView serverArea = new WebView();
 
     private VirtualizedScrollPane<GenericStyledArea<ParStyle, String, TextStyle>> chapterReader;
 
-    private ListView<String> biblesList;
+    private ListView<String> biblesList = new ListView<>();;
+
+    private ListView<BibleLinkCreator.BibleTranslations>
+            bibleServerList = new ListView<>();
 
     private TreeView<String> booksTree;
 
@@ -81,15 +79,23 @@ public class BibleStudyCompoundControl extends BorderPane {
 
     Map<Integer, IndexRange> selectedVersesMap = new LinkedHashMap<>();
 
+    private BibleLinkCreator.BibleTranslations translation = BibleLinkCreator.BibleTranslations.BIBLE_HFA;
 
-
-    public BibleStudyCompoundControl(BibleTextUtils utils, XMLBIBLE selected, String actBookLabel) {
+    public BibleStudyCompoundControl(BibleTextUtils utils,
+                                     XMLBIBLE selected,
+                                     String actBookLabel, ReaderType readerType) {
         this.utils = utils;
         this.selected = selected;
         this.actBookLabel = actBookLabel;
         this.actBook = utils.getBookLabelAsClass(actBookLabel);
-        this.initChapterReader();
-        this.initBibleBox();
+        if (readerType.equals(ReaderType.ZEFANJA_READER)) {
+            this.initChapterReaderZefanja();
+            this.initBibleBoxZefanja();
+        } else if (readerType.equals(ReaderType.BIBLESERVER_READER)) {
+            this.initChapterReaderBibleServer();
+            this.initBibleBoxServer();
+        }
+
         this.initBookTree();
         this.initStudyNotes();
         this.setTop(topControls);
@@ -103,6 +109,7 @@ public class BibleStudyCompoundControl extends BorderPane {
         for (String name: bibleNames) {
             biblesList.getItems().add(name);
         }
+        bibleServerList.getItems().addAll(BibleLinkCreator.BibleTranslations.values());
         topControls.getHistoryChoice().getItems().addAll(context.getHistory());
         utils.loadAccordancesDownLoaded(
                 new File(ApplicationProperties.getApplicationAccordanceDir()),
@@ -116,6 +123,7 @@ public class BibleStudyCompoundControl extends BorderPane {
     private void showRoot() {
         rendering = new TextRendering(utils, this.area, actBookLabel, actChapter);
         fillTextArea();
+        loadWebChapter(actChapter, actBookLabel);
     }
 
     private void fillTextArea() {
@@ -130,17 +138,34 @@ public class BibleStudyCompoundControl extends BorderPane {
 
 
 
-    private void initChapterReader() {
-        area = new FoldableStyledArea();
+    private void initChapterReaderZefanja() {
         chapterReader = new VirtualizedScrollPane(area);
         this.setCenter(chapterReader);
 
     }
 
-    private void initBibleBox() {
-        biblesList = new ListView<>();
+    private void initChapterReaderBibleServer() {
+        this.setCenter(serverArea);
+       // String test = "https://www.bibleserver.com/HFA/1.Korinther13%2C7-14";
+
+    }
+
+    public void loadPage(String url) {
+        try {
+            serverArea.getEngine().setJavaScriptEnabled(true);
+            serverArea.getEngine().load(url);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initBibleBoxZefanja() {
         this.setRight(biblesList);
         biblesList.getSelectionModel().selectFirst();
+    }
+    private void initBibleBoxServer() {
+        this.setRight(bibleServerList);
+        bibleServerList.getSelectionModel().selectFirst();
     }
 
     private void initBookTree() {
@@ -191,6 +216,7 @@ public class BibleStudyCompoundControl extends BorderPane {
                             }
                             if (utils.getBookLabels().contains(bookLabel)) {
                                 jumpToBookAndChapter(bookLabel, chapter);
+                                loadWebChapter(chapter, bookLabel);
                             }
                         }
                     }
@@ -207,6 +233,18 @@ public class BibleStudyCompoundControl extends BorderPane {
                 showChapter();
                 BibleTextUtils.BookLink link =
                         new BibleTextUtils.BookLink(actBookLabel, actChapter, Arrays.asList(1));
+                if (playBible != null) {
+                    playBible.stopChapter();
+                }
+                initMediaView();
+            }
+        });
+        bibleServerList.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                selectedIndex = t1.intValue();
+                translation = bibleServerList.getItems().get(selectedIndex);
+                loadWebChapter(actChapter, actBookLabel);
                 if (playBible != null) {
                     playBible.stopChapter();
                 }
@@ -320,6 +358,18 @@ public class BibleStudyCompoundControl extends BorderPane {
                 }
             }
         });
+    }
+
+    private void loadWebChapter(int chapter, String bookLabel) {
+        actBookLabel = bookLabel;
+        actChapter = chapter;
+        BibleTextUtils.BookLabel label =
+                new BibleTextUtils.BookLabel(bookLabel);
+        String link = BibleLinkCreator
+                .createBibleLinkShort(
+                        translation,
+                        label, chapter);
+        loadPage(link);
     }
 
     private TreeItem<String> buildBooksTree() {
@@ -468,5 +518,41 @@ public class BibleStudyCompoundControl extends BorderPane {
 
     public MediaView getChapterPlayView() {
         return chapterPlayView;
+    }
+
+    public BibleTextUtils.BookLabel getActBook() {
+        return actBook;
+    }
+
+    public Integer getActChapter() {
+        return actChapter;
+    }
+
+    public String getActBookLabel() {
+        return actBookLabel;
+    }
+
+    public BibleStudyCompoundControl setActBookLabel(String actBookLabel) {
+        this.actBookLabel = actBookLabel;
+        return this;
+    }
+
+    public BibleStudyCompoundControl setActChapter(Integer actChapter) {
+        this.actChapter = actChapter;
+        return this;
+    }
+
+    public BibleStudyCompoundControl setActBook(BibleTextUtils.BookLabel actBook) {
+        this.actBook = actBook;
+        return this;
+    }
+
+    public FoldableStyledArea getArea() {
+        return area;
+    }
+
+    public static enum ReaderType {
+        ZEFANJA_READER,
+        BIBLESERVER_READER
     }
 }
