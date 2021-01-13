@@ -57,17 +57,12 @@ import java.io.*;
 import java.math.BigInteger;
 import java.util.*;
 
-public class MainZefanjaController {
+public class MainController {
 
     @FXML
     TabPane mainTabPane;
 
-    @FXML
-    TabPane appTabPane;
-
     @FXML Tab readBible;
-
-    @FXML Tab readBibleWeb;
 
 
     @FXML
@@ -109,9 +104,6 @@ public class MainZefanjaController {
     @FXML
     GridPane topGridPane;
 
-    @FXML
-    Tab zefanjaXSD;
-
 
 
 
@@ -123,7 +115,7 @@ public class MainZefanjaController {
 
     List<BIBLEBOOK> theBooks = new ArrayList<>();
 
-
+    FoldableStyledArea area;
 
 
 
@@ -160,8 +152,6 @@ public class MainZefanjaController {
     private MediaControl mediaControl;
 
     private BibleStudyCompoundControl bibleStudy;
-
-    BibleStudyCompoundControl bibleStudyWeb;
 
 
 
@@ -210,16 +200,9 @@ public class MainZefanjaController {
 
         if (selected != null) {
             bibleStudy =
-                    new BibleStudyCompoundControl(utils, selected,
-                            utils.getBookLabels().get(0),
-                            BibleStudyCompoundControl.ReaderType.ZEFANJA_READER);
-            bibleStudyWeb = new BibleStudyCompoundControl(utils, selected,
-                    utils.getBookLabels().get(0),
-                    BibleStudyCompoundControl.ReaderType.BIBLESERVER_READER);
+                    new BibleStudyCompoundControl(utils, selected, utils.getBookLabels().get(0));
 
-            initAreaContextMenu();
             readBible.setContent(bibleStudy);
-            readBibleWeb.setContent(bibleStudyWeb);
             bibleStudy.setMinWidth(1198);
             bibleStudy.setMinHeight(795);
             loadNotesAndRender();
@@ -252,7 +235,7 @@ public class MainZefanjaController {
     private void fireLinkEvent(BibleTextUtils.BookLink link) {
         try {
             SetLinkEvent event = new SetLinkEvent(link);
-            this.bibleStudy.getArea().fireEvent(event);
+            this.area.fireEvent(event);
         } catch (Exception ex) {
             org.pmw.tinylog.Logger.trace(ex);
             org.pmw.tinylog.Logger.trace("cannot send Link Event");
@@ -269,7 +252,7 @@ public class MainZefanjaController {
         mItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                bibleStudy.getArea().emitSearxchToAll();
+                area.emitSearxchToAll();
             }
 
         });
@@ -283,14 +266,12 @@ public class MainZefanjaController {
                 highlightsTab.setEditable(false);
                 Optional<Color> resultColor = ColorDialog.callColorDialog();
                 List<Vers> versList = new ArrayList<>();
-                Vers vers = BibleTextUtils
-                        .generateVerses(utils,
-                                bibleStudy.getActBook(), bibleStudy.getActChapter(), bibleStudy.getArea(),
+                Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area,
                         bibleStudy.getSelectedMapSorted());
                 if (resultColor.isPresent()) {
                     for (Integer key: bibleStudy.getSelectedMapSorted().keySet()) {
                         IndexRange range = bibleStudy.getSelectedMapSorted().get(key);
-                        bibleStudy.getArea().setStyle(range.getStart(),
+                        area.setStyle(range.getStart(),
                                 range.getEnd(),
                                 TextStyle.backgroundColor(resultColor.get()));
                         if(!vers.getVers().contains(BigInteger.valueOf(key))) {
@@ -312,8 +293,7 @@ public class MainZefanjaController {
             @Override
             public void handle(ActionEvent actionEvent) {
                 Note theNote = new Note();
-                Vers vers = BibleTextUtils.generateVerses(utils,
-                        bibleStudy.getActBook(), bibleStudy.getActChapter(), bibleStudy.getArea(),
+                Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area,
                         bibleStudy.getSelectedMapSorted());
                 theNote.getVerslink().add(vers);
                 Optional<Color> resultColor = ColorDialog.callColorDialog();
@@ -338,7 +318,7 @@ public class MainZefanjaController {
                     List<Vers> versList = newNote.get().getVerslink();
                     for (BigInteger versNo: vers.getVers()) {
                         IndexRange range = bibleStudy.getSelectedMapSorted().get(versNo.intValue());
-                        bibleStudy.getArea().setStyle(range.getStart(),
+                        area.setStyle(range.getStart(),
                                 range.getEnd(),
                                 TextStyle.backgroundColor(resultColor.get()));
                     }
@@ -354,7 +334,7 @@ public class MainZefanjaController {
             }
         });
         contMenu.getItems().add(mItem);
-        bibleStudy.getArea().contextMenuObjectProperty().setValue(contMenu);
+        area.contextMenuObjectProperty().setValue(contMenu);
         mItem = new MenuItem();
         mItem.setText("Copy");
         mItem.setOnAction(new EventHandler<ActionEvent>() {
@@ -362,8 +342,7 @@ public class MainZefanjaController {
             public void handle(ActionEvent actionEvent) {
                 Note theNote = new Note();
 
-                Vers vers = BibleTextUtils.generateVerses(utils,
-                        bibleStudy.getActBook(), bibleStudy.getActChapter(), bibleStudy.getArea(),
+                Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area,
                         bibleStudy.getSelectedMapSorted());
                 List<Vers> verses = new ArrayList<>();
                 verses.add(vers);
@@ -372,7 +351,7 @@ public class MainZefanjaController {
             }
         });
         contMenu.getItems().add(mItem);
-        bibleStudy.getArea().contextMenuObjectProperty().setValue(contMenu);
+        area.contextMenuObjectProperty().setValue(contMenu);
         mItem = new MenuItem();
         mItem.setText("copy Link to last PlanDay");
         mItem.setOnAction(new EventHandler<ActionEvent>() {
@@ -380,10 +359,7 @@ public class MainZefanjaController {
             public void handle(ActionEvent actionEvent) {
                 List<Day> dayList = ensureFirstDay();
                 Day theDay = dayList.get(dayList.size() - 1);
-                Vers vers = BibleTextUtils.generateVerses(utils,
-                        bibleStudy.getActBook(),
-                        bibleStudy.getActChapter(),
-                        bibleStudy.getArea(),
+                Vers vers = BibleTextUtils.generateVerses(utils, actBook, actChapter, area,
                         bibleStudy.getSelectedMapSorted());
                 theDay.getVerses().add(vers);
                 String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses());
@@ -392,7 +368,7 @@ public class MainZefanjaController {
 
         });
         contMenu.getItems().add(mItem);
-        bibleStudy.getArea().contextMenuObjectProperty().setValue(contMenu);
+        area.contextMenuObjectProperty().setValue(contMenu);
     }
 
     private void setPlanOutputSelected(Day theDay, String versHtml) {
@@ -450,9 +426,9 @@ public class MainZefanjaController {
     public void settings(ActionEvent event) {
         new SettingsDialog().showAppSettingsDialog();
         if (rendering == null) {
-            rendering = new TextRendering(utils, bibleStudy.getArea(), actBookLabel, actChapter);
+            rendering = new TextRendering(utils, this.area, actBookLabel, actChapter);
         }
-        rendering.setAreaText(new StringBuffer(bibleStudy.getArea().getText()));
+        rendering.setAreaText(new StringBuffer(area.getText()));
     }
 
     @FXML
@@ -492,13 +468,13 @@ public class MainZefanjaController {
     public void readFullChapter(ActionEvent event) {
         int index = resultlist.getSelectionModel().getSelectedIndex();
         BibleFulltextEngine.BibleTextKey textKey = verseKeys.get(index);
-        bibleStudy.setActChapter(textKey.getChapter());
-        bibleStudy.setActBookLabel(utils.getBookLabels().get(textKey.getBook()));
-        bibleStudy.setActBook(new BibleTextUtils.BookLabel(bibleStudy.getActBookLabel()));
-        BibleTextUtils.BookLink link = new BibleTextUtils.BookLink(bibleStudy.getActBookLabel(),
-                bibleStudy.getActChapter(), Arrays.asList(textKey.getVers()));
+        actChapter = textKey.getChapter();
+        actBookLabel = utils.getBookLabels().get(textKey.getBook() - 1);
+        actBook = new BibleTextUtils.BookLabel(actBookLabel);
+        BibleTextUtils.BookLink link = new BibleTextUtils.BookLink(actBookLabel,
+                actChapter, Arrays.asList(textKey.getVers()));
         fireLinkEvent(link);
-        appTabPane.getSelectionModel().select(zefanjaXSD);
+        mainTabPane.getSelectionModel().select(readBible);
     }
 
     @FXML
@@ -519,15 +495,14 @@ public class MainZefanjaController {
     }
 
     private void fullChapterFromVers(Vers vers) {
-        bibleStudy.setActChapter(vers.getChapter().intValue());
-        bibleStudy.setActBookLabel(utils.getBookLabels().get(vers.getBook().intValue() - 1));
-        bibleStudy.setActBook(new BibleTextUtils.BookLabel(bibleStudy.getActBookLabel()));
+        actChapter = vers.getChapter().intValue();
+        actBookLabel = utils.getBookLabels().get(vers.getBook().intValue() - 1);
+        actBook = new BibleTextUtils.BookLabel(actBookLabel);
         List<Integer> array = new ArrayList<>();
         vers.getVers().forEach(e -> array.add(e.intValue()));
-        BibleTextUtils.BookLink link = new BibleTextUtils.BookLink(bibleStudy.getActBookLabel(),
-                bibleStudy.getActChapter(), array);
+        BibleTextUtils.BookLink link = new BibleTextUtils.BookLink(actBookLabel, actChapter, array);
         fireLinkEvent(link);
-        mainTabPane.getSelectionModel().select(zefanjaXSD);
+        mainTabPane.getSelectionModel().select(readBible);
     }
 
     @FXML

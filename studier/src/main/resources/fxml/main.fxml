@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.harry.jesus.MainZefanjaController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.harry.jesus.MainController">
    <children>
       <MenuBar maxHeight="-Infinity" maxWidth="-Infinity">
         <menus>
@@ -41,53 +41,57 @@
           </Menu>
         </menus>
       </MenuBar>
-      <StackPane prefHeight="1100.0" prefWidth="1600.0">
+      <StackPane prefHeight="900.0" prefWidth="1400.0">
          <children>
-            <TabPane fx:id="appTabPane" tabClosingPolicy="UNAVAILABLE">
+            <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE">
               <tabs>
-                <Tab fx:id="zefanjaXSD" text="Zefanja XSD Content">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <Tab fx:id="readBible" text="Read Bible">
+
+                </Tab>
+                <Tab fx:id="createDevTab" text="Create Devotional">
+                     <content>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE">
-                                <tabs>
-                                  <Tab fx:id="readBible" text="Read Bible">
-                                    <content>
-                  
-                                        <AnchorPane fx:id="bibleReadPane" prefHeight="-Infinity" prefWidth="-Infinity" />
-                                    </content>
-                                       <graphic>
-                                          <StackPane prefHeight="150.0" prefWidth="200.0" />
-                                       </graphic>
-                                  </Tab>
-                                </tabs>
-                              </TabPane>
+                              <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="900.0" prefWidth="1200.0">
+                                <items>
+                                  <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <HTMLEditor fx:id="devotionalEdit" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" layoutY="-12.0" prefHeight="700.0" prefWidth="1200.0">
+                                                </HTMLEditor>
+                                       </children>
+                                    </AnchorPane>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                                       <children>
+                                          <Button fx:id="loadDev" layoutX="192.0" layoutY="20.0" mnemonicParsing="false" onAction="#loadDev" text="Load">
+                                             <tooltip>
+                                                <Tooltip text="This her loads a devotional stored as html" />
+                                             </tooltip>
+                                          </Button>
+                                          <Button fx:id="saveDev" layoutX="274.0" layoutY="19.0" mnemonicParsing="false" onAction="#saveDev" text="Save">
+                                             <tooltip>
+                                                <Tooltip text="This here saves the devotional as html" />
+                                             </tooltip>
+                                          </Button>
+                                          <Button fx:id="newDev" layoutX="49.0" layoutY="19.0" mnemonicParsing="false" onAction="#newDev" text="New Devotional" />
+                                          <Button fx:id="toPDF" layoutX="350.0" layoutY="19.0" mnemonicParsing="false" onAction="#toPDF" text="To PDF">
+                                             <tooltip>
+                                                <Tooltip text="Export HTML as PDF" />
+                                             </tooltip>
+                                          </Button>
+                                          <Button fx:id="printDev" layoutX="446.0" layoutY="20.0" mnemonicParsing="false" onAction="#printDev" text="Print Devotional">
+                                             <tooltip>
+                                                <Tooltip text="Later on print directly" />
+                                             </tooltip>
+                                          </Button>
+                                       </children>
+                                    </AnchorPane>
+                                </items>
+                              </SplitPane>
                            </children>
                         </AnchorPane>
-                  </content>
+                     </content>
                 </Tab>
-                <Tab fx:id="bibleServer" text="Bible Server Content">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" >
-                      <children>
-                          <TabPane fx:id="mainTabPaneWeb" tabClosingPolicy="UNAVAILABLE">
-                              <tabs>
-                                  <Tab fx:id="readBibleWeb" text="Read Bible">
-                                      <content>
-
-                                          <AnchorPane fx:id="bibleReadPane" prefHeight="-Infinity" prefWidth="-Infinity" />
-                                      </content>
-                                      <graphic>
-                                          <StackPane prefHeight="150.0" prefWidth="200.0" />
-                                      </graphic>
-                                  </Tab>
-                              </tabs>
-                          </TabPane>
-                      </children>
-                    </AnchorPane>
-                  </content>
-                </Tab>
-                  <Tab fx:id="searchTab" text="Search">
+                  <Tab text="Search">
                     <content>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
@@ -166,7 +170,7 @@
                                           <MenuItem mnemonicParsing="false" onAction="#copyToPlanFromNote" text="copy Link to last PlanDay" />
                                           <MenuItem fx:id="readFullChapterNote" mnemonicParsing="false" onAction="#readFullChapterNote" text="Read Full Chapter" />
 
-                                                        </items>
+                                      </items>
                                     </ContextMenu>
                                  </contextMenu>
                                </TableView>
@@ -227,49 +231,6 @@
                         </AnchorPane>
                      </content>
                   </Tab>
-                <Tab fx:id="createDevTab" text="Create Devotional">
-                     <content>
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <children>
-                              <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="900.0" prefWidth="1200.0">
-                                <items>
-                                  <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                       <children>
-                                          <HTMLEditor fx:id="devotionalEdit" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" layoutY="-12.0" prefHeight="700.0" prefWidth="1200.0">
-                                                </HTMLEditor>
-                                       </children>
-                                    </AnchorPane>
-                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-                                       <children>
-                                          <Button fx:id="loadDev" layoutX="192.0" layoutY="20.0" mnemonicParsing="false" onAction="#loadDev" text="Load">
-                                             <tooltip>
-                                                <Tooltip text="This her loads a devotional stored as html" />
-                                             </tooltip>
-                                          </Button>
-                                          <Button fx:id="saveDev" layoutX="274.0" layoutY="19.0" mnemonicParsing="false" onAction="#saveDev" text="Save">
-                                             <tooltip>
-                                                <Tooltip text="This here saves the devotional as html" />
-                                             </tooltip>
-                                          </Button>
-                                          <Button fx:id="newDev" layoutX="49.0" layoutY="19.0" mnemonicParsing="false" onAction="#newDev" text="New Devotional" />
-                                          <Button fx:id="toPDF" layoutX="350.0" layoutY="19.0" mnemonicParsing="false" onAction="#toPDF" text="To PDF">
-                                             <tooltip>
-                                                <Tooltip text="Export HTML as PDF" />
-                                             </tooltip>
-                                          </Button>
-                                          <Button fx:id="printDev" layoutX="446.0" layoutY="20.0" mnemonicParsing="false" onAction="#printDev" text="Print Devotional">
-                                             <tooltip>
-                                                <Tooltip text="Later on print directly" />
-                                             </tooltip>
-                                          </Button>
-                                       </children>
-                                    </AnchorPane>
-                                </items>
-                              </SplitPane>
-                           </children>
-                        </AnchorPane>
-                     </content>
-                </Tab>
               </tabs>
             </TabPane>
          </children>
