@@ -115,17 +115,7 @@ public class BibleStudyCompoundControl extends BorderPane {
 
     private void showRoot() {
         rendering = new TextRendering(utils, this.area, actBookLabel, actChapter);
-        fillTextArea();
-    }
-
-    private void fillTextArea() {
-        rendering.render(selected, utils.getBookLabels().get(0), actChapter);
-        actBookLabel = utils.getBookLabels().get(0);
-        actBook = utils.getBookLabelAsClass(actBookLabel);
-        studyNotes.getItems().clear();
-        studyNotes.getItems().addAll(rendering.getNotes());
-        String [] splitted = actBookLabel.split(",");
-        topControls.getChapterInfo().setText("Book: " + splitted[1] + " Chapter: " + actChapter);
+        jumpToBookAndChapter(actBookLabel, actChapter);
     }
 
 
@@ -384,6 +374,11 @@ public class BibleStudyCompoundControl extends BorderPane {
         if (!context.getHistory().contains(entry)) {
             context.addHistoryEntry(entry);
         }
+        if (topControls.getHistoryChoice().getItems().size() >= 20) {
+            topControls.getHistoryChoice()
+                    .getItems()
+                    .remove(topControls.getHistoryChoice().getItems().size() -1);
+        }
         if (!topControls.getHistoryChoice().getItems().contains(entry)) {
             topControls.getHistoryChoice().getItems().add(0, entry);
             topControls.getHistoryChoice().getSelectionModel().select(entry);
@@ -438,7 +433,7 @@ public class BibleStudyCompoundControl extends BorderPane {
             selectedVersesMap.clear();
             rendering.clearRendering();
             topControls.getChapterInfo().setText("Book: " + splitted[1] + " Chapter: " + actChapter);
-            initMediaView();
+
         }
         return found;
     }
@@ -468,5 +463,36 @@ public class BibleStudyCompoundControl extends BorderPane {
 
     public MediaView getChapterPlayView() {
         return chapterPlayView;
+    }
+
+    public BibleTextUtils.BookLabel getActBook() {
+        return actBook;
+    }
+
+    public FoldableStyledArea getArea() {
+        return area;
+    }
+
+    public String getActBookLabel() {
+        return actBookLabel;
+    }
+
+    public Integer getActChapter() {
+        return actChapter;
+    }
+
+    public BibleStudyCompoundControl setActBookLabel(String actBookLabel) {
+        this.actBookLabel = actBookLabel;
+        return this;
+    }
+
+    public BibleStudyCompoundControl setActChapter(Integer actChapter) {
+        this.actChapter = actChapter;
+        return this;
+    }
+
+    public BibleStudyCompoundControl setActBook(BibleTextUtils.BookLabel actBook) {
+        this.actBook = actBook;
+        return this;
     }
 }

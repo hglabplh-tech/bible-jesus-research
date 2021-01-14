@@ -285,12 +285,12 @@ public class TextRendering {
 
             for (Map.Entry<Integer, String> versInfo : value.entrySet()) {
                 IndexRange range = chapterMap.get(versInfo.getKey());
-                setRangeColor(versInfo.getValue(), range);
+                setRangeColor(this.area, versInfo.getValue(), range);
             }
         }
     }
 
-    public void setRangeColor(String color, IndexRange range) {
+    public static void setRangeColor(FoldableStyledArea area, String color, IndexRange range) {
         Integer fontSize = ApplicationProperties.getFontSize();
         Optional<String> fontFamily = ApplicationProperties.getFontFamily();
         TextStyle appStyle = ApplicationProperties.getShape();
@@ -298,7 +298,7 @@ public class TextRendering {
                 .updateFontFamily(fontFamily.get())
                 .updateTextColor(appStyle.getTextColor().get())
                 .updateFontSize(fontSize);
-        this.area.setStyle(range.getStart(), range.getEnd(), theStyle);
+        area.setStyle(range.getStart(), range.getEnd(), theStyle);
     }
 
     public static void refreshAreaStyle(FoldableStyledArea textArea, IndexRange range, Boolean toggle) {
