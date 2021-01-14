@@ -299,8 +299,8 @@ public class BibleTextUtils {
     }
 
     public Optional<BIBLEBOOK> getBookByLabel(XMLBIBLE bible, String bookLabel) {
-        String [] labArr = bookLabel.split(",");
-        Integer bookNo = Integer.valueOf(labArr[0]);
+        BookLabel label = new BookLabel(bookLabel);
+        Integer bookNo = label.getBookNumber();
         Optional<BIBLEBOOK> result = Optional.empty();
         Optional<JAXBElement<BIBLEBOOK>> optBook = bible.getBIBLEBOOK().stream()
                 .filter(e -> e.getValue().getBnumber().intValue() == bookNo)

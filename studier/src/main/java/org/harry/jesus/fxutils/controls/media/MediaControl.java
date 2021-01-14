@@ -51,6 +51,7 @@ import javafx.util.Duration;
 
 public class MediaControl extends BorderPane {
 
+    final Button playButton = new Button(">");
     private MediaPlayer mp;
     private MediaView mediaView;
     private final boolean repeat = false;
@@ -82,7 +83,7 @@ public class MediaControl extends BorderPane {
         mediaBar.setPadding(new Insets(5, 10, 5, 10));
         BorderPane.setAlignment(mediaBar, Pos.CENTER);
 
-        final Button playButton = new Button(">");
+
 
         playButton.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
@@ -198,6 +199,57 @@ public class MediaControl extends BorderPane {
         mediaBar.getChildren().add(volumeSlider);
 
         setBottom(mediaBar);
+    }
+
+    public MediaPlayer getMp() {
+        return mp;
+    }
+
+    public MediaControl setMp(MediaPlayer mp) {
+        this.mp = mp;
+        mp.currentTimeProperty().addListener(new InvalidationListener() {
+            public void invalidated(Observable ov) {
+                updateValues();
+            }
+        });
+
+        mp.setOnPlaying(new Runnable() {
+            public void run() {
+                if (stopRequested) {
+                    mp.pause();
+                    stopRequested = false;
+                } else {
+                    playButton.setText("||");
+                }
+            }
+        });
+
+        mp.setOnPaused(new Runnable() {
+            public void run() {
+                System.out.println("onPaused");
+                playButton.setText(">");
+            }
+        });
+
+        mp.setOnReady(new Runnable() {
+            public void run() {
+                duration = mp.getMedia().getDuration();
+                updateValues();
+            }
+        });
+
+        mp.setCycleCount(repeat ? MediaPlayer.INDEFINITE : 1);
+        mp.setOnEndOfMedia(new Runnable() {
+            public void run() {
+                if (!repeat) {
+                    playButton.setText(">");
+                    stopRequested = true;
+                    atEndOfMedia = true;
+                }
+            }
+        });
+
+        return this;
     }
 
     protected void updateValues() {

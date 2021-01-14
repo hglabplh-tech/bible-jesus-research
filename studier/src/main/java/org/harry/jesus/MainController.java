@@ -680,15 +680,7 @@ public class MainController {
         clipboard.setContent(content);
     }
 
-    @FXML
-    public void playChapter(ActionEvent event) {
-        BibleTextUtils.BookLink link =
-                new BibleTextUtils.BookLink(bibleStudy.getActBookLabel(),
-                        bibleStudy.getActChapter(), Arrays.asList(1));
-        this.playBible = new PlayBible("C:\\Users\\haral\\biblebooks\\to_hear\\MP3"
-                , bibleStudy.getChapterPlayView());
-        this.playBible.playChapter(link);
-    }
+
 
 
     @FXML

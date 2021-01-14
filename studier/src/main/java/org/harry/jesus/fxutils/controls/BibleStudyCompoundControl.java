@@ -110,7 +110,7 @@ public class BibleStudyCompoundControl extends BorderPane {
         topControls.getDictionaries().getItems().addAll(utils.getDictInstances());
         this.initListeners();
         TreeItem<String> root = buildBooksTree();
-        this.showRoot();
+        biblesList.getSelectionModel().select(0);
     }
 
     private void showRoot() {
@@ -151,8 +151,8 @@ public class BibleStudyCompoundControl extends BorderPane {
                 new BibleTextUtils.BookLink(actBookLabel, actChapter, Arrays.asList(1));
         MediaPlayer mp = playBible.playChapter(link);
         if (mp != null) {
-            mediaControl = new MediaControl(mp, chapterPlayView);
-            topControls.add(mediaControl, 0, 1, 1, 2);
+                mediaControl = new MediaControl(mp, chapterPlayView);
+                topControls.add(mediaControl, 0, 1, 1, 2);
         }
     }
 
@@ -191,7 +191,12 @@ public class BibleStudyCompoundControl extends BorderPane {
                 selectedIndex = t1.intValue();
                 BibleTextUtils.BibleBookInstance instance = utils.getBibleInstances().get(t1.intValue());
                 selected = instance.getBible();
-
+                Optional<BIBLEBOOK> book = utils.getBookByLabel(selected, actBookLabel);
+                if (!book.isPresent()) {
+                    Integer bookNo = selected.getBIBLEBOOK().get(0)
+                            .getValue().getBnumber().intValue();
+                    actBookLabel = utils.getBookLabels().get(bookNo - 1);
+                }
                 optAccordance = instance.getOptDictAccRefTuple();
                 TreeItem<String> root = buildBooksTree();
                 showChapter();
@@ -326,12 +331,15 @@ public class BibleStudyCompoundControl extends BorderPane {
             }
 
             for (BIBLEBOOK theBook : theBooks) {
-                String label = utils.getBookLabels().get(theBook.getBnumber().intValue() - 1);
-                item = new TreeItem(label);
-                root.getChildren().add(item);
-                for (JAXBElement<CHAPTER> chapter : theBook.getCHAPTER()) {
-                    TreeItem<String> cItem = new TreeItem<>(chapter.getValue().getCnumber().toString());
-                    item.getChildren().add(cItem);
+
+                if (theBook.getBnumber().intValue() >= 1 && theBook.getBnumber().intValue() <= 66) {
+                    String label = utils.getBookLabels().get(theBook.getBnumber().intValue() - 1);
+                    item = new TreeItem(label);
+                    root.getChildren().add(item);
+                    for (JAXBElement<CHAPTER> chapter : theBook.getCHAPTER()) {
+                        TreeItem<String> cItem = new TreeItem<>(chapter.getValue().getCnumber().toString());
+                        item.getChildren().add(cItem);
+                    }
                 }
 
             }
@@ -390,9 +398,13 @@ public class BibleStudyCompoundControl extends BorderPane {
     private HistoryEntry createHistoryEntry() {
         BibleTextUtils.BookLink link = new BibleTextUtils.BookLink(actBookLabel, actChapter);
         Calendar date = Calendar.getInstance();
-        Optional<CHAPTER> chapter =
-                utils.getChapter(utils.getBooks(selected).get(actBook.getBookNumber() - 1),
-                        actChapter);
+        Optional<BIBLEBOOK> theBook = utils.getBookByLabel(selected, actBookLabel);
+        Optional<CHAPTER> chapter = Optional.empty();
+        if (theBook.isPresent()) {
+             chapter =
+                    utils.getChapter(theBook.get(),
+                            actChapter);
+        }
         if (chapter.isPresent()) {
             Map<BibleFulltextEngine.BibleTextKey, String> verses =
                     utils.getVerses(chapter.get(), actBook.getBookNumber());
@@ -461,9 +473,6 @@ public class BibleStudyCompoundControl extends BorderPane {
         return selected;
     }
 
-    public MediaView getChapterPlayView() {
-        return chapterPlayView;
-    }
 
     public BibleTextUtils.BookLabel getActBook() {
         return actBook;
