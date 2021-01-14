@@ -136,11 +136,20 @@ public class GenDictHTMLScene {
                                             List<TItem> items, long total, long done) {
             int index = 0;
             for (TItem item : items) {
-                htmlBuffer.append("<H5 id=\"" +
-                        item.getId()
-                        + "\">"
-                        + item.getId()
-                        + "</H5>\n");
+                if (item.getId() != null) {
+                    htmlBuffer.append("<H5 id=\"" +
+                            item.getId()
+                            + "\">"
+                            + item.getId()
+                            + "</H5>\n");
+                }
+                if (item.getStrongId() != null) {
+                    htmlBuffer.append("<H5 id=\"" +
+                            item.getStrongId()
+                            + "\">"
+                            + item.getStrongId()
+                            + "</H5>\n");
+                }
                 List<Serializable> objects = item.getContent();
                 for (Serializable object : objects) {
                     if (object instanceof JAXBElement) {
@@ -162,6 +171,8 @@ public class GenDictHTMLScene {
                             RefLinkType refLink = (RefLinkType) (((JAXBElement) object).getValue());
                             setRefLinkToBuffer(utils, htmlBuffer, refLink);
                         }
+
+
 
 
                     }

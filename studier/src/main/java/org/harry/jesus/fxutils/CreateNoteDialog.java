@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import jesus.harry.org.versnotes._1.Note;
 import jesus.harry.org.versnotes._1.Vers;
 
@@ -51,6 +52,12 @@ public class CreateNoteDialog {
         grid.add(noteField,0,1);
 // Enable/Disable login button depending on whether a passwordKey was entered.
 
+        final ColorPicker colorPicker = new ColorPicker();
+        colorPicker.setValue(Color.CORAL);
+        colorPicker.autosize();
+        colorPicker.setEditable(true);
+        colorPicker.setCenterShape(true);
+        grid.add(colorPicker,0,2);
 
 
         dialog.getDialogPane().setContent(grid);
@@ -65,6 +72,10 @@ public class CreateNoteDialog {
                 Note result = new Note();
                 result.getVerslink().addAll(note.getVerslink());
                 result.setNote(noteField.getText());
+                for (Vers verse: result.getVerslink()) {
+                    verse.setBackcolor(colorPicker.getValue().toString());
+                }
+
                 return result;
             }
             return null;

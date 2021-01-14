@@ -4,6 +4,7 @@ import jesus.harry.org.versnotes._1.Vers;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class LinkHandler {
     public static String buildVersLinkEnhanced(BibleTextUtils utils, Integer bookNumber, Integer chapter, List versNoList) {
@@ -98,6 +99,17 @@ public class LinkHandler {
                                     int lastIndex = scanResult.getFirst();
                                     lastIndex = Math.min(lastIndex, text.length());
                                     String linkString = text.substring(startLinks, lastIndex);
+                                    AtomicInteger lastIndexPoint = new AtomicInteger(0);
+                                    String finalLinkString = linkString;
+                                    Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9")
+                                            .forEach(e -> {
+                                                if (finalLinkString.lastIndexOf(e) > lastIndexPoint.get()) {
+                                                    lastIndexPoint.set(finalLinkString.lastIndexOf(e));
+                                                }
+
+                                            });
+                                    linkString = linkString.substring(0,
+                                            Math.min(lastIndexPoint.get() + 1, linkString.length()));
                                     Optional<BibleTextUtils.BookLink> link = buildLink(utils, linkString);
                                     if (link.isPresent()) {
                                         System.out.println(linkString);
@@ -106,6 +118,9 @@ public class LinkHandler {
                                     found = true;
                                     if (semicolon == -1) {
                                         tempText = tempText.substring(lastIndex);
+                                        if (tempText.isEmpty()) {
+                                            index = -1;
+                                        }
                                     } else {
                                         tempText = tempText.substring(semicolon).trim();
                                         index = tempText.indexOf(",");
@@ -161,6 +176,7 @@ public class LinkHandler {
         int blankInd = lastPart.indexOf(" ");
         int bracketInd = lastPart.indexOf(")");
         int exclamationInd = lastPart.indexOf("!");
+        int dotInd = lastPart.indexOf("\\.");
         int min = -1;
         int nextLinkINQueue = -1;
         if (semiColonInd != -1 && blankInd != -1) {
@@ -176,6 +192,8 @@ public class LinkHandler {
             min = bracketInd;
         } else if (exclamationInd > -1){
             min = exclamationInd;
+        } else if (dotInd > -1){
+            min = dotInd;
         } else {
             min = lastPart.length();
         }
@@ -229,6 +247,7 @@ public class LinkHandler {
                     Integer chapter = Integer.parseInt(chapStr);
                     String versesStr = temp.substring(start);
                     String[] single = versesStr.split("\\.");
+
                     String[] range = versesStr.split("-");
                     List<Integer> verses = new ArrayList<>();
                     if (single.length == 1 && range.length == 1) {
@@ -287,6 +306,9 @@ public class LinkHandler {
         map.put("2.Ch", "2. Chr");
         map.put("1.Chr", "1. Chr");
         map.put("2.Chr", "2. Chr");
+        map.put("Römer", "Roemer");
+        map.put("Matthäus", "Matthaeus");
+        map.put("Hebräer", "Hebraeer");
         if (map.get(book) != null) {
             return map.get(book);
         } else {

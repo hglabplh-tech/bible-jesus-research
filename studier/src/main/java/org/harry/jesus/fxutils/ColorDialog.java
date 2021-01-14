@@ -18,6 +18,9 @@ public class ColorDialog {
     public static Optional<Color> callColorDialog() {
         final ColorPicker colorPicker = new ColorPicker();
         colorPicker.setValue(Color.CORAL);
+        colorPicker.autosize();
+        colorPicker.setEditable(true);
+        colorPicker.setCenterShape(true);
 
         Dialog<Color> dialog = new Dialog<>();
 

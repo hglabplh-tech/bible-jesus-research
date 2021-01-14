@@ -290,15 +290,10 @@ public class MainController {
                         bibleStudy.getArea(),
                         bibleStudy.getSelectedMapSorted());
                 theNote.getVerslink().add(vers);
-                Optional<Color> resultColor = ColorDialog.callColorDialog();
 
                 Optional<Note> newNote = CreateNoteDialog.showNoteCreateDialog(theNote);
                 if (newNote.isPresent()) {
                     Color noteColor = null;
-                    if (resultColor.isPresent()) {
-                        noteColor = resultColor.get();
-                        vers.setBackcolor(noteColor.toString());
-                    }
                     noteList.getVersenote().add(newNote.get());
 
                     notesTable.getSelectionModel().setCellSelectionEnabled(true);
@@ -314,7 +309,7 @@ public class MainController {
                     TextRendering.storeVersRendering(versList, noteColor);
                     for (IndexRange range: bibleStudy.getSelectedMapSorted().values()) {
                         TextRendering.setRangeColor(bibleStudy.getArea(),
-                                noteColor.toString(), range);
+                                newNote.get().getVerslink().get(0).getBackcolor(), range);
                     }
                     noteList.getVersenote().add(newNote.get());
                     notesTable.setVisible(false);
