@@ -277,7 +277,7 @@ public class TextRendering {
         for (Map.Entry<IndexRange, TextStyle> entry : renderMap.entrySet()) {
             IndexRange range = entry.getKey();
             TextStyle style = entry.getValue();
-            area.setStyle(range.getStart(), range.getEnd(), style);
+            mergeRangeStyle(this.area, style, range);
         }
         Tuple<Integer, Integer> key = new Tuple<>(actBookNo, actChapter);
         Map<Integer, String> value = BibleThreadPool.getContext().getRenderMap().get(key);
@@ -295,6 +295,17 @@ public class TextRendering {
         Optional<String> fontFamily = ApplicationProperties.getFontFamily();
         TextStyle appStyle = ApplicationProperties.getShape();
         TextStyle theStyle = TextStyle.backgroundColor(Color.web(color))
+                .updateFontFamily(fontFamily.get())
+                .updateTextColor(appStyle.getTextColor().get())
+                .updateFontSize(fontSize);
+        area.setStyle(range.getStart(), range.getEnd(), theStyle);
+    }
+
+    public static void mergeRangeStyle(FoldableStyledArea area, TextStyle style, IndexRange range) {
+        Integer fontSize = ApplicationProperties.getFontSize();
+        Optional<String> fontFamily = ApplicationProperties.getFontFamily();
+        TextStyle appStyle = ApplicationProperties.getShape();
+        TextStyle theStyle = style
                 .updateFontFamily(fontFamily.get())
                 .updateTextColor(appStyle.getTextColor().get())
                 .updateFontSize(fontSize);
@@ -417,12 +428,13 @@ public class TextRendering {
                  Class jaxbClazz = ((JAXBElement<?>) content).getDeclaredType();
                 if (jaxbClazz.getName().equals(STYLE.class.getName()) ) {
                     STYLE styled = (STYLE) ((JAXBElement<?>) content).getValue();
+                    String cssString = styled.getCss();
                     for (Object styledContent : styled.getContent()) {
                         if (styledContent instanceof String) {
                             String text = (String) styledContent;
                             start = strContent.toString().length() - 1;
                             IndexRange range = new IndexRange(start, start + text.length() + 1);
-                            TextStyle style = TextStyle.bold(true).updateBackgroundColor(Color.AZURE);
+                            TextStyle style = new TextStyle().fromCss(cssString);
                             renderMap.put(range, style);
                             renderBlock(strContent, text);
                         }

@@ -18,6 +18,10 @@ import org.fxmisc.richtext.model.Codec;
  */
 public class TextStyle {
 
+    public final static String CSS_BOLD = "font-style:bold";
+
+    public final static String CSS_ITALIC = "font-style:italic";
+
     public static final TextStyle EMPTY = new TextStyle();
 
     public static final Codec<TextStyle> CODEC = new Codec<TextStyle>() {
@@ -255,6 +259,19 @@ public class TextStyle {
 
         return sb.toString();
     }
+
+    public static TextStyle fromCss(String styleString) {
+        TextStyle style = new  TextStyle();
+        if(styleString.contains(CSS_BOLD) || styleString.contains("-fx-font-weight: bold")) {
+            style = TextStyle.bold(true);
+        } else  if(styleString.contains(CSS_ITALIC) || styleString.contains("-fx-font-weight: italic")) {
+            style = TextStyle.italic(true);
+        }
+
+
+        return style;
+    }
+
 
     public TextStyle updateWith(TextStyle mixin) {
         return new TextStyle(

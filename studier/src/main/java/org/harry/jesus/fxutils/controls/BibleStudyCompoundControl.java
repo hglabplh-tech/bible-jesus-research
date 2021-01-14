@@ -230,7 +230,10 @@ public class BibleStudyCompoundControl extends BorderPane {
                     index--;
                     if (index >= 0) {
                         actBookLabel = utils.getBookLabels().get(index);
-                        actChapter  = selected.getBIBLEBOOK().get(index).getValue().getCHAPTER().size();
+                        Optional<BIBLEBOOK> book = utils.getBookByLabel(selected, actBookLabel);
+                        if (book.isPresent()) {
+                            actChapter  = book.get().getCHAPTER().size();
+                        }
                         found = showChapter();
                         if (!found) {
                             topControls.getPrevChapter().setDisable(true);
@@ -274,8 +277,10 @@ public class BibleStudyCompoundControl extends BorderPane {
                                 && newValue.intValue() < topControls.getHistoryChoice().getItems().size()) {
                             HistoryEntry entry = topControls.getHistoryChoice()
                                     .getItems().get(newValue.intValue());
-                            BibleTextUtils.BookLink link = entry.getBookLink();
-                            jumpToBookAndChapter(link.getBookLabel(), link.getChapter());
+                            if (entry != null) {
+                                BibleTextUtils.BookLink link = entry.getBookLink();
+                                jumpToBookAndChapter(link.getBookLabel(), link.getChapter());
+                            }
                         }
                     }
                 });
