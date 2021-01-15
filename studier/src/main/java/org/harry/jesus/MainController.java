@@ -148,7 +148,6 @@ public class MainController {
 
     @FXML
     public void initialize() {
-        XMLBIBLE selected = null;
         printDev.setDisable(true);
         initListeners();
         HTMLEditorExt editorExt = new HTMLEditorExt(devotionalEdit);
@@ -167,10 +166,10 @@ public class MainController {
                         + File.separator
                         + "bibleStudyAudio"
                 );
-        utils = new BibleTextUtils();
-        selected = null;
+        utils = BibleTextUtils.getInstance();
+
         if (utils.getBibleInstances().size() > 0) {
-            selected = utils.getBibleInstances().get(0).getBible();
+            utils.setSelected(utils.getBibleInstances().get(0).getBible());
         }
         searchOptions.getItems().addAll(SearchOptions.SIMPLE,
                 SearchOptions.EXACT,
@@ -186,10 +185,10 @@ public class MainController {
 
 
 
-        if (selected != null) {
+        if (utils.getSelected() != null) {
             bibleStudy =
-                    new BibleStudyCompoundControl(utils, selected, utils.getBookLabels().get(0));
-
+                    new BibleStudyCompoundControl(utils, utils.getSelected(),
+                            utils.getBookLabels().get(0));
             initAreaContextMenu();
             readBible.setContent(bibleStudy);
             bibleStudy.setMinWidth(1198);

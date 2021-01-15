@@ -13,7 +13,7 @@ public class BibleTextUtilTest {
 
     @BeforeClass
     public static void beforeClass () {
-        utils = new BibleTextUtils();
+        utils = BibleTextUtils.getInstance();
     }
 
     @Test

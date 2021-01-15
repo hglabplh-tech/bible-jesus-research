@@ -28,10 +28,13 @@ public class BibleTextUtils {
 
     XMLBIBLE selected = null;
 
+    private static BibleTextUtils myInst  = null;
+
+
     Map<Integer, BookLabel> bookLabMap = new LinkedHashMap<>();
 
 
-    public BibleTextUtils() {
+    private BibleTextUtils() {
         try {
 
             InputStreamReader reader = new InputStreamReader(this.getClass().getResourceAsStream("/booksinfo.csv"));
@@ -48,13 +51,25 @@ public class BibleTextUtils {
             BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
             loadBiblesDownLoaded(biblePath, context);
             //loadAccordancesDownLoaded(accordancePath,context);
-            selected = bibleInstances.get(0).getBible();
+            if (bibleInstances.size() > 0) {
+                selected = bibleInstances.get(0).getBible();
+            } else {
+                selected = null;
+            }
 
 
         } catch (Exception ex) {
             Logger.trace("Exception occured loading bibles");
         }
     }
+
+    public static BibleTextUtils getInstance()  {
+        if (myInst == null) {
+            myInst = new BibleTextUtils();
+        }
+        return myInst;
+    }
+
 
     private void buidBookLabMap() {
         for (String label: bookLabels) {

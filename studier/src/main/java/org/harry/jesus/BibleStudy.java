@@ -3,11 +3,18 @@ package org.harry.jesus;
 import javafx.application.Application;
 import javafx.event.EventType;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.harry.jesus.fxutils.SetLinkEvent;
+import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.synchjeremia.ApplicationProperties;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
 import org.harry.jesus.synchjeremia.SynchThread;
@@ -32,11 +39,6 @@ public class BibleStudy extends Application {
 
     public static FXMLLoader fxmlLoader = null;
 
-
-
-    public static void setRoot(String fxml, CSS css) throws IOException {
-        scene.setRoot(loadFXML(fxml, css));
-}
 
     @Override
     public void start(Stage stage) throws IOException {

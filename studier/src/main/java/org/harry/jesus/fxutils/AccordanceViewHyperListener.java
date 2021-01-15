@@ -1,6 +1,9 @@
 package org.harry.jesus.fxutils;
 
 import generated.XMLBIBLE;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker;
 import javafx.scene.control.IndexRange;
 import javafx.scene.paint.Color;
 import javafx.scene.web.WebEngine;
@@ -41,8 +44,8 @@ public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
     @Override
     public boolean hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
         URL url = hyperlinkEvent.getURL();
-
         String href = url.toString();
+
         if (href.indexOf("#") > -1) {
             gotoHtmlLink(href);
         } else {
@@ -54,7 +57,16 @@ public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
     private void gotoHtmlLink(String href) {
         String htmlLink = href.substring("http://_self/#".length());
         WebEngine engine = this.view.getEngine();
+        engine.setJavaScriptEnabled(true);
         engine.executeScript("scrollTo('" + htmlLink + "')");
+        System.out.println(href);
+    }
+
+    private void gotoChapterLink(String href) {
+        String htmlLink = href.substring("http://_self/#".length());
+        WebEngine engine = this.chapterView.getEngine();
+        engine.setJavaScriptEnabled(true);
+        JScriptWebViewUtils.findString(engine, "(" + htmlLink + ")");
         System.out.println(href);
     }
 
@@ -68,6 +80,23 @@ public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
             this.area.fireEvent(event);
             chapterView.getEngine().loadContent(
                     HTMLRendering.renderFullChapter(utils, utils.getSelected(), links));
+            StringBuffer linkBuffer = new StringBuffer();
+            HTMLRendering.buildLinkInternal(Integer.toString(link.getVerses().get(0)),
+                    linkBuffer);
+            chapterView.getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener< Worker.State >() {
+
+                @Override
+                public void changed(ObservableValue<? extends Worker.State> observable, Worker.State oldValue, Worker.State newValue) {
+                    if (newValue.equals(Worker.State.SUCCEEDED)) {
+                        gotoChapterLink(linkBuffer.toString());
+                    }
+                }
+            });
+            try {
+                gotoChapterLink(linkBuffer.toString());
+            } catch (Exception ex) {
+
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

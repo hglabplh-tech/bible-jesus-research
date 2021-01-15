@@ -16,58 +16,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
+
 public class HTMLRendering {
 
-    public static StringBuffer buildAccordance(BibleTextUtils utils, Dictionary accordance) {
-        StringBuffer htmlBuffer = new StringBuffer();
-        buildAccHead(htmlBuffer);
-        buidAccordanceHeader(htmlBuffer, accordance);
-        buildAccItemEntriesHTML(utils, htmlBuffer, accordance.getItem());
-        buildAccFoot(htmlBuffer);
-        Logger.trace(htmlBuffer.toString());
-        return htmlBuffer;
-    }
 
-    public static void buidAccordanceHeader(StringBuffer htmlBuffer, Dictionary accordance) {
-        htmlBuffer.append("<H1 id=\"header\">Dictionary</H1><hr><p><span style=\"font-size: small; font-family: &quot;Times New Roman&quot;;\">");
-        TINFORMATION dictionaryInfo = accordance.getINFORMATION();
-        for (JAXBElement element : dictionaryInfo.getTitleOrCreatorOrDescription()) {
-
-            if (element.getName().getLocalPart().equals("title")) {
-                htmlBuffer.append("<br>title: " + element.getValue());
-            } else if (element.getName().getLocalPart().equals("creator")) {
-                htmlBuffer.append("<br>creator: " + element.getValue());
-            } else if (element.getName().getLocalPart().equals("description")) {
-                htmlBuffer.append("<br>description: " + element.getValue());
-            } else if (element.getName().getLocalPart().equals("publisher")) {
-                htmlBuffer.append("<br>publisher: " + element.getValue());
-            } else if (element.getName().getLocalPart().equals("date")) {
-                htmlBuffer.append("<br>date: " + element.getValue());
-            } else if (element.getName().getLocalPart().equals("subject")) {
-                htmlBuffer.append("<br>subject: " + element.getValue());
-            } else if (element.getName().getLocalPart().equals("contributors")) {
-                htmlBuffer.append("<br>contributors: " + element.getValue());
-            } else if (element.getName().getLocalPart().equals("type")) {
-                htmlBuffer.append("<br>type: " + element.getValue());
-            } else if (element.getName().getLocalPart().equals("identifier")) {
-                htmlBuffer.append("<br>identifier: " + element.getValue());
-            } else if (element.getName().getLocalPart().equals("format")) {
-                htmlBuffer.append("<br>format: " + element.getValue());
-            } else if (element.getName().getLocalPart().equals("source")) {
-                htmlBuffer.append("<br>source: " + element.getValue());
-            } else if (element.getName().getLocalPart().equals("language")) {
-                htmlBuffer.append("<br>language: " + element.getValue());
-            } else if (element.getName().getLocalPart().equals("coverage")) {
-                htmlBuffer.append("<br>coverage: " + element.getValue());
-            } else if (element.getName().getLocalPart().equals("rights")) {
-                htmlBuffer.append("<br>rights: " + element.getValue());
-            }
-        }
-        htmlBuffer.append("</span></p><hr>");
-    }
-    public static void buildAccHead(StringBuffer htmlBuffer) {
-        htmlBuffer.append("<html>\n" +
+    public static void buildHead(StringBuffer htmlBuffer) {
+        htmlBuffer.append("<!DOCTYPE html>\n" +
+                "<html>\n" +
                 " <head>\n" +
+                "<meta charset=\"utf-8\"/>\n" +
                 "     <script>\n" +
                 "         function scrollTo(elementId) {\n" +
                 "             document.getElementById(elementId).scrollIntoView();\n" +
@@ -76,150 +34,9 @@ public class HTMLRendering {
                 " </head>\n<body>\n");
     }
 
-    public static void buildAccFoot(StringBuffer htmlBuffer) {
+    public static void buildFoot(StringBuffer htmlBuffer) {
         htmlBuffer.append("</body>\n" +
                 "</html>");
-    }
-
-    public static void buildAccItemEntriesHTML(BibleTextUtils utils,
-                                               StringBuffer htmlBuffer,
-                                               List<TItem> items) {
-        int index = 0;
-        for (TItem item: items) {
-            htmlBuffer.append("<H5 id=\"" +
-                    item.getId()
-                    +  "\">"
-                    + item.getId()
-                    + "</H5>\n");
-            List<Serializable> objects = item.getContent();
-            for (Serializable object : objects) {
-                if (object instanceof JAXBElement) {
-                    JAXBElement jaxbElement = (JAXBElement) object;
-                    if (((JAXBElement) object).getName().getLocalPart().equals("description")) {
-                        TParagraph thisElenent = (TParagraph) (((JAXBElement) object).getValue());
-                        buildAccParagraphEntryHTML(utils, htmlBuffer, thisElenent);
-                    } else if (jaxbElement.getName().getLocalPart().equals("title")) {
-                            MyAnyType title = (MyAnyType)jaxbElement.getValue();
-                            List<Serializable> contents = title.getContent();
-                            StringBuffer titleBuffer = new StringBuffer();
-                            for (Serializable cont : contents) {
-                                if (cont instanceof String) {
-                                    titleBuffer.append((String)cont);
-                                }
-                            }
-                            htmlBuffer.append("<p> Title: " + titleBuffer.toString() + "</p>\n");
-                    }  else if (((JAXBElement) object).getName().getLocalPart().equals("reflink")) {
-                        RefLinkType refLink = (RefLinkType) (((JAXBElement) object).getValue());
-                        setRefLinkToBuffer(utils, htmlBuffer, refLink);
-                    }
-
-
-                }
-            }
-            index++;
-            Logger.trace("Accordance Item No: " + index + " processed");
-        }
-    }
-
-    public static void buildAccParagraphEntryHTML(BibleTextUtils utils,
-                                                  StringBuffer htmlBuffer,
-                                                 TParagraph paragraph) {
-        int indexHyper = 0;
-        List<Serializable> objects = paragraph.getContent();
-        for  (Serializable pContent: paragraph.getContent()) {
-            if (pContent instanceof JAXBElement) {
-
-                JAXBElement jaxbElement = (JAXBElement) pContent;
-                Object thisContent = ((JAXBElement) pContent).getValue();
-                if (jaxbElement.getName().getLocalPart().equals("title")) {
-                    indexHyper = 0;
-                    String title = (String) thisContent;
-                    htmlBuffer.append("<p>description title: "
-                            + title
-                            + "</p>\n"
-                    );
-                } else if (jaxbElement.getName().getLocalPart().equals("see")) {
-                    indexHyper = 0;
-                    SeeType see = (SeeType) jaxbElement.getValue();
-                    buildSee(see, htmlBuffer);
-                } else if (thisContent instanceof BibLinkType) {
-                    indexHyper = 0;
-                    BibLinkType bibleLink = (BibLinkType) thisContent;
-                    Logger.trace("BibLink: ["
-                            + bibleLink.getBn() + ","
-                            + bibleLink.getCn1() + ","
-                            + bibleLink.getVn1() + "]\n");
-                } else if (thisContent instanceof RefLinkType) {
-                    if (indexHyper == 0) {
-                        htmlBuffer.append("<p>");
-                    } else if ((indexHyper % 5) == 0) {
-                        htmlBuffer.append("<br>");
-                    } else {
-                        htmlBuffer.append(" , ");
-                    }
-
-                    RefLinkType refLink = (RefLinkType) thisContent;
-                    setRefLinkToBuffer(utils, htmlBuffer, refLink);
-                    indexHyper++;
-                }
-
-            } else if (pContent instanceof String) {
-                htmlBuffer.append(pContent);
-            }
-        }
-
-    }
-
-    private static void setRefLinkToBuffer(BibleTextUtils utils, StringBuffer htmlBuffer, RefLinkType refLink) {
-        String mScope = refLink.getMscope();
-        if (mScope != null && !mScope.isEmpty()) {
-            createAccBibleLink(utils, htmlBuffer, mScope);
-        }
-        String target = refLink.getTarget();
-        if (target != null && !target.isEmpty()) {
-            createAccBibleLink(utils, htmlBuffer, target);
-        }
-        String content = refLink.getContent();
-        if (content != null && !content.isEmpty()) {
-            htmlBuffer.append("<br>" + content);
-        }
-    }
-
-    public static void buildSee(SeeType see, StringBuffer htmlBuffer) {
-        String target = see.getTarget();
-        if (target.equals("x-self")) {
-            htmlBuffer.append("<p>See: <A href=\"http://_self/#"
-                    + see.getContent()
-                    + "\">"
-                    + see.getContent()
-                    + "</A></p>\n");
-        }
-    }
-
-    public static void createAccBibleLink(BibleTextUtils utils, StringBuffer htmlBuffer,
-                                            String mScope) {
-        String [] parts = mScope.split(";");
-        if (parts.length > 1) {
-            Integer book = Integer.parseInt(parts[0]);
-            String chapter = parts[1];
-            String verse = "1";
-            if (parts.length == 3) {
-                verse = parts[2];
-            }
-            BibleTextUtils.BookLabel link = utils.getBookLabMap().get(book);
-            String longName = link.getLongName();
-            String theFinal = "["
-                    + longName
-                    + " "
-                    + chapter.toString()
-                    + "," + verse
-                    + "]";
-            generateHyperLink(htmlBuffer, theFinal);
-        } else {
-            htmlBuffer.append("#target#");
-        }
-
-
     }
 
     public static StringBuffer buildVersHTML(BibleFulltextEngine.BibleTextKey link, String linkText, CHAPTER chapter) {
@@ -286,6 +103,7 @@ public class HTMLRendering {
                                     List<BibleTextUtils.BookLink> links) {
         StringBuffer htmlContent = new StringBuffer();
 
+        buildHead(htmlContent);
         Integer start = 0;
 
         htmlContent.append("<h4>"+ links.get(0).toString() + " whole chapter</h4>");
@@ -309,23 +127,35 @@ public class HTMLRendering {
                 Map.Entry<BibleFulltextEngine.BibleTextKey, String> mapEntry =
                         utils.getVersEntry(jaxbChapter.getValue(), key);
                 String versText = mapEntry.getValue();
-                htmlContent.append("<p>(" + versNo);
-                htmlContent.append(")</p>" );
-                for  (int versNum : links.get(0).getVerses()) {
-                    if (versNo == versNum) {
-                        renderVers(htmlContent, versText, Color.GREEN);
-                    } else {
-                        renderVers(htmlContent, versText, null);
-                    }
+                htmlContent.append("<p/>");
+                htmlContent.append("(" + Integer.toString(versNo) + ")<br>");
+                if (links.get(0).getVerses().contains(versNo)) {
+                    renderVers(htmlContent, versText, Color.GREEN);
+                } else {
+                    renderVers(htmlContent, versText, null);
                 }
+
 
 
             }
         }
 
+        buildFoot(htmlContent);
         return htmlContent.toString();
     }
 
+    public static void buildHeading(StringBuffer htmlBuffer, String idText) {
+        htmlBuffer.append("<H5 id=\"" +
+                idText
+                + "\">("
+                + escapeHtml4(idText)
+                + ")</H5>\n");
+    }
+
+    public static void buildLinkInternal(String link, StringBuffer htmlBuffer) {
+            htmlBuffer.append("http://_self/#"
+                    + link);
+    }
 
 
 

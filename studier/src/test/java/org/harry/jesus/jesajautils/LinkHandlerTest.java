@@ -10,7 +10,7 @@ public class LinkHandlerTest {
     @Test
     public void simpleTest() {
         String text2 = "verboten (vergleiche 3. Mose 18,9; 20,17; 5. Mose 27,22)";
-        BibleTextUtils utils = new BibleTextUtils();
+        BibleTextUtils utils = BibleTextUtils.getInstance();
         LinkHandler.parseLinksFuzzy(utils, "vergleiche Hesekiel 28,11-15; Daniel 10,13");
         LinkHandler.parseLinksFuzzy(utils, text2);
         System.out.println(LinkHandler.generateLinksFuzzy(utils, text2));
@@ -18,7 +18,7 @@ public class LinkHandlerTest {
 
     @Test
     public void testComplexLine() {
-        BibleTextUtils utils = new BibleTextUtils();
+        BibleTextUtils utils = BibleTextUtils.getInstance();
         String text = "Das zweite Buch Mose wird auch \"Exodus\" genannt, \"Auszug\", " +
                 "denn es beinhaltet die Geschichte vom Auszug des Volkes Israel aus der Sklaverei in Ägypten. " +
                 "Das Buch ist in zwei Hauptteile gegliedert: Kapitel 1-19: " +

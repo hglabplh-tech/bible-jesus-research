@@ -31,7 +31,7 @@ public class BibleFulltextEngine {
 
     private Map<BibleTextKey, String> wholeBook = new LinkedHashMap<>();
 
-    private static BibleTextUtils util = new BibleTextUtils();
+    private static BibleTextUtils util = BibleTextUtils.getInstance();
 
     private final XMLBIBLE bible;
 

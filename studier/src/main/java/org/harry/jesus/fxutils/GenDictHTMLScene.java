@@ -73,10 +73,10 @@ public class GenDictHTMLScene {
 
         public Tuple<Long, StringBuffer> buildAccordance(BibleTextUtils utils, Dictionary accordance, long total, long done) {
             StringBuffer htmlBuffer = new StringBuffer();
-            buildAccHead(htmlBuffer);
+            HTMLRendering.buildHead(htmlBuffer);
             buidAccordanceHeader(htmlBuffer, accordance);
             done = buildAccItemEntriesHTML(utils, htmlBuffer, accordance.getItem(), total, done);
-            buildAccFoot(htmlBuffer);
+            HTMLRendering.buildFoot(htmlBuffer);
             Logger.trace(htmlBuffer.toString());
             return new Tuple<>(done, htmlBuffer);
         }
@@ -117,24 +117,6 @@ public class GenDictHTMLScene {
                 }
             }
             htmlBuffer.append("</span></p><hr>");
-        }
-
-        public static void buildAccHead(StringBuffer htmlBuffer) {
-            htmlBuffer.append("<!DOCTYPE html>\n" +
-                    "<html>\n" +
-                    " <head>\n" +
-                    "<meta charset=\"utf-8\"/>\n" +
-                    "     <script>\n" +
-                    "         function scrollTo(elementId) {\n" +
-                    "             document.getElementById(elementId).scrollIntoView();\n" +
-                    "         }\n" +
-                    "     </script>\n" +
-                    " </head>\n<body>\n");
-        }
-
-        public void buildAccFoot(StringBuffer htmlBuffer) {
-            htmlBuffer.append("</body>\n" +
-                    "</html>");
         }
 
         public long buildAccItemEntriesHTML(BibleTextUtils utils,
