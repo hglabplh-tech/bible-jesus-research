@@ -55,8 +55,6 @@ public class BibleStudyCompoundControl extends BorderPane {
 
     private BibleTextUtils utils;
 
-    private XMLBIBLE selected = null;
-
     private String actBookLabel;
 
     private MediaView chapterPlayView = new MediaView();
@@ -85,7 +83,7 @@ public class BibleStudyCompoundControl extends BorderPane {
 
     public BibleStudyCompoundControl(BibleTextUtils utils, XMLBIBLE selected, String actBookLabel) {
         this.utils = utils;
-        this.selected = selected;
+        this.utils.setSelected(selected);
         this.actBookLabel = actBookLabel;
         this.actBook = utils.getBookLabelAsClass(actBookLabel);
         this.initChapterReader();
@@ -103,7 +101,16 @@ public class BibleStudyCompoundControl extends BorderPane {
         for (String name: bibleNames) {
             biblesList.getItems().add(name);
         }
-        topControls.getHistoryChoice().getItems().addAll(context.getHistory());
+        int index = context.getHistory().size() -1;
+        for (;index >= 0; index--) {
+            HistoryEntry entry = context.getHistory().get(index);
+            topControls.getHistoryChoice().getItems().add(entry);
+            if (topControls.getHistoryChoice().getItems().size() > 10) {
+                break;
+            }
+        }
+
+
         utils.loadAccordancesDownLoaded(
                 new File(ApplicationProperties.getApplicationAccordanceDir()),
                 context);
@@ -166,7 +173,7 @@ public class BibleStudyCompoundControl extends BorderPane {
                             String value = new_val.getValue();
                             if (value.equals("Book Information")) {
                                 rendering = new TextRendering(utils, area, actBookLabel, actChapter);
-                                rendering.showBibleInfo(selected);
+                                rendering.showBibleInfo(utils.getSelected());
                                 return;
                             }
                             String regex = "[0-9]+";
@@ -190,10 +197,10 @@ public class BibleStudyCompoundControl extends BorderPane {
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
                 selectedIndex = t1.intValue();
                 BibleTextUtils.BibleBookInstance instance = utils.getBibleInstances().get(t1.intValue());
-                selected = instance.getBible();
-                Optional<BIBLEBOOK> book = utils.getBookByLabel(selected, actBookLabel);
+                utils.setSelected(instance.getBible());
+                Optional<BIBLEBOOK> book = utils.getBookByLabel(utils.getSelected(), actBookLabel);
                 if (!book.isPresent()) {
-                    Integer bookNo = selected.getBIBLEBOOK().get(0)
+                    Integer bookNo = utils.getSelected().getBIBLEBOOK().get(0)
                             .getValue().getBnumber().intValue();
                     actBookLabel = utils.getBookLabels().get(bookNo - 1);
                 }
@@ -230,7 +237,8 @@ public class BibleStudyCompoundControl extends BorderPane {
                     index--;
                     if (index >= 0) {
                         actBookLabel = utils.getBookLabels().get(index);
-                        Optional<BIBLEBOOK> book = utils.getBookByLabel(selected, actBookLabel);
+                        Optional<BIBLEBOOK> book = utils.getBookByLabel(utils.getSelected()
+                                , actBookLabel);
                         if (book.isPresent()) {
                             actChapter  = book.get().getCHAPTER().size();
                         }
@@ -323,14 +331,14 @@ public class BibleStudyCompoundControl extends BorderPane {
     }
 
     private TreeItem<String> buildBooksTree() {
-        if (selected != null) {
+        if (utils.getSelected() != null) {
             TreeItem<String> root = new TreeItem<>();
             root.setValue("The books");
             booksTree.setRoot(root);
             TreeItem item = new TreeItem("Book Information");
             root.getChildren().add(item);
             theBooks.clear();
-            List<JAXBElement<BIBLEBOOK>> books = selected.getBIBLEBOOK();
+            List<JAXBElement<BIBLEBOOK>> books = utils.getSelected().getBIBLEBOOK();
             for (JAXBElement<BIBLEBOOK> book : books) {
                 theBooks.add(book.getValue());
             }
@@ -355,7 +363,7 @@ public class BibleStudyCompoundControl extends BorderPane {
     }
 
     private void jumpToBookAndChapter(String bookLabel, int chapter) {
-        Optional<BIBLEBOOK> book = utils.getBookByLabel(selected, bookLabel);
+        Optional<BIBLEBOOK> book = utils.getBookByLabel(utils.getSelected(), bookLabel);
         if (book.isPresent()) {
             actBookLabel = bookLabel;
             actBook = utils.getBookLabelAsClass(bookLabel);
@@ -403,7 +411,7 @@ public class BibleStudyCompoundControl extends BorderPane {
     private HistoryEntry createHistoryEntry() {
         BibleTextUtils.BookLink link = new BibleTextUtils.BookLink(actBookLabel, actChapter);
         Calendar date = Calendar.getInstance();
-        Optional<BIBLEBOOK> theBook = utils.getBookByLabel(selected, actBookLabel);
+        Optional<BIBLEBOOK> theBook = utils.getBookByLabel(utils.getSelected(), actBookLabel);
         Optional<CHAPTER> chapter = Optional.empty();
         if (theBook.isPresent()) {
              chapter =
@@ -425,12 +433,12 @@ public class BibleStudyCompoundControl extends BorderPane {
 
 
     private void showLink(List<BibleTextUtils.BookLink> links) {
-        String htmlText = HTMLRendering.renderLink(utils, selected, links);
+        String htmlText = HTMLRendering.renderLink(utils, utils.getSelected(), links);
         ReadLinksDialog.showReadLinkDialog(utils, area, htmlText);
     }
 
     private boolean fillChapterText() {
-        boolean found = rendering.render(selected, actBookLabel, actChapter);
+        boolean found = rendering.render(utils.getSelected(), actBookLabel, actChapter);
         if (found) {
             studyNotes.getItems().clear();
             studyNotes.getItems().addAll(rendering.getNotes());
@@ -475,7 +483,7 @@ public class BibleStudyCompoundControl extends BorderPane {
     }
 
     public XMLBIBLE getSelected() {
-        return selected;
+        return utils.getSelected();
     }
 
 

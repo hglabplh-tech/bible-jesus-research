@@ -1,14 +1,17 @@
 package org.harry.jesus.jesajautils;
 
 import generated.*;
+import javafx.scene.paint.Color;
 import jesus.harry.org.versnotes._1.Vers;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 import org.pmw.tinylog.Logger;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementRef;
+import java.awt.*;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -270,12 +273,56 @@ public class HTMLRendering {
                             + "," + versNo
                             + "]");
                     htmlContent.append("</p>");
-                    renderVers(htmlContent, versText);
+                    renderVers(htmlContent, versText, null);
 
 
                 }
             }
         }
+        return htmlContent.toString();
+    }
+
+    public static String renderFullChapter(BibleTextUtils utils, XMLBIBLE bible,
+                                    List<BibleTextUtils.BookLink> links) {
+        StringBuffer htmlContent = new StringBuffer();
+
+        Integer start = 0;
+
+        htmlContent.append("<h4>"+ links.get(0).toString() + " whole chapter</h4>");
+        Optional<BIBLEBOOK> book = utils.getBookByLabel(bible, links.get(0).getBookLabel());
+        if (book.isPresent()) {
+            JAXBElement<CHAPTER> jaxbChapter = book.get().getCHAPTER().get(
+                    links.get(0).getChapter() - 1);
+            List<Integer> versesNoList = new ArrayList<>();
+            for (Object obj : jaxbChapter.getValue().getPROLOGOrCAPTIONOrVERS()) {
+                Object value = ((JAXBElement)obj).getValue();
+                if (value instanceof VERS) {
+                    Integer temp = ((VERS)value).getVnumber().intValue();
+                    versesNoList.add(temp);
+                }
+            }
+            for  (Integer versNo: versesNoList) {
+                Integer bookNo = links.get(0).getBookLabelClass().getBookNumber();
+                Integer chapterNo  = links.get(0).getChapter();
+                BibleFulltextEngine.BibleTextKey key =
+                        new BibleFulltextEngine.BibleTextKey(bookNo, chapterNo, versNo);
+                Map.Entry<BibleFulltextEngine.BibleTextKey, String> mapEntry =
+                        utils.getVersEntry(jaxbChapter.getValue(), key);
+                String versText = mapEntry.getValue();
+                htmlContent.append("<p>(" + versNo);
+                htmlContent.append(")</p>" );
+                for  (int versNum : links.get(0).getVerses()) {
+                    if (versNo == versNum) {
+                        renderVers(htmlContent, versText, Color.GREEN);
+                    } else {
+                        renderVers(htmlContent, versText, null);
+                    }
+                }
+
+
+            }
+        }
+
         return htmlContent.toString();
     }
 
@@ -305,10 +352,17 @@ public class HTMLRendering {
                 .append("</p><hr>");
     }
 
-    public static void renderVers(StringBuffer htmlBuffer, String buffer) {
-        htmlBuffer.append("<hr><p><span style=\"font-size: small; font-family: &quot;Times New Roman&quot;;\">")
-                .append(buffer.toString())
-                .append("</span></p><hr>");
+    public static void renderVers(StringBuffer htmlBuffer, String buffer, Color color) {
+        if (color == null) {
+            htmlBuffer.append("<hr><p><span style=\"font-size: small; font-family: &quot;Times New Roman&quot;;\">")
+                    .append(buffer.toString())
+                    .append("</span></p><hr>");
+        } else {
+            htmlBuffer.append("<hr><p><span style=\"background-color:#ddd;\" style=\"background-color:"
+                    + color.toString().replace("0x", "#") + ";font-size: small; font-family: &quot;Times New Roman&quot;;\">")
+                    .append(buffer.toString())
+                    .append("</span></p><hr>");
+        }
     }
 
     public static String renderVersesASDoc(XMLBIBLE selected, BibleTextUtils utils, List<Vers> verses) {
@@ -326,8 +380,8 @@ public class HTMLRendering {
             if (chapter.isPresent()) {
                 String linkText = LinkHandler.buildVersLinkEnhanced(utils, book.getBnumber().intValue(),
                         chapter.get().getCnumber().intValue(), vers.getVers());
-                renderVers(buffer, linkText);
-                renderVers(buffer, vers.getVtext());
+                renderVers(buffer, linkText, null);
+                renderVers(buffer, vers.getVtext(), null);
             }
         }
         return buffer.toString();

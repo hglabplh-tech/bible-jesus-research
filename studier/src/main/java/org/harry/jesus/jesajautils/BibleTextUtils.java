@@ -1,11 +1,8 @@
 package org.harry.jesus.jesajautils;
 
 import com.google.common.io.LineReader;
-import generated.BIBLEBOOK;
-import generated.CHAPTER;
+import generated.*;
 import generated.Dictionary;
-import generated.VERS;
-import generated.XMLBIBLE;
 import javafx.scene.control.IndexRange;
 import jesus.harry.org.versnotes._1.Vers;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
@@ -29,6 +26,8 @@ public class BibleTextUtils {
     List<DictionaryInstance> dictInstances = new ArrayList<>();
     List<String> bookLabels = new ArrayList<>();
 
+    XMLBIBLE selected = null;
+
     Map<Integer, BookLabel> bookLabMap = new LinkedHashMap<>();
 
 
@@ -49,7 +48,7 @@ public class BibleTextUtils {
             BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
             loadBiblesDownLoaded(biblePath, context);
             //loadAccordancesDownLoaded(accordancePath,context);
-
+            selected = bibleInstances.get(0).getBible();
 
 
         } catch (Exception ex) {
@@ -63,6 +62,15 @@ public class BibleTextUtils {
             Integer book = Integer.parseInt(label.split(",")[0]);
             this.bookLabMap.put(book, labAsClass);
         }
+    }
+
+    public XMLBIBLE getSelected() {
+        return selected;
+    }
+
+    public BibleTextUtils setSelected(XMLBIBLE selected) {
+        this.selected = selected;
+        return this;
     }
 
     public Map<Integer, BookLabel> getBookLabMap() {
@@ -361,13 +369,24 @@ public class BibleTextUtils {
                 if (versNo.equals(key.getVers())) {
                     for (Object content : vers.getContent()) {
                         if (content instanceof String) {
-                            buffer.append((String) content);
+                            String text = (String) content;
+                            buffer.append(text);
+                        } else if (content instanceof JAXBElement) {
+                            Class jaxbClazz = ((JAXBElement<?>) content).getDeclaredType();
+                            if (jaxbClazz.getName().equals(STYLE.class.getName())) {
+                                STYLE styled = (STYLE) ((JAXBElement<?>) content).getValue();
+                                for (Object styledContent : styled.getContent()) {
+                                    if (styledContent instanceof String) {
+                                        String text = (String) styledContent;
+                                        buffer.append(text);
+                                    }
+
+                                }
+
+                            }
                         }
                     }
                 }
-
-
-
             }
         }
         result = new Map.Entry<BibleFulltextEngine.BibleTextKey, String>() {

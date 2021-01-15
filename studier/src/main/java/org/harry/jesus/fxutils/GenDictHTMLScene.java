@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.apache.commons.text.StringEscapeUtils;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.HTMLRendering;
 import org.harry.jesus.jesajautils.Tuple;
@@ -19,6 +20,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+
+import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
+
 
 public class GenDictHTMLScene {
 
@@ -116,8 +120,10 @@ public class GenDictHTMLScene {
         }
 
         public static void buildAccHead(StringBuffer htmlBuffer) {
-            htmlBuffer.append("<html>\n" +
+            htmlBuffer.append("<!DOCTYPE html>\n" +
+                    "<html>\n" +
                     " <head>\n" +
+                    "<meta charset=\"utf-8\"/>\n" +
                     "     <script>\n" +
                     "         function scrollTo(elementId) {\n" +
                     "             document.getElementById(elementId).scrollIntoView();\n" +
@@ -140,14 +146,14 @@ public class GenDictHTMLScene {
                     htmlBuffer.append("<H5 id=\"" +
                             item.getId()
                             + "\">"
-                            + item.getId()
+                            + escapeHtml4(item.getId())
                             + "</H5>\n");
                 }
                 if (item.getStrongId() != null) {
                     htmlBuffer.append("<H5 id=\"" +
                             item.getStrongId()
                             + "\">"
-                            + item.getStrongId()
+                            + escapeHtml4(item.getStrongId())
                             + "</H5>\n");
                 }
                 List<Serializable> objects = item.getContent();
@@ -166,7 +172,7 @@ public class GenDictHTMLScene {
                                     titleBuffer.append((String) cont);
                                 }
                             }
-                            htmlBuffer.append("<p> Title: " + titleBuffer.toString() + "</p>\n");
+                            htmlBuffer.append("<p> Title: " + escapeHtml4(titleBuffer.toString()) + "</p>\n");
                         } else if (((JAXBElement) object).getName().getLocalPart().equals("reflink")) {
                             RefLinkType refLink = (RefLinkType) (((JAXBElement) object).getValue());
                             setRefLinkToBuffer(utils, htmlBuffer, refLink);
@@ -199,7 +205,7 @@ public class GenDictHTMLScene {
                         indexHyper = 0;
                         String title = (String) thisContent;
                         htmlBuffer.append("<p>description title: "
-                                + title
+                                + escapeHtml4(title)
                                 + "</p>\n"
                         );
                     } else if (jaxbElement.getName().getLocalPart().equals("see")) {

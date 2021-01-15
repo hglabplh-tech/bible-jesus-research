@@ -623,7 +623,7 @@ public class MainController {
         String listText = resultlist.getItems().get(index);
         int endIndex = listText.indexOf("]");
         StringBuffer buffer = HTMLRendering.buildVersHTML(link, listText.substring(0, endIndex + 1), chapter);
-        HTMLRendering.renderVers(htmlBuffer, buffer.toString());
+        HTMLRendering.renderVers(htmlBuffer, buffer.toString(),null);
 
         copyHtmlToClip(htmlBuffer);
 
@@ -649,7 +649,7 @@ public class MainController {
                             vers.getChapter().intValue(), versNo.intValue());
             StringBuffer buffer = HTMLRendering.buildVersHTML(link, listText.substring(startIndex, endIndex + 1), chapter);
             startIndex = endIndex + 1;
-            HTMLRendering.renderVers(htmlBuffer, buffer.toString());
+            HTMLRendering.renderVers(htmlBuffer, buffer.toString(), null);
             copyHtmlToClip(htmlBuffer);
         }
 

@@ -33,7 +33,7 @@ public class ReadLinksDialog {
                                           FoldableStyledArea area, String htmlText) {
 
         Stage stage = new Stage();
-        stage.setTitle("Second Stage");
+        stage.setTitle("Read Links");
         try {
             Scene secondScene = new Scene(loadFXML("linkReader", utils, area, htmlText));
             stage.setScene(secondScene);

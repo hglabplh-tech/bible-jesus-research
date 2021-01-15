@@ -7,6 +7,7 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.codefx.libfx.control.webview.WebViewHyperlinkListener;
 import org.harry.jesus.jesajautils.BibleTextUtils;
+import org.harry.jesus.jesajautils.HTMLRendering;
 import org.harry.jesus.jesajautils.LinkHandler;
 import org.harry.jesus.jesajautils.TextRendering;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
@@ -26,12 +27,17 @@ public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
 
     private final WebView view;
 
+    private final WebView chapterView;
 
-    public AccordanceViewHyperListener(BibleTextUtils utils, FoldableStyledArea area, WebView view) {
+
+    public AccordanceViewHyperListener(BibleTextUtils utils, FoldableStyledArea area,
+                                       WebView view, WebView chapterView) {
         this.utils = utils;
         this.area = area;
         this.view = view;
+        this.chapterView = chapterView;
     }
+
     @Override
     public boolean hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
         URL url = hyperlinkEvent.getURL();
@@ -60,6 +66,8 @@ public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
             BibleTextUtils.BookLink link = links.get(0);
             SetLinkEvent event = new SetLinkEvent(link);
             this.area.fireEvent(event);
+            chapterView.getEngine().loadContent(
+                    HTMLRendering.renderFullChapter(utils, utils.getSelected(), links));
         } catch (Exception e) {
             e.printStackTrace();
         }

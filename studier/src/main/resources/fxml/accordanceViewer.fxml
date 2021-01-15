@@ -7,15 +7,16 @@
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.harry.jesus.AccordanceViewController">
    <children>
-      <StackPane fx:id="stackPane" prefHeight="700.0" prefWidth="900.0">
-         <children>
-            <WebView fx:id="konkordanzViewer" layoutX="14.0" prefHeight="341.0" prefWidth="570.0" />
-         </children>
-      </StackPane>
+      <SplitPane dividerPositions="0.5" prefHeight="800.0" prefWidth="1200.0">
+         <items>
+            <WebView fx:id="dictionaryViewer" prefHeight="341.0" prefWidth="570.0" />
+            <WebView fx:id="chapterViewer" prefHeight="615.0" prefWidth="900.0" />
+         </items>
+      </SplitPane>
       <Button fx:id="closeWin" mnemonicParsing="false" onAction="#closeWin" text="Close" />
       <Button fx:id="search" mnemonicParsing="false" onAction="#search" text="Search">
          <graphic>
-            <TextField fx:id="searchInput" promptText="search Term"/>
+            <TextField fx:id="searchInput" promptText="search Term" />
          </graphic>
       </Button>
    </children>
