@@ -6,7 +6,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.Tuple;
-import org.harry.jesus.synchjeremia.AccordanceRef;
+import org.harry.jesus.jesajautils.configjaxbser.DictionaryRef;
 
 public class BibleInfoDialog {
 
@@ -30,8 +30,8 @@ public class BibleInfoDialog {
         grid.add(versionLab, 0, 1);
         grid.add(hashLab, 0, 2);
         if (instance.getOptDictAccRefTuple().isPresent()) {
-            Tuple<Dictionary, AccordanceRef> acc = instance.getOptDictAccRefTuple().get();
-            AccordanceRef ref = acc.getSecond();
+            Tuple<Dictionary, DictionaryRef> acc = instance.getOptDictAccRefTuple().get();
+            DictionaryRef ref = acc.getSecond();
             Label accPathLab = new Label("Accordance File Path: " + ref.getPathToBook());
             Label accHashLab = new Label("Accordance SHA256-Hash : 0x" + ref.getHashValue());
             grid.add(accPathLab, 0, 3);

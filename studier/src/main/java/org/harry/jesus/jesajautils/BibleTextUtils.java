@@ -6,10 +6,10 @@ import generated.Dictionary;
 import javafx.scene.control.IndexRange;
 import jesus.harry.org.versnotes._1.Vers;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
+import org.harry.jesus.jesajautils.configjaxbser.BaseConfig;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
-import org.harry.jesus.synchjeremia.AccordanceRef;
-import org.harry.jesus.synchjeremia.ApplicationProperties;
-import org.harry.jesus.synchjeremia.BibleRef;
+import org.harry.jesus.jesajautils.configjaxbser.DictionaryRef;
+import org.harry.jesus.jesajautils.configjaxbser.BibleRef;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
 
 import org.pmw.tinylog.Logger;
@@ -19,21 +19,56 @@ import java.io.*;
 import java.math.BigInteger;
 import java.util.*;
 
+
+/**
+ * Class to read bibles from zefania XML and to read Dictionaries
+ * and access their content
+ * @author Harald Glab-Plhak
+ * (C) Harald Glab-Plhak
+ */
 public class BibleTextUtils {
 
 
-    List<BibleBookInstance> bibleInstances = new ArrayList<>();
-    List<DictionaryInstance> dictInstances = new ArrayList<>();
-    List<String> bookLabels = new ArrayList<>();
+    /**
+     * bible instances list
+     */
+    private List<BibleBookInstance> bibleInstances = new ArrayList<>();
 
-    XMLBIBLE selected = null;
+    /**
+     * dictionary instances list
+     */
+    private List<DictionaryInstance> dictInstances = new ArrayList<>();
 
+    /**
+     * The book labels String list {bookNo, book Long Name, book Short Name}
+     */
+    private List<String> bookLabels = new ArrayList<>();
+
+    /**
+     *  association between dictionaries and bibles
+     */
+    private Set<Tuple<BibleRef, DictionaryRef>> assocSet = new HashSet<>();
+
+    /**
+     * The actual selected bible
+     */
+    private XMLBIBLE selected = null;
+
+    /**
+     * The private singleton instance for a Object instance of this class
+     */
     private static BibleTextUtils myInst  = null;
 
 
-    Map<Integer, BookLabel> bookLabMap = new LinkedHashMap<>();
+    /**
+     * A map with the key bookNo and the label(class) as value
+     */
+    private  Map<Integer, BookLabel> bookLabMap = new LinkedHashMap<>();
 
 
+    /**
+     * The constructor here the stuff is loaded
+     */
     private BibleTextUtils() {
         try {
 
@@ -46,11 +81,12 @@ public class BibleTextUtils {
             }
             reader.close();
             buidBookLabMap();
-            File biblePath = new File(ApplicationProperties.getApplicationBiblesDir());
-            File accordancePath = new File(ApplicationProperties.getApplicationAccordanceDir());
+            BaseConfig base = BibleThreadPool.getContext().getAppSettings().getBaseConfig();
+            File biblePath = new File(base.getBiblesDir());
+            File accordancePath = new File(base.getDictionariesDir());
             BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
             loadBiblesDownLoaded(biblePath, context);
-            //loadAccordancesDownLoaded(accordancePath,context);
+            loadAccordancesDownLoaded(accordancePath,context);
             if (bibleInstances.size() > 0) {
                 selected = bibleInstances.get(0).getBible();
             } else {
@@ -63,6 +99,10 @@ public class BibleTextUtils {
         }
     }
 
+    /**
+     * Return the singleton instance if there is none the one and only is created
+     * @return the singleton
+     */
     public static BibleTextUtils getInstance()  {
         if (myInst == null) {
             myInst = new BibleTextUtils();
@@ -71,27 +111,48 @@ public class BibleTextUtils {
     }
 
 
+    /**
+     * Build the book-label-map out of the book label strings
+     */
     private void buidBookLabMap() {
         for (String label: bookLabels) {
             BookLabel labAsClass = getBookLabelAsClass(label);
-            Integer book = Integer.parseInt(label.split(",")[0]);
+            Integer book = labAsClass.getBookNumber();
             this.bookLabMap.put(book, labAsClass);
         }
     }
 
+    /**
+     * Return the selected bible
+     * @return the selected bible
+     */
     public XMLBIBLE getSelected() {
         return selected;
     }
 
+    /**
+     * Set the actual selected bible
+     * @param selected the new selected bible
+     * @return the bible text utils instance builder setter
+     */
     public BibleTextUtils setSelected(XMLBIBLE selected) {
         this.selected = selected;
         return this;
     }
 
+    /**
+     * Return the book label map
+     * @return the book label map
+     */
     public Map<Integer, BookLabel> getBookLabMap() {
         return bookLabMap;
     }
 
+    /**
+     * Load the bibles placed in the bibles directory by the user
+     * @param biblePath the bibles path
+     * @param context the thread-context
+     */
     private void loadBiblesDownLoaded(File biblePath, BibleThreadPool.ThreadBean context) {
         for (File bibleFile : biblePath.listFiles(new FilenameFilter() {
             @Override
@@ -108,6 +169,11 @@ public class BibleTextUtils {
         loadBiblesFromRef(context.getBibleRefList());
     }
 
+    /**
+     * Load the dictionaries placed in the dictionary directory of the user
+     * @param accordancePath the dictionaries path
+     * @param context the thread context
+     */
     public void loadAccordancesDownLoaded(File accordancePath, BibleThreadPool.ThreadBean context) {
         for (File accordanceFile : accordancePath.listFiles(new FilenameFilter() {
             @Override
@@ -122,7 +188,7 @@ public class BibleTextUtils {
             Tuple<Dictionary, String> actAccordance = BibleReader.loadBibleAccordance(accordanceFile);
             String fileName = accordanceFile.getName();
             fileName = fileName.substring(0, fileName.indexOf(".xml"));
-            AccordanceRef accRef = new AccordanceRef()
+            DictionaryRef accRef = new DictionaryRef()
                     .setHashValue(actAccordance.getSecond())
                     .setFilename(fileName)
                     .setPathToBook(accordanceFile.getAbsolutePath());
@@ -149,6 +215,10 @@ public class BibleTextUtils {
     }
 
 
+    /**
+     * Really load the bible from the reference object
+     * @param references the bible reference object
+     */
     private void loadBiblesFromRef(List<BibleRef> references) {
 
         for (BibleRef ref : references) {
@@ -163,6 +233,12 @@ public class BibleTextUtils {
 
     }
 
+    /**
+     * Build a verse text entry from a single search result
+     * @param key the bible text key which was from the search result
+     * @param versText the text of the verse
+     * @return The entry as string
+     */
     public String generateVersEntry(BibleFulltextEngine.BibleTextKey key,
                                            String versText) {
         String versLink =  "";
@@ -171,6 +247,11 @@ public class BibleTextUtils {
         return result;
     }
 
+    /**
+     * Build a link in internal format from a single search result
+     * @param key the search result key
+     * @return the generated link
+     */
     private String buildVersLink(BibleFulltextEngine.BibleTextKey key) {
         String versLink = "";
         List<String> csv = this.getBookLabels();
@@ -214,7 +295,12 @@ public class BibleTextUtils {
         return result;
     }
 
-    private static int getSequence(Object vers) {
+    /**
+     * Get a Integer from Integer or BigIntegewr
+     * @param vers the Integer or BigInteger
+     * @return the Integer
+     */
+    private static Integer getSequence(Object vers) {
         int sequence;
         if (vers instanceof Integer) {
             sequence = (Integer) vers;
@@ -223,35 +309,6 @@ public class BibleTextUtils {
         }
         return sequence;
     }
-
-    public static String generateVersEntry(BibleTextUtils utils, Vers vers, String versText) {
-        List<String> csv = utils.getBookLabels();
-        Optional<String> book = csv.stream()
-                .filter(e -> e.contains(vers.getBook().toString()))
-                .findFirst();
-        if (book.isPresent()) {
-            String [] split = book.get().split(",");
-            String versLink = "[" + split[1] + " " + vers.getChapter() + "," + vers.getVers() + "]: ";
-            String result = versLink + versText;
-            return result;
-        } else {
-            return versText;
-        }
-    }
-
-    public static Vers generateVers(BookLabel actBook, Integer actChapter,
-                                    FoldableStyledArea area, Map<Integer, IndexRange> selectedVersesMap,
-                                    Integer versNo) {
-        Vers vers = new Vers();
-        vers.getVers().add(BigInteger.valueOf((long) versNo));
-        vers.setChapter(BigInteger.valueOf(actChapter));
-        vers.setBook(BigInteger.valueOf(actBook.getBookNumber()));
-        IndexRange range = selectedVersesMap.get(versNo);
-        String vText = area.getText(range);
-        vers.setVtext(vText);
-        return vers;
-    }
-
 
     public static Vers generateVerses(BibleTextUtils utils, BookLabel actBook, Integer actChapter,
                                       FoldableStyledArea area, Map<Integer, IndexRange> selectedVersesMap) {
@@ -550,7 +607,7 @@ public class BibleTextUtils {
 
         private final XMLBIBLE bible;
 
-        private Optional<Tuple<Dictionary, AccordanceRef>> optDictAccRefTuple = Optional.empty();
+        private Optional<Tuple<Dictionary, DictionaryRef>> optDictAccRefTuple = Optional.empty();
 
         public BibleBookInstance(BibleRef bibleRef, XMLBIBLE bible) {
             this.bibleRef = bibleRef;
@@ -565,12 +622,12 @@ public class BibleTextUtils {
             return bible;
         }
 
-        public Optional<Tuple<Dictionary, AccordanceRef>> getOptDictAccRefTuple() {
+        public Optional<Tuple<Dictionary, DictionaryRef>> getOptDictAccRefTuple() {
             return optDictAccRefTuple;
         }
 
         public BibleBookInstance setOptDictAccRefTuple(Dictionary dictionary,
-                                                       AccordanceRef accRef) {
+                                                       DictionaryRef accRef) {
             this.optDictAccRefTuple = Optional.of(new Tuple<>(dictionary, accRef));
             return this;
         }
@@ -579,21 +636,32 @@ public class BibleTextUtils {
 
     public static class DictionaryInstance {
 
-        private final AccordanceRef dictionaryRef;
+        private final DictionaryRef dictionaryRef;
+
+        private Optional<Tuple<XMLBIBLE, BibleRef>> optBibleRefTuple = Optional.empty();
 
         private final Dictionary dictionary;
 
-        public DictionaryInstance(AccordanceRef dictionaryRef, Dictionary dictionary) {
+        public DictionaryInstance(DictionaryRef dictionaryRef, Dictionary dictionary) {
             this.dictionaryRef = dictionaryRef;
             this.dictionary = dictionary;
         }
 
-        public AccordanceRef getDictionaryRef() {
+        public DictionaryRef getDictionaryRef() {
             return dictionaryRef;
         }
 
         public Dictionary getDictionary() {
             return dictionary;
+        }
+
+        public Optional<Tuple<XMLBIBLE, BibleRef>> getOptBibleRefTuple() {
+            return optBibleRefTuple;
+        }
+
+        public DictionaryInstance setBibleRefTuple(Tuple<XMLBIBLE, BibleRef> bibleRefTuple) {
+            this.optBibleRefTuple = Optional.of(bibleRefTuple);
+            return this;
         }
 
         @Override

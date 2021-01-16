@@ -8,7 +8,7 @@ import org.harry.jesus.fxutils.SettingsDialog;
 import org.harry.jesus.jesajautils.BibleTextUtils.BookLink;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.TextStyle;
-import org.harry.jesus.synchjeremia.ApplicationProperties;
+import org.harry.jesus.jesajautils.configjaxbser.BaseConfig;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
 
 
@@ -291,40 +291,40 @@ public class TextRendering {
     }
 
     public static void setRangeColor(FoldableStyledArea area, String color, IndexRange range) {
-        Integer fontSize = ApplicationProperties.getFontSize();
-        Optional<String> fontFamily = ApplicationProperties.getFontFamily();
-        TextStyle appStyle = ApplicationProperties.getShape();
+        BaseConfig base = BibleThreadPool.getContext().getAppSettings().getBaseConfig();
+        Integer fontSize = base.getFontSize();
+        String fontFamily = base.getFontFamily();
+        TextStyle appStyle = base.getShape();
         TextStyle theStyle = TextStyle.backgroundColor(Color.web(color))
-                .updateFontFamily(fontFamily.get())
+                .updateFontFamily(fontFamily)
                 .updateTextColor(appStyle.getTextColor().get())
                 .updateFontSize(fontSize);
         area.setStyle(range.getStart(), range.getEnd(), theStyle);
     }
 
     public static void mergeRangeStyle(FoldableStyledArea area, TextStyle style, IndexRange range) {
-        Integer fontSize = ApplicationProperties.getFontSize();
-        Optional<String> fontFamily = ApplicationProperties.getFontFamily();
-        TextStyle appStyle = ApplicationProperties.getShape();
+        BaseConfig base = BibleThreadPool.getContext().getAppSettings().getBaseConfig();
+        Integer fontSize = base.getFontSize();
+        String fontFamily = base.getFontFamily();
+        TextStyle appStyle = base.getShape();
         TextStyle theStyle = style
-                .updateFontFamily(fontFamily.get())
+                .updateFontFamily(fontFamily)
                 .updateTextColor(appStyle.getTextColor().get())
                 .updateFontSize(fontSize);
         area.setStyle(range.getStart(), range.getEnd(), theStyle);
     }
 
     public static void refreshAreaStyle(FoldableStyledArea textArea, IndexRange range, Boolean toggle) {
-       Integer fontSize = ApplicationProperties.getFontSize();
-       Optional<String> fontFamily = ApplicationProperties.getFontFamily();
-       TextStyle theStyle = ApplicationProperties.getShape();
+        BaseConfig base = BibleThreadPool.getContext().getAppSettings().getBaseConfig();
+        Integer fontSize = base.getFontSize();
+        String fontFamily = base.getFontFamily();
+        TextStyle theStyle = base.getShape();
        if (range == null) {
-           if (fontFamily.isPresent()) {
-               SettingsDialog.setPreview(textArea, theStyle, fontFamily.get(), fontSize);
-           }
+           SettingsDialog.setPreview(textArea, theStyle, fontFamily, fontSize);
        } else {
            TextStyle underLined = theStyle.updateUnderline(toggle);
-           if (fontFamily.isPresent()) {
-               SettingsDialog.setPreview(textArea, underLined, fontFamily.get(), fontSize, range);
-           }
+           SettingsDialog.setPreview(textArea, underLined, fontFamily, fontSize, range);
+
        }
     }
 

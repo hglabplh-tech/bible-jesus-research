@@ -160,12 +160,8 @@ public class MainController {
         SynchThread.loadHistory(context);
         SynchThread.loadNotes(context);
         SynchThread.loadHighlights(context);
-        ApplicationProperties.loadApplicationProperties();
-        String mediaPath = context.getSettings()
-                .getProperty(ApplicationProperties.AUDIO_PATH, System.getProperty("user.home")
-                        + File.separator
-                        + "bibleStudyAudio"
-                );
+        String mediaPath = context.getAppSettings().getBaseConfig().getMediaPath();
+        SynchThread.loadApplicationSettings(context);
         utils = BibleTextUtils.getInstance();
 
         if (utils.getBibleInstances().size() > 0) {
@@ -175,7 +171,6 @@ public class MainController {
                 SearchOptions.EXACT,
                 SearchOptions.FUZZY);
         searchOptions.getSelectionModel().select(0);
-        context.addSetting(ApplicationProperties.AUDIO_PATH, mediaPath);
         noteList = context.getNoteList();
         verseKeys = context.getVerseKeys();
         highlights = context.getHighlights();
@@ -570,7 +565,8 @@ public class MainController {
 
     @FXML
     public void genDictHTML(ActionEvent event) {
-        String dictDir = ApplicationProperties.getApplicationAccordanceDir();
+        String dictDir = BibleThreadPool.getContext()
+                .getAppSettings().getBaseConfig().getDictionariesDir();
         GenDictHTMLScene.generateDictHTML(utils, new File(dictDir));
     }
 

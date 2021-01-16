@@ -14,10 +14,12 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.TextStyle;
+import org.harry.jesus.jesajautils.configjaxbser.BaseConfig;
+import org.harry.jesus.jesajautils.configjaxbser.BibleAppConfig;
 import org.harry.jesus.synchjeremia.ApplicationProperties;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
+import org.harry.jesus.synchjeremia.SynchThread;
 
-import java.io.File;
 import java.util.Optional;
 
 /**
@@ -33,6 +35,8 @@ public class SettingsDialog {
      *
      */
 
+    BibleAppConfig config = null;
+
     public SettingsDialog() {
 
     }
@@ -40,6 +44,7 @@ public class SettingsDialog {
     public void showAppSettingsDialog() {
         // Create the custom dialog.
         BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
+        config = context.getAppSettings();
         Dialog<Integer> dialog = new Dialog<>();
         dialog.setTitle("Create the Note");
 
@@ -58,19 +63,21 @@ public class SettingsDialog {
         grid.setPadding(new Insets(20, 150, 10, 10));
         Label bibleDirLab = new Label("Bible Source Bible Directory:");
         TextField bibleDirField = new TextField();
-        Label accordanceDirLab = new Label("Bible Accordance Source Directory:");
+        Label accordanceDirLab = new Label("Bible Dictionary Source Directory:");
         TextField accordanceField = new TextField();
         Label mediaDirLab = new Label("Play Bible Directory:");
         TextField mediaDirField = new TextField();
 
-        String xmlPath = ApplicationProperties.getApplicationBiblesDir();
+        String xmlPath = config.getBaseConfig().getBiblesDir();
         bibleDirField.setText(xmlPath);
 
-        String audioPath = ApplicationProperties.getApplicationMediaDir();
+        String audioPath = config.getBaseConfig().getMediaPath();
         mediaDirField.setText(audioPath);
+        String dictPath = config.getBaseConfig().getMediaPath();
+        accordanceField.setText(dictPath);
         Button getMediaDirButton = new Button("Get Media Directory");
         Button getBibleDirButton = new Button("Get Bible Directory");
-        Button getAccordanceDirButton = new Button("Get Accordance Directory");
+        Button getAccordanceDirButton = new Button("Get Dictionary Directory");
         getBibleDirButton.addEventHandler(ActionEvent.ACTION, new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -78,8 +85,8 @@ public class SettingsDialog {
                 if (path.isPresent()) {
                     String biblePath = path.get();
                     bibleDirField.setText(biblePath);
-                    ApplicationProperties.setApplicationBiblesDir(biblePath);
-                    ApplicationProperties.storeApplicationProperties();
+                    BibleThreadPool.getContext().setAppSettings(config);
+                    SynchThread.storeApplicationSettings(context);
                 }
             }
         });
@@ -90,8 +97,8 @@ public class SettingsDialog {
                 if (path.isPresent()) {
                     String biblePath = path.get();
                     accordanceField.setText(biblePath);
-                    ApplicationProperties.setApplicationAccordanceDir(biblePath);
-                    ApplicationProperties.storeApplicationProperties();
+                    BibleThreadPool.getContext().setAppSettings(config);
+                    SynchThread.storeApplicationSettings(context);
                 }
             }
         });
@@ -102,8 +109,8 @@ public class SettingsDialog {
                 if (path.isPresent()) {
                     String selectedPath = path.get();
                     mediaDirField.setText(selectedPath);
-                    ApplicationProperties.setApplicationMediaDir(selectedPath);
-                    ApplicationProperties.storeApplicationProperties();
+                    BibleThreadPool.getContext().setAppSettings(config);
+                    SynchThread.storeApplicationSettings(context);
                 }
             }
         });
@@ -116,7 +123,7 @@ public class SettingsDialog {
         ChoiceBox<Integer> fontSizeBox = getFontSizeChoiceBox();
         fontSizeBox.getSelectionModel().select(ApplicationProperties.getFontSize());
         Label shapeLabel = new Label("Select default Shape");
-        ChoiceBox<String> shapeBox = makeShapeBox();
+        ChoiceBox<BaseConfig.ShapeEnum> shapeBox = makeShapeBox();
         FoldableStyledArea area = new FoldableStyledArea();
         area.setMaxSize(140, 35);
         area.replaceText("Jesus loves you");
@@ -147,12 +154,13 @@ public class SettingsDialog {
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == saveButtonType) {
                 String font = fontBox.getSelectionModel().getSelectedItem();
-                String shape = shapeBox.getSelectionModel().getSelectedItem();
+                BaseConfig.ShapeEnum shape = shapeBox.getSelectionModel().getSelectedItem();
                 Integer fontSize = fontSizeBox.getValue();
-                ApplicationProperties.setFontFamily(font);
-                ApplicationProperties.setShape(shape);
-                ApplicationProperties.setFontSize(fontSize);
-                ApplicationProperties.storeApplicationProperties();
+                config.getBaseConfig().setFontFamily(font);
+                config.getBaseConfig().setReaderShape(shape);
+                config.getBaseConfig().setFontSize(fontSize);
+                context.setAppSettings(config);
+                SynchThread.storeApplicationSettings(context);
             }
             return 0;
         });
@@ -162,9 +170,8 @@ public class SettingsDialog {
                     @Override
                     public void changed(ObservableValue<? extends Number> observable,
                                         Number oldValue, Number newValue) {
-                        String selected = shapeBox.getItems().get(newValue.intValue());
-                        TextStyle baseShape = ApplicationProperties
-                                .getShapeMap().get(selected);
+                        BaseConfig.ShapeEnum selected = shapeBox.getItems().get(newValue.intValue());
+                        TextStyle baseShape = BaseConfig.getShapeMap().get(selected);
                         setPreview(area, baseShape,
                                 fontBox.getValue(), fontSizeBox.getValue());
                     }
@@ -176,9 +183,9 @@ public class SettingsDialog {
                     @Override
                     public void changed(ObservableValue<? extends Number> observable,
                                         Number oldValue, Number newValue) {
-                        String shape = shapeBox.getValue();
+                        BaseConfig.ShapeEnum shape = shapeBox.getValue();
                         String fontFamily = fontBox.getSelectionModel().getSelectedItem();
-                        TextStyle baseShape = ApplicationProperties
+                        TextStyle baseShape = BaseConfig
                                 .getShapeMap().get(shape);
                         setPreview(area, baseShape,
                                 fontFamily, fontSizeBox.getValue());
@@ -191,9 +198,9 @@ public class SettingsDialog {
                     @Override
                     public void changed(ObservableValue<? extends Number> observable,
                                         Number oldValue, Number newValue) {
-                        String shape = shapeBox.getValue();
+                        BaseConfig.ShapeEnum shape = shapeBox.getValue();
                         Integer fontSize = fontSizeBox.getSelectionModel().getSelectedItem();
-                        TextStyle baseShape = ApplicationProperties
+                        TextStyle baseShape = BaseConfig
                                 .getShapeMap().get(shape);
                         setPreview(area, baseShape,
                                 fontBox.getValue(), fontSize);
@@ -226,10 +233,10 @@ public class SettingsDialog {
         return box;
     }
 
-    private ChoiceBox<String> makeShapeBox() {
-        ChoiceBox<String> box = new ChoiceBox<>();
-        box.getItems().addAll(ApplicationProperties.getShapeMap().keySet());
-        box.getSelectionModel().select(ApplicationProperties.getShapeString());
+    private ChoiceBox<BaseConfig.ShapeEnum> makeShapeBox() {
+        ChoiceBox<BaseConfig.ShapeEnum> box = new ChoiceBox<>();
+        box.getItems().addAll(BaseConfig.ShapeEnum.values());
+        box.getSelectionModel().select(config.getBaseConfig().getReaderShape());
         return box;
     }
 

@@ -15,6 +15,8 @@ And there is also a way to define plans.
 What I have done on top is to have a way to hear the 
 chapters even of NT while reading. For this you need downloads 
 from https://diehoerbibel.com/downloads/
+Here you find the AT
+https://www.sermon-online.de/search.pl?d1=Audio-Bibel+Zip-Files+downloaden&lang=de&filetype=21&searchstring=audio-bibel&language=24
 I will explain this when the version is more than DRAFT
 I written this application to thank our Lord for his
 word and to praise the Lord by delivering a possibility to read the bible 

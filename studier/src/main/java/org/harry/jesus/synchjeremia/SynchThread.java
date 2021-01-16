@@ -3,13 +3,13 @@ package org.harry.jesus.synchjeremia;
 import javafx.application.Platform;
 import org.harry.jesus.danielpersistence.PersistenceLayer;
 import org.harry.jesus.jesajautils.Tuple;
+import org.harry.jesus.jesajautils.configjaxbser.AppSettingsPersistence;
+import org.harry.jesus.jesajautils.configjaxbser.BaseConfig;
+import org.harry.jesus.jesajautils.configjaxbser.BibleAppConfig;
 import org.pmw.tinylog.Logger;
 
 import java.io.*;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class SynchThread extends TimerTask {
 
@@ -25,6 +25,8 @@ public class SynchThread extends TimerTask {
 
     private static final String SETTINGS_PROP = "application.properties";
 
+    private static final String APP_SETTINGS_XML = "appSettings.xml";
+
     public  static final File appDir;
 
     private static final File renderObj;
@@ -36,6 +38,8 @@ public class SynchThread extends TimerTask {
     private static final File highlightsXML;
 
     public  static final File appProps;
+
+    public  static final File appSettings;
 
     private static Timer timer = new Timer();
 
@@ -51,6 +55,7 @@ public class SynchThread extends TimerTask {
         notesXML = new File(appDir, NOTES_XML);
         highlightsXML = new File(appDir, HIGHLIGHT_XML);
         appProps = new File(appDir, SETTINGS_PROP);
+        appSettings = new File(appDir, APP_SETTINGS_XML);
         timer.schedule (new SynchThread()
            , (long)(1000L * 120L), (long)(1000L * 60L));
     }
@@ -63,7 +68,8 @@ public class SynchThread extends TimerTask {
                 storeRendering(context);
                 storeNotes(context);
                 storeHighlights(context);
-                ApplicationProperties.storeApplicationProperties();
+                //ApplicationProperties.storeApplicationProperties();
+                storeApplicationSettings(context);
             }
 
 
@@ -169,6 +175,62 @@ public class SynchThread extends TimerTask {
                 }
             } catch (IOException | ClassNotFoundException ex) {
                 Logger.trace("Error storing history" + ex.getMessage());
+            }
+        }
+    }
+
+    public static void storeApplicationSettings(BibleThreadPool.ThreadBean context) {
+        synchronized (SynchThread.class) {
+            try {
+                FileOutputStream stream = new FileOutputStream(appSettings);
+                AppSettingsPersistence.storeAppSettings(context.getAppSettings(), stream);
+
+            } catch (IOException ex) {
+                Logger.trace("Error storing rendering" + ex.getMessage());
+            }
+        }
+    }
+
+    private static void convertFromOldProps(BibleThreadPool.ThreadBean context) {
+        BaseConfig base = new BaseConfig();
+
+        if (appProps.exists()) {
+                    base.setBiblesDir(ApplicationProperties.getApplicationBiblesDir())
+                    .setDictionariesDir(ApplicationProperties.getApplicationAccordanceDir())
+                    .setFontFamily(ApplicationProperties.getFontFamily().get())
+                    .setMediaPath(ApplicationProperties.getApplicationMediaDir())
+                    .setReaderShape(BaseConfig.ShapeEnum.fromValue(ApplicationProperties.getShapeString()))
+                    .setFontSize(ApplicationProperties.getFontSize());
+            appProps.delete();
+        } else {
+            String basePath = System.getProperty("user.home");
+            Optional<String> optFont = ApplicationProperties.fontFamilies
+                    .stream()
+                    .filter(e -> e.contains("Tempus"))
+                    .findFirst();
+            base.setReaderShape(BaseConfig.ShapeEnum.BASE_SHAPE)
+                    .setBiblesDir(basePath)
+                    .setDictionariesDir(basePath)
+                    .setMediaPath(basePath)
+                    .setFontFamily(optFont.get())
+                    .setFontSize(10);
+        }
+        BibleAppConfig config = new BibleAppConfig().setBaseConfig(base);
+        context.setAppSettings(config);
+
+    }
+
+    public static void loadApplicationSettings(BibleThreadPool.ThreadBean context) {
+        synchronized (SynchThread.class) {
+            try {
+                convertFromOldProps(context);
+                if (appSettings.exists()) {
+                    FileInputStream stream = new FileInputStream(appSettings);
+                    BibleAppConfig bibleAppConfig = AppSettingsPersistence.loadAppSettings(stream);
+                    context.setAppSettings(bibleAppConfig);
+                }
+            } catch (IOException ex) {
+                Logger.trace("Error storing rendering" + ex.getMessage());
             }
         }
     }

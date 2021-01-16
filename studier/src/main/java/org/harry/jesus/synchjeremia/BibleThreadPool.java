@@ -1,13 +1,12 @@
 package org.harry.jesus.synchjeremia;
 
-import javafx.scene.paint.Color;
 import jesus.harry.org.highlights._1.Highlights;
 import jesus.harry.org.versnotes._1.Versnotes;
 import org.harry.jesus.jesajautils.Tuple;
+import org.harry.jesus.jesajautils.configjaxbser.BibleAppConfig;
+import org.harry.jesus.jesajautils.configjaxbser.BibleRef;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 
-import javax.mail.Message;
-import java.security.PrivateKey;
 import java.util.*;
 
 public class BibleThreadPool {
@@ -52,6 +51,8 @@ public class BibleThreadPool {
 
         List<HistoryEntry> history = new ArrayList<>();
 
+        BibleAppConfig appSettings = new BibleAppConfig();
+
         public List<BibleFulltextEngine.BibleTextKey> getVerseKeys() {
             return verseKeys;
         }
@@ -90,6 +91,15 @@ public class BibleThreadPool {
         public Properties addSetting(String key, String value) {
             settings.setProperty(key, value);
             return settings;
+        }
+
+        public BibleAppConfig getAppSettings() {
+            return appSettings;
+        }
+
+        public ThreadBean setAppSettings(BibleAppConfig appSettings) {
+            this.appSettings = appSettings;
+            return this;
         }
 
         public List<BibleRef> getBibleRefList() {

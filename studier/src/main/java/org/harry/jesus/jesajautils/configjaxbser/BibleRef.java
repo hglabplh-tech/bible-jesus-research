@@ -1,15 +1,31 @@
-package org.harry.jesus.synchjeremia;
+package org.harry.jesus.jesajautils.configjaxbser;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import java.util.Objects;
 
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "", propOrder = {
+        "bibleID",
+        "pathToBook",
+        "fuzzyLinkSearch",
+        "hashValue"
+
+})
 public class BibleRef {
 
+    @XmlElement(name = "pathToBook", required = true)
     private String pathToBook = null;
 
+    @XmlElement(name = "bibleID", required = true)
     private String bibleID = null;
 
+    @XmlElement(name = "hashValue", required = true)
     private String hashValue = null;
 
+    @XmlElement(name = "fuzzyLinkSearch", required = true)
     private Boolean fuzzyLinkSearch = false;
 
     public static final String FORMAT_XSD = "zefania.xsd";
@@ -51,8 +67,16 @@ public class BibleRef {
         return this;
     }
 
+
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BibleRef)) return false;
+        BibleRef bibleRef = (BibleRef) o;
+        return  getBibleID().equals(bibleRef.getBibleID());
+    }
+
+    public boolean equalsExact(Object o) {
         if (this == o) return true;
         if (!(o instanceof BibleRef)) return false;
         BibleRef bibleRef = (BibleRef) o;

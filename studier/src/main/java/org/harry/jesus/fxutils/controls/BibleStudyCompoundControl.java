@@ -8,19 +8,12 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXML;
-import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
-import javafx.scene.web.WebEngine;
-import jesus.harry.org.plan._1.Day;
-import jesus.harry.org.versnotes._1.Note;
-import jesus.harry.org.versnotes._1.Vers;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.GenericStyledArea;
 import org.harry.jesus.fxutils.*;
@@ -30,13 +23,12 @@ import org.harry.jesus.jesajautils.*;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.ParStyle;
 import org.harry.jesus.jesajautils.browse.TextStyle;
+import org.harry.jesus.jesajautils.configjaxbser.DictionaryRef;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 import org.harry.jesus.synchjeremia.*;
 import org.tinylog.Logger;
 
 import javax.xml.bind.JAXBElement;
-import java.io.File;
-import java.math.BigInteger;
 import java.util.*;
 
 public class BibleStudyCompoundControl extends BorderPane {
@@ -73,7 +65,7 @@ public class BibleStudyCompoundControl extends BorderPane {
 
     private int selectedIndex = 0;
 
-    private Optional<Tuple<Dictionary, AccordanceRef>> optAccordance = Optional.empty();
+    private Optional<Tuple<Dictionary, DictionaryRef>> optAccordance = Optional.empty();
 
     private TextRendering rendering = null;
 
@@ -110,10 +102,6 @@ public class BibleStudyCompoundControl extends BorderPane {
             }
         }
 
-
-        utils.loadAccordancesDownLoaded(
-                new File(ApplicationProperties.getApplicationAccordanceDir()),
-                context);
         topControls.getDictionaries().getItems().addAll(utils.getDictInstances());
         this.initListeners();
         TreeItem<String> root = buildBooksTree();
@@ -151,7 +139,8 @@ public class BibleStudyCompoundControl extends BorderPane {
     }
 
     public void initMediaView() {
-        String mediaPath = context.getSettings().getProperty(ApplicationProperties.AUDIO_PATH);
+        String mediaPath = BibleThreadPool.getContext().getAppSettings()
+                .getBaseConfig().getMediaPath();
         this.playBible = new PlayBible(mediaPath
                 , chapterPlayView);
         BibleTextUtils.BookLink link =

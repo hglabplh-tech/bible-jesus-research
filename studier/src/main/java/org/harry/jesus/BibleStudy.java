@@ -57,7 +57,7 @@ public class BibleStudy extends Application {
             SynchThread.storeHistory(BibleThreadPool.getContext());
             SynchThread.storeNotes(BibleThreadPool.getContext());
             SynchThread.storeHighlights(BibleThreadPool.getContext());
-            ApplicationProperties.storeApplicationProperties();
+            SynchThread.storeApplicationSettings(BibleThreadPool.getContext());
             System.exit(0);
         });
         scene = new Scene(loadFXML("main", CSS.BIBLE));
