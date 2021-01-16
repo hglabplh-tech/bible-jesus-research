@@ -181,8 +181,9 @@ public class MainController {
 
 
         if (utils.getSelected() != null) {
+            BibleTextUtils utils = BibleTextUtils.getInstance();
             bibleStudy =
-                    new BibleStudyCompoundControl(utils, utils.getSelected(),
+                    new BibleStudyCompoundControl(utils.getSelected(),
                             utils.getBookLabels().get(0));
             initAreaContextMenu();
             readBible.setContent(bibleStudy);
@@ -417,7 +418,7 @@ public class MainController {
                     bibleStudy.getActBookLabel(),
                     bibleStudy.getActChapter());
         }
-        rendering.setAreaText(new StringBuffer(bibleStudy.getArea().getText()));
+        bibleStudy.showChapter();
     }
 
     @FXML

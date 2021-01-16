@@ -1,6 +1,7 @@
 package org.harry.jesus;
 
 
+import generated.XMLBIBLE;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
@@ -34,11 +35,13 @@ public class AccordanceViewController {
     @FXML
     WebView chapterViewer;
 
+    private XMLBIBLE selected = null;
+
 
     @FXML
     public void initialize() {
 
-
+        selected = BibleTextUtils.getInstance().getSelected();
 
         searchInput.addEventHandler(SearchDictEvent.SEARCH_DICT_EVENT,
                 event -> {
@@ -52,13 +55,14 @@ public class AccordanceViewController {
 
 
 
-    public void setWebViewListener(BibleTextUtils utils, FoldableStyledArea area, String html) {
+    public void setWebViewListener(FoldableStyledArea area, String html) {
         WebEngine engine = dictionaryViewer.getEngine();
         engine.setJavaScriptEnabled(true);
         engine.loadContent(html);
         area.addLinkedSearchTextField(searchInput);
         WebViews.addHyperlinkListener(dictionaryViewer,
-                new AccordanceViewHyperListener(utils, area, dictionaryViewer, chapterViewer), HyperlinkEvent.EventType.ACTIVATED);
+                new AccordanceViewHyperListener(area, dictionaryViewer,
+                        chapterViewer, selected), HyperlinkEvent.EventType.ACTIVATED);
 
     }
 

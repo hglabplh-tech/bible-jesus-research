@@ -9,6 +9,7 @@ import java.util.Objects;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
         "bibleID",
+        "biblename",
         "pathToBook",
         "fuzzyLinkSearch",
         "hashValue"
@@ -18,6 +19,9 @@ public class BibleRef {
 
     @XmlElement(name = "pathToBook", required = true)
     private String pathToBook = null;
+
+    @XmlElement(name = "biblename", required = false)
+    private String biblename;
 
     @XmlElement(name = "bibleID", required = true)
     private String bibleID = null;
@@ -67,6 +71,15 @@ public class BibleRef {
         return this;
     }
 
+    public String getBiblename() {
+        return biblename;
+    }
+
+    public BibleRef setBiblename(String biblename) {
+        this.biblename = biblename;
+        return this;
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -82,22 +95,20 @@ public class BibleRef {
         BibleRef bibleRef = (BibleRef) o;
         return getPathToBook().equals(bibleRef.getPathToBook())
                 && getBibleID().equals(bibleRef.getBibleID())
+                && getBiblename().equals(bibleRef.getBiblename())
                 && getHashValue().equals(bibleRef.getHashValue())
                 && getFuzzyLinkSearch().equals(bibleRef.getFuzzyLinkSearch());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPathToBook(), getBibleID(), getHashValue(), getFuzzyLinkSearch());
+        return Objects.hash(getPathToBook(), getBibleID(), getHashValue(), getFuzzyLinkSearch(), getBiblename());
     }
 
     @Override
     public String toString() {
-        return "BibleRef{" +
-                "pathToBook='" + pathToBook + '\'' +
-                ", bibleName='" + bibleID + '\'' +
-                ", hashValue='" + hashValue + '\'' +
-                ", fuzzyLinkSearch=" + fuzzyLinkSearch +
-                '}';
+        return  bibleID
+                + ", " + biblename
+                + ", " + hashValue;
     }
 }

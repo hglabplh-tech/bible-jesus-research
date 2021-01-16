@@ -11,7 +11,7 @@ import org.harry.jesus.BibleStudy;
 import org.harry.jesus.AccordanceViewController;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
-import org.harry.jesus.synchjeremia.ApplicationProperties;
+import org.harry.jesus.synchjeremia.BibleThreadPool;
 import org.pmw.tinylog.Logger;
 
 import java.io.File;
@@ -33,14 +33,15 @@ public class ViewAccordanceDialog {
 
      *
      */
-    public static void showAccordanceDialog(BibleTextUtils utils,
-                                            FoldableStyledArea area,
+    public static void showAccordanceDialog(FoldableStyledArea area,
                                             String accFName) {
 
         Stage stage = new Stage();
         stage.setTitle("Dictionary View");
         try {
-            String accDir = ApplicationProperties.getApplicationAccordanceDir();
+            String accDir = BibleThreadPool.getContext()
+                    .getAppSettings().getBaseConfig()
+                    .getDictionariesDir();
             String fileName = accFName + ".html";
             File inFile = new File(accDir, fileName);
             StringBuffer htmlBuffer = new StringBuffer();
@@ -60,10 +61,10 @@ public class ViewAccordanceDialog {
                     htmlBuffer.append("<p><h1>Accordance not available yet</h1></p>");
                 }
             } else {
-                GenDictHTMLScene.generateDictHTML(utils, new File(accDir));
+                GenDictHTMLScene.generateDictHTML(BibleTextUtils.getInstance(), new File(accDir));
                 htmlBuffer.append("<p><h1>Accordance not available yet</h1></p>");
             }
-            Scene secondScene = new Scene(loadFXML("accordanceViewer", utils,
+            Scene secondScene = new Scene(loadFXML("accordanceViewer",
                     area, htmlBuffer.toString()));
             stage.setScene(secondScene);
             stage.show();
@@ -74,7 +75,6 @@ public class ViewAccordanceDialog {
     }
 
     public static Parent loadFXML(String fxml,
-                                  BibleTextUtils utils,
                                   FoldableStyledArea area,
                                   String html) throws IOException {
         URL resourceURL = BibleStudy.class.getResource("/fxml/" + fxml + ".fxml");
@@ -82,7 +82,7 @@ public class ViewAccordanceDialog {
 
         Pane root = (Pane) fxmlLoader.load();
         AccordanceViewController controller = (AccordanceViewController)fxmlLoader.getController();
-        controller.setWebViewListener(utils, area, html);
+        controller.setWebViewListener(area, html);
 
 
         return root;

@@ -12,6 +12,8 @@ import java.util.Map;
         "bibleRefs",
         "dictionaryRefs",
         "dictBibleMap",
+        "selectBible",
+        "selectDictionary"
 })
 public class BiblesDictConfig {
 
@@ -24,6 +26,12 @@ public class BiblesDictConfig {
 
     @XmlJavaTypeAdapter(DictBibleMapAdapter.class)
     protected Map<DictionaryRef, BibleRef> dictBibleMap = new HashMap<>();
+
+    @XmlElement( required = false)
+    protected Boolean selectDictionary = Boolean.FALSE;
+
+    @XmlElement( required = false)
+    protected Boolean selectBible = Boolean.FALSE;
 
 
 
@@ -43,5 +51,23 @@ public class BiblesDictConfig {
             dictionaryRefs = new ArrayList<>();
         }
         return dictionaryRefs;
+    }
+
+    public Boolean getSelectDictionary() {
+        return selectDictionary;
+    }
+
+    public Boolean getSelectBible() {
+        return selectBible;
+    }
+
+    public BiblesDictConfig setSelectDictionary(Boolean selectDictionary) {
+        this.selectDictionary = selectDictionary;
+        return this;
+    }
+
+    public BiblesDictConfig setSelectBible(Boolean selectBible) {
+        this.selectBible = selectBible;
+        return this;
     }
 }

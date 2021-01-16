@@ -5,8 +5,10 @@ import generated.*;
 import generated.Dictionary;
 import javafx.scene.control.IndexRange;
 import jesus.harry.org.versnotes._1.Vers;
+import org.apache.commons.io.IOUtils;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.configjaxbser.BaseConfig;
+import org.harry.jesus.jesajautils.configjaxbser.BiblesDictConfig;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 import org.harry.jesus.jesajautils.configjaxbser.DictionaryRef;
 import org.harry.jesus.jesajautils.configjaxbser.BibleRef;
@@ -17,6 +19,7 @@ import org.pmw.tinylog.Logger;
 import javax.xml.bind.JAXBElement;
 import java.io.*;
 import java.math.BigInteger;
+import java.net.URL;
 import java.util.*;
 
 
@@ -28,7 +31,20 @@ import java.util.*;
  */
 public class BibleTextUtils {
 
+    private static String biblesResDir = "/bibles/";
+    private static String dictResDir = "/bibles/dictionaries/";
 
+    private static List<String> installedDicts = Arrays.asList(
+            "SF_2005-12-09_GER_LUTH1912-KOK_(DIE LUTHERBIBEL VON 1912 - KONKORDANZ).xml",
+            "SF_2006-03-08_GER_ELB1905-KOK_(DIE ELBERFELDERBIBEL VON 1905 - KONKORDANZ).xml"
+
+    );
+    private static List<String> installedBibles = Arrays.asList(
+            "SF_2009-01-20_GER_ELB1905_(ELBERFELDER 1905).xml",
+            "SF_2009-01-20_GER_LUTH1912_(LUTHER 1912).xml",
+            "SF_2009-01-20_GER_SCH1951_(SCHLACHTER 1951).xml",
+            "SF_2014-09-30_GER_NEU_(NEUE EVANGELISTISCHE ÜBERSETZUNG (NEÜ)).xml"
+    );
     /**
      * bible instances list
      */
@@ -83,10 +99,18 @@ public class BibleTextUtils {
             buidBookLabMap();
             BaseConfig base = BibleThreadPool.getContext().getAppSettings().getBaseConfig();
             File biblePath = new File(base.getBiblesDir());
-            File accordancePath = new File(base.getDictionariesDir());
+            File dictionariesPath = new File(base.getDictionariesDir());
+            if (!biblePath.exists()) {
+                biblePath.mkdirs();
+            }
+            if (!dictionariesPath.exists()) {
+                dictionariesPath.mkdirs();
+            }
+            copyBibles(biblePath);
+            copyDicts(dictionariesPath);
             BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
             loadBiblesDownLoaded(biblePath, context);
-            loadAccordancesDownLoaded(accordancePath,context);
+            loadAccordancesDownLoaded(dictionariesPath,context);
             if (bibleInstances.size() > 0) {
                 selected = bibleInstances.get(0).getBible();
             } else {
@@ -96,6 +120,32 @@ public class BibleTextUtils {
 
         } catch (Exception ex) {
             Logger.trace("Exception occured loading bibles");
+        }
+    }
+
+    private void copyBibles(File biblePath) throws IOException {
+        for(String bibleName: installedBibles) {
+            InputStream input = this.getClass()
+                    .getResourceAsStream(biblesResDir + bibleName);
+            writeIfNotThere(biblePath, bibleName, input);
+        }
+    }
+
+    private void copyDicts(File dictPath) throws IOException {
+        for(String dictName: installedDicts) {
+            InputStream input = this.getClass()
+                    .getResourceAsStream(dictResDir + dictName);
+            writeIfNotThere(dictPath, dictName, input);
+        }
+    }
+
+    private void writeIfNotThere(File path, String fileName, InputStream input) throws IOException {
+        if (input != null) {
+            File outFile = new File(path, fileName);
+            if (!outFile.exists()) {
+                FileOutputStream outStream = new FileOutputStream(outFile);
+                IOUtils.copy(input, outStream);
+            }
         }
     }
 
@@ -169,6 +219,45 @@ public class BibleTextUtils {
         loadBiblesFromRef(context.getBibleRefList());
     }
 
+    public static void searchSelectedForDict(DictionaryRef dictionaryRef) {
+        XMLBIBLE selected = getInstance().getSelected();
+        BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
+        BiblesDictConfig dictConf = context.getAppSettings().getDictConfig();
+        Optional<BibleRef> refFound = Optional.empty();
+        for (Map.Entry<DictionaryRef, BibleRef> entry : dictConf.getDictBibleMapping().entrySet()) {
+            if (entry.getKey().equals(dictionaryRef)) {
+                refFound = Optional.of(entry.getValue());
+            }
+        }
+        if (refFound.isPresent()) {
+            for (BibleBookInstance bible: BibleTextUtils.getInstance().getBibleInstances()) {
+                if (bible.getBibleRef().equals(refFound.get())) {
+                    selected = bible.getBible();
+                }
+            }
+        }
+        BibleTextUtils.getInstance().setSelected(selected);
+    }
+
+    public static Optional<DictionaryInstance> searchSelectedForBible(BibleRef bibleRef) {
+        BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
+        BiblesDictConfig dictConf = context.getAppSettings().getDictConfig();
+        Optional<DictionaryRef> refFound = Optional.empty();
+        for (Map.Entry<DictionaryRef, BibleRef> entry : dictConf.getDictBibleMapping().entrySet()) {
+            if (entry.getValue().equals(bibleRef)) {
+                refFound = Optional.of(entry.getKey());
+            }
+        }
+        if (refFound.isPresent()) {
+            for (DictionaryInstance dictionary: BibleTextUtils.getInstance().getDictInstances()) {
+                if (dictionary.getDictionaryRef().equals(refFound.get())) {
+                    return Optional.of(dictionary);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
     /**
      * Load the dictionaries placed in the dictionary directory of the user
      * @param accordancePath the dictionaries path
@@ -203,12 +292,11 @@ public class BibleTextUtils {
                 instance.get().setOptDictAccRefTuple(actAccordance.getFirst(), accRef);
             }
             String id = AccordanceUtil.getIdFromInfo(actAccordance.getFirst().getINFORMATION());
+            String name = AccordanceUtil.getNameFromInfo(actAccordance.getFirst().getINFORMATION());
             accRef.setDictionaryID(id);
+            accRef.setDictionaryName(name);
             dictInstances.add(new DictionaryInstance(accRef, actAccordance.getFirst()));
-           /* AccordanceGenThread thread =
-                    new AccordanceGenThread(this,
-                            actAccordance.getFirst(), fileName, accordancePath);
-            thread.start(); */
+
 
         }
 
@@ -227,7 +315,8 @@ public class BibleTextUtils {
                     .getIdFromBibleInfo(actBible
                             .getFirst()
                             .getINFORMATION()
-                            .getValue())).setHashValue(actBible.getSecond());
+                            .getValue())).setHashValue(actBible.getSecond())
+                    .setBiblename(actBible.getFirst().getBiblename());
             bibleInstances.add(new BibleBookInstance(ref, actBible.getFirst()));
     }
 

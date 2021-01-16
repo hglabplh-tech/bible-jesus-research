@@ -203,14 +203,16 @@ public class SynchThread extends TimerTask {
                     .setFontSize(ApplicationProperties.getFontSize());
             appProps.delete();
         } else {
-            String basePath = System.getProperty("user.home");
+            String basePath = System.getProperty("user.home") + "/bibleStudyApp";
+            String biblePath = basePath + "/" + "installedBibles";
+            String dictPath = basePath + "/" + "installedBibleDicts";
             Optional<String> optFont = ApplicationProperties.fontFamilies
                     .stream()
                     .filter(e -> e.contains("Tempus"))
                     .findFirst();
             base.setReaderShape(BaseConfig.ShapeEnum.BASE_SHAPE)
-                    .setBiblesDir(basePath)
-                    .setDictionariesDir(basePath)
+                    .setBiblesDir(biblePath)
+                    .setDictionariesDir(dictPath)
                     .setMediaPath(basePath)
                     .setFontFamily(optFont.get())
                     .setFontSize(10);

@@ -31,6 +31,20 @@ public class AccordanceUtil {
 
     }
 
+    public static String getNameFromInfo(TINFORMATION info) {
+        List<JAXBElement<?>> elements =
+                info.getTitleOrCreatorOrDescription();
+        for (JAXBElement<?> element: elements) {
+            if (element.getName().getLocalPart().equals("title")) {
+                String id = (String)element.getValue();
+                return id;
+            }
+
+        }
+        return "";
+
+    }
+
     public static String getIdFromBibleInfo(INFORMATION info) {
         List<JAXBElement<?>> elements =
                 info.getTitleOrCreatorOrDescription();

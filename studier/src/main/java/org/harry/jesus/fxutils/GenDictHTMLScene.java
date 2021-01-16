@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.HTMLRendering;
@@ -15,12 +16,11 @@ import org.harry.jesus.jesajautils.Tuple;
 import org.pmw.tinylog.Logger;
 
 import javax.xml.bind.JAXBElement;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.List;
 
+import static java.lang.String.*;
 import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
 
 
@@ -63,6 +63,8 @@ public class GenDictHTMLScene {
         private Integer updateCounter = 0;
 
         private final File accordenceAppDir;
+
+        private String actDictionary = "";
 
 
 
@@ -283,6 +285,7 @@ public class GenDictHTMLScene {
                 total = total + dictInstance.getDictionary().getItem().size();
             }
             for (BibleTextUtils.DictionaryInstance dictInstance: utils.getDictInstances()) {
+                actDictionary = dictInstance.getDictionaryRef().getDictionaryName();
                 done = genDictionary(dictInstance, total, done);
             }
             updateProgress(total, total);
@@ -307,10 +310,12 @@ public class GenDictHTMLScene {
             updateGenDictProgress(done, total);
             try {
                 FileOutputStream outStream = new FileOutputStream(outFile);
-                outStream.write(html.toString().getBytes());
-                outStream.close();
+                StringReader reader = new StringReader(html.toString());
+                IOUtils.copy(reader, outStream, Charset.defaultCharset());
                 Logger.trace("Ready build accordance file: " + outFile.getAbsolutePath());
+                setLabelWriteSuccessText(done, total);
             } catch (IOException ex) {
+                setLabelWriteFailedText(done, total);
                 Logger.trace(ex);
                 Logger.trace("Write: \""
                         + outFile.getAbsolutePath()
@@ -332,7 +337,20 @@ public class GenDictHTMLScene {
         }
 
         private void setLabelText(long done, long total) {
-            String text = String.format("Progress (done / total) -> (%d / %d)", done,total);
+            String text = format("Progress (done / total) -> (%d / %d)\n" +
+                    "generating: %s", done,total, actDictionary);
+            updateMessage(text);
+        }
+
+        private void setLabelWriteSuccessText(long done, long total) {
+            String text = format("Progress (done / total) -> (%d / %d)\n" +
+                    "writing: %s (success)", done,total, actDictionary);
+            updateMessage(text);
+        }
+
+        private void setLabelWriteFailedText(long done, long total) {
+            String text = format("Progress (done / total) -> (%d / %d)\n" +
+                    "writing: %s (failed)", done,total, actDictionary);
             updateMessage(text);
         }
     }

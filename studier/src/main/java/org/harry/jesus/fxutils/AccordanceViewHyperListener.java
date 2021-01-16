@@ -24,7 +24,7 @@ import static org.harry.jesus.fxutils.WebViewHyperListener.getRealBibleLink;
 
 public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
 
-    private final BibleTextUtils utils;
+
 
     private final FoldableStyledArea area;
 
@@ -32,13 +32,16 @@ public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
 
     private final WebView chapterView;
 
+    private final XMLBIBLE selected;
 
-    public AccordanceViewHyperListener(BibleTextUtils utils, FoldableStyledArea area,
-                                       WebView view, WebView chapterView) {
-        this.utils = utils;
+
+    public AccordanceViewHyperListener(FoldableStyledArea area,
+                                       WebView view, WebView chapterView, XMLBIBLE selected) {
+
         this.area = area;
         this.view = view;
         this.chapterView = chapterView;
+        this.selected = selected;
     }
 
     @Override
@@ -73,10 +76,12 @@ public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
     private void gotoBibleLink(String href) {
         String bibleLink = getRealBibleLink(href);
         try {
+            BibleTextUtils utils = BibleTextUtils.getInstance();
             System.out.println(bibleLink);
             List<BibleTextUtils.BookLink> links = LinkHandler.parseLinks(utils, bibleLink);
             BibleTextUtils.BookLink link = links.get(0);
             SetLinkEvent event = new SetLinkEvent(link);
+            utils.setSelected(selected);
             this.area.fireEvent(event);
             chapterView.getEngine().loadContent(
                     HTMLRendering.renderFullChapter(utils, utils.getSelected(), links));

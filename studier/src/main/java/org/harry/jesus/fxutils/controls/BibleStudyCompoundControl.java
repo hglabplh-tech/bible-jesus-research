@@ -73,8 +73,8 @@ public class BibleStudyCompoundControl extends BorderPane {
 
 
 
-    public BibleStudyCompoundControl(BibleTextUtils utils, XMLBIBLE selected, String actBookLabel) {
-        this.utils = utils;
+    public BibleStudyCompoundControl(XMLBIBLE selected, String actBookLabel) {
+        this.utils = BibleTextUtils.getInstance();
         this.utils.setSelected(selected);
         this.actBookLabel = actBookLabel;
         this.actBook = utils.getBookLabelAsClass(actBookLabel);
@@ -193,7 +193,14 @@ public class BibleStudyCompoundControl extends BorderPane {
                             .getValue().getBnumber().intValue();
                     actBookLabel = utils.getBookLabels().get(bookNo - 1);
                 }
-                optAccordance = instance.getOptDictAccRefTuple();
+                Optional<BibleTextUtils.DictionaryInstance> dictInstance =
+                        BibleTextUtils.searchSelectedForBible(instance.getBibleRef());
+                Boolean doIt = context.getAppSettings().getDictConfig().getSelectDictionary();
+                if (dictInstance.isPresent() && doIt) {
+                    ViewAccordanceDialog.showAccordanceDialog(area,
+                            dictInstance.get().getDictionaryRef().getFilename());
+                }
+
                 TreeItem<String> root = buildBooksTree();
                 showChapter();
                 BibleTextUtils.BookLink link =
@@ -288,7 +295,11 @@ public class BibleStudyCompoundControl extends BorderPane {
                                 Number newValue) {
                 BibleTextUtils.DictionaryInstance entry =
                         topControls.getDictionaries().getItems().get(newValue.intValue());
-                ViewAccordanceDialog.showAccordanceDialog(utils, area,
+                Boolean doIt = context.getAppSettings().getDictConfig().getSelectBible();
+                if (doIt) {
+                    BibleTextUtils.searchSelectedForDict(entry.getDictionaryRef());
+                }
+                ViewAccordanceDialog.showAccordanceDialog(area,
                         entry.getDictionaryRef().getFilename());
             }
         });

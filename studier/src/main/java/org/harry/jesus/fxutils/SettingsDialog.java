@@ -3,6 +3,7 @@ package org.harry.jesus.fxutils;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -12,14 +13,19 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import org.harry.jesus.fxutils.controls.DictBibleSettingsCompound;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.TextStyle;
 import org.harry.jesus.jesajautils.configjaxbser.BaseConfig;
 import org.harry.jesus.jesajautils.configjaxbser.BibleAppConfig;
+import org.harry.jesus.jesajautils.configjaxbser.BibleRef;
+import org.harry.jesus.jesajautils.configjaxbser.DictionaryRef;
 import org.harry.jesus.synchjeremia.ApplicationProperties;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
 import org.harry.jesus.synchjeremia.SynchThread;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -73,7 +79,7 @@ public class SettingsDialog {
 
         String audioPath = config.getBaseConfig().getMediaPath();
         mediaDirField.setText(audioPath);
-        String dictPath = config.getBaseConfig().getMediaPath();
+        String dictPath = config.getBaseConfig().getDictionariesDir();
         accordanceField.setText(dictPath);
         Button getMediaDirButton = new Button("Get Media Directory");
         Button getBibleDirButton = new Button("Get Bible Directory");
@@ -118,6 +124,12 @@ public class SettingsDialog {
         /**
          * set the font box
          */
+        DictBibleSettingsCompound dictCompound = new DictBibleSettingsCompound();
+        TabPane settingsTab = new TabPane();
+        Tab baseSettings = new Tab("Base Settings");
+        settingsTab.getTabs().add(baseSettings);
+        Tab advSettings = new Tab("Advanced Settings");
+        settingsTab.getTabs().add(advSettings);
         Label fontLabel = new Label("Select default Font");
         ChoiceBox<String> fontBox = makeFontBox();
         ChoiceBox<Integer> fontSizeBox = getFontSizeChoiceBox();
@@ -146,7 +158,9 @@ public class SettingsDialog {
                 ApplicationProperties.getFontFamily().get(),
                 ApplicationProperties.getFontSize());
 
-        dialog.getDialogPane().setContent(grid);
+        baseSettings.setContent(grid);
+        advSettings.setContent(dictCompound);
+        dialog.getDialogPane().setContent(settingsTab);
 
 // Request focus on the passwordKey field by default.
         Platform.runLater(() -> mediaDirField.requestFocus());
@@ -159,6 +173,19 @@ public class SettingsDialog {
                 config.getBaseConfig().setFontFamily(font);
                 config.getBaseConfig().setReaderShape(shape);
                 config.getBaseConfig().setFontSize(fontSize);
+                Boolean selectBible = dictCompound.getSelectBible().isSelected();
+                Boolean selectDictionary = dictCompound.getSelectDictionary().isSelected();
+                config.getDictConfig()
+                        .setSelectBible(selectBible)
+                        .setSelectDictionary(selectDictionary);
+                config.getDictConfig().getBibleRefs().clear();
+                config.getDictConfig().getBibleRefs().addAll(
+                        dictCompound.getBibleRefs().getItems());
+                config.getDictConfig().getDictionaryRefs().clear();
+                config.getDictConfig().getDictionaryRefs().addAll(
+                        dictCompound.getDictRefs().getItems());
+                Map<DictionaryRef, BibleRef> map = config.getDictConfig().getDictBibleMapping();
+                fillAssocMap(map, config, dictCompound.getAssocData());
                 context.setAppSettings(config);
                 SynchThread.storeApplicationSettings(context);
             }
@@ -261,5 +288,23 @@ public class SettingsDialog {
             area.setStyle(range.getStart(), range.getEnd(), tempStyle);
         }
         return tempStyle;
+    }
+
+    private void fillAssocMap(Map<DictionaryRef, BibleRef> map,
+                              BibleAppConfig config,
+                              ObservableList<DictBibleSettingsCompound.AssocData> data) {
+        List<BibleRef> bibleRefs = config.getDictConfig().getBibleRefs();
+        List<DictionaryRef> dictRefs = config.getDictConfig().getDictionaryRefs();
+        for (DictBibleSettingsCompound.AssocData item: data) {
+            Optional<BibleRef> optBible = bibleRefs.stream().filter(e -> e.getBibleID().equals(item.getBibleID()))
+                    .findFirst();
+            Optional<DictionaryRef> optDict = dictRefs.stream().filter(e -> e.getDictionaryID()
+                    .equals(item.getDictionaryID()))
+                    .findFirst();
+            if (optBible.isPresent() && optDict.isPresent()) {
+                map.put(optDict.get(), optBible.get());
+            }
+
+        }
     }
 }

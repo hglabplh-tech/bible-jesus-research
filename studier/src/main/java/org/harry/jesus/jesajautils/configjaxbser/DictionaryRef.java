@@ -11,6 +11,7 @@ import java.util.Objects;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
         "dictionaryID",
+        "dictionaryName",
         "pathToBook",
         "filename",
         "hashValue"
@@ -30,6 +31,9 @@ public class DictionaryRef {
 
     @XmlElement(name = "dictionaryID", required = true)
     private String dictionaryID = null;
+
+    @XmlElement(name = "dictionaryName", required = false)
+    private String dictionaryName = null;
 
     public static final String FORMAT_XSD = "zefaniaDict.xsd";
 
@@ -73,13 +77,25 @@ public class DictionaryRef {
         return this;
     }
 
+    public String getDictionaryName() {
+        return dictionaryName;
+    }
+
+    public DictionaryRef setDictionaryName(String dictionaryName) {
+        this.dictionaryName = dictionaryName;
+        return this;
+    }
+
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DictionaryRef)) return false;
-        DictionaryRef that = (DictionaryRef) o;
-        return getDictionaryID().equals(that.getDictionaryID());
+        if (o instanceof  DictionaryRef) {
+            DictionaryRef that = (DictionaryRef) o;
+            return getDictionaryID().equals(that.getDictionaryID());
+        } else {
+            return false;
+        }
+
     }
 
 
@@ -97,11 +113,9 @@ public class DictionaryRef {
 
     @Override
     public String toString() {
-        return "DictionaryRef{" +
-                "pathToBook='" + pathToBook + '\'' +
-                ", filename='" + filename + '\'' +
-                ", hashValue='" + hashValue + '\'' +
-                ", dictionaryID='" + dictionaryID + '\'' +
-                '}';
+        return  dictionaryID
+                + ", " + dictionaryName
+                + ", " + hashValue;
+
     }
 }
