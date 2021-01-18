@@ -517,4 +517,8 @@ public class BibleStudyCompoundControl extends BorderPane {
         this.actBook = actBook;
         return this;
     }
+
+    public void clearSelected() {
+        this.selectedVersesMap.clear();
+    }
 }

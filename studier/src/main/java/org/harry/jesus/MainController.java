@@ -273,6 +273,7 @@ public class MainController {
                     HighlightsEntry entry = getHighlightsEntry(vers);
                     highlightsTab.getItems().add(entry);
                 }
+                bibleStudy.clearSelected();
             }
         });
         mItem = new MenuItem();
@@ -291,8 +292,9 @@ public class MainController {
                 if (result.isPresent()) {
                     CreatePictureDialog.saveToFile(result.get());
                 }
-
+                bibleStudy.clearSelected();
             }
+
         });
         mItem = new MenuItem();
         mItem.setText("createNote");
@@ -310,7 +312,6 @@ public class MainController {
                 Optional<Note> newNote = CreateNoteDialog.showNoteCreateDialog(theNote);
                 if (newNote.isPresent()) {
                     Color noteColor = null;
-                    noteList.getVersenote().add(newNote.get());
 
                     notesTable.getSelectionModel().setCellSelectionEnabled(true);
                     notesTable.setEditable(false);
@@ -331,6 +332,7 @@ public class MainController {
                     notesTable.setVisible(false);
                     notesTable.refresh();
                     notesTable.setVisible(true);
+                    bibleStudy.clearSelected();
 
                 }
 
@@ -354,6 +356,7 @@ public class MainController {
                 verses.add(vers);
                 String versHtml = HTMLRendering.renderVerses(bibleStudy.getSelected(), utils, verses);
                 copyHtmlToClip(new StringBuffer(versHtml));
+                bibleStudy.clearSelected();
             }
         });
         contMenu.getItems().add(mItem);
@@ -372,6 +375,7 @@ public class MainController {
                 theDay.getVerses().add(vers);
                 String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses());
                 setPlanOutputSelected(theDay, versHtml);
+                bibleStudy.clearSelected();
             }
 
         });
@@ -417,6 +421,10 @@ public class MainController {
     }
 
 
+    @FXML
+    public void showVersePics(ActionEvent event) {
+
+    }
 
     @FXML
     public void about(ActionEvent event) {

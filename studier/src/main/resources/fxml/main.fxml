@@ -32,6 +32,7 @@
                <items>
                   <MenuItem fx:id="genDictHTML" mnemonicParsing="false" onAction="#genDictHTML" text="Generate Dictionaries HTML" />
                   <MenuItem fx:id="settings" mnemonicParsing="false" onAction="#settings" text="Settings" />
+                  <MenuItem fx:id="showVersePics" mnemonicParsing="false" onAction="#showVersePics" text="Show Verses Gallery" />
                </items></Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>
