@@ -4,12 +4,8 @@ import generated.*;
 import javafx.scene.paint.Color;
 import jesus.harry.org.versnotes._1.Vers;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
-import org.pmw.tinylog.Logger;
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlElementRef;
-import java.awt.*;
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -195,9 +191,13 @@ public class HTMLRendering {
         }
     }
 
-    public static String renderVersesASDoc(XMLBIBLE selected, BibleTextUtils utils, List<Vers> verses) {
+    public static String renderVersesASDoc(XMLBIBLE selected,
+                                           BibleTextUtils utils, List<Vers> verses, String noteText) {
         StringBuffer buffer = new StringBuffer().append("<html><title>Some selected verses</title><body>");
         buffer.append(renderVerses(selected, utils, verses));
+        if (noteText != null) {
+            renderVers(buffer, noteText, null);
+        }
         buffer.append("</body></html>");
         return buffer.toString();
     }

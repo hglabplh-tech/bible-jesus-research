@@ -518,6 +518,10 @@ public class BibleStudyCompoundControl extends BorderPane {
         return this;
     }
 
+    public List<BIBLEBOOK> getTheBooks() {
+        return theBooks;
+    }
+
     public void clearSelected() {
         this.selectedVersesMap.clear();
     }

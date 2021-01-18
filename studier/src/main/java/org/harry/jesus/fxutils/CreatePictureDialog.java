@@ -13,16 +13,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import jesus.harry.org.versnotes._1.Vers;
 import org.harry.jesus.fxutils.graphics.ImageMaker;
-import org.harry.jesus.synchjeremia.SynchThread;
+import org.harry.jesus.jesajautils.Tuple;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
-import java.util.UUID;
 
 
 /**
@@ -97,22 +92,10 @@ public class CreatePictureDialog {
         InputStream imageIN = JesusMisc.showOpenDialog(dialog.getDialogPane());
         if (imageIN != null) {
             source = new Image(imageIN);
-            double ratio = source.getWidth() / source.getHeight();
-            int width = 0;
-            int height = 0;
-            if (1000 / ratio < 1000) {
-                width = 1000;
-                height = (int) (1000 / ratio);
-            } else if (1000 * ratio < 1000) {
-                height = 1000;
-                width = (int) (1000 * ratio);
-            } else {
-                height = 1000;
-                width = 1000;
-            }
+            Tuple<Integer, Integer> widthHeightTuple = ImageMaker.getZoomValues(source, 1000);
             imageArea.setPreserveRatio(false);
-            imageArea.setFitWidth(width);
-            imageArea.setFitHeight(height);
+            imageArea.setFitWidth(widthHeightTuple.getFirst());
+            imageArea.setFitHeight(widthHeightTuple.getSecond());
             imageArea.setImage(source);
         } else {
             source = new Image(
@@ -140,23 +123,6 @@ public class CreatePictureDialog {
         return dialog.showAndWait();
     }
 
-    private static Color convertColor(javafx.scene.paint.Color fx) {
-        return  new Color((float) fx.getRed(),
-                (float) fx.getGreen(),
-                (float) fx.getBlue(),
-                (float) fx.getOpacity());
-    }
-
-    public static void saveToFile(Image image) {
-        File outputFile = new File(SynchThread.appDir, UUID.randomUUID().toString() + ".png");
-        BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
-        try {
-            ImageIO.write(bImage, "png", outputFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private class ShowButtonHandler implements EventHandler<ActionEvent> {
 
         private final Image source;
@@ -174,7 +140,7 @@ public class CreatePictureDialog {
                 BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
                 Optional<BufferedImage> result = ImageMaker
                         .createImage(theVers.getVtext(),
-                                convertColor(picker.getValue()),
+                                ImageMaker.convertColor(picker.getValue()),
                                 fontSizeBox.getValue(),
                                 bImage);
                 if (result.isPresent()) {
@@ -184,4 +150,6 @@ public class CreatePictureDialog {
             }
         }
     }
+
+
 }

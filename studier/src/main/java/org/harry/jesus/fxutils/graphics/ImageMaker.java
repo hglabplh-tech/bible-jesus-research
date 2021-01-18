@@ -1,15 +1,22 @@
 package org.harry.jesus.fxutils.graphics;
 
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
+import org.harry.jesus.jesajautils.Tuple;
+import org.harry.jesus.synchjeremia.SynchThread;
 import org.jetbrains.annotations.NotNull;
 import org.pmw.tinylog.Logger;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Optional;
+import java.util.UUID;
 
 public class ImageMaker {
     public static Optional<BufferedImage> createImage (String verseText,
@@ -65,5 +72,52 @@ public class ImageMaker {
             }
         }
         return cookedText;
+    }
+
+    public static Color convertColor(javafx.scene.paint.Color fx) {
+        return  new Color((float) fx.getRed(),
+                (float) fx.getGreen(),
+                (float) fx.getBlue(),
+                (float) fx.getOpacity());
+    }
+
+    public static void saveToFile(Image image) {
+        File outputFile = new File(SynchThread.appDir, UUID.randomUUID().toString() + ".png");
+        BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
+        try {
+            ImageIO.write(bImage, "png", outputFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Tuple<Integer, Integer> getZoomValues(Image source, Integer relation) {
+        double ratio = source.getWidth() / source.getHeight();
+        int width = 0;
+        int height = 0;
+        if (relation / ratio < relation) {
+            width = relation;
+            height = (int) (relation / ratio);
+        } else if (relation * ratio < relation) {
+            height = relation;
+            width = (int) (relation * ratio);
+        } else {
+            height = relation;
+            width = relation;
+        }
+        return new Tuple<>(width,height);
+    }
+
+    public static byte [] getBytesFromImage(Image image) {
+        try {
+            BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
+            ByteArrayOutputStream s = new ByteArrayOutputStream();
+            ImageIO.write(bImage, "png", s);
+            byte[] result = s.toByteArray();
+            s.close(); //especially if you are using a different output stream.
+            return result;
+        } catch (IOException ex) {
+            return null;
+        }
     }
 }

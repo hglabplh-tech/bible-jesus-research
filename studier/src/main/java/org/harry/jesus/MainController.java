@@ -2,24 +2,19 @@ package org.harry.jesus;
 
 import generated.BIBLEBOOK;
 import generated.CHAPTER;
-import generated.Dictionary;
-import generated.XMLBIBLE;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.DataFormat;
 import javafx.scene.layout.*;
 
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.web.HTMLEditor;
 import javafx.scene.web.WebEngine;
@@ -30,8 +25,6 @@ import jesus.harry.org.plan._1.Plan;
 import jesus.harry.org.versnotes._1.Note;
 import jesus.harry.org.versnotes._1.Vers;
 import jesus.harry.org.versnotes._1.Versnotes;
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.GenericStyledArea;
 import org.fxmisc.richtext.model.*;
 import org.harry.jesus.danielpersistence.PersistenceLayer;
 import org.harry.jesus.fxutils.*;
@@ -39,9 +32,8 @@ import org.harry.jesus.fxutils.controls.BibleStudyCompoundControl;
 import org.harry.jesus.fxutils.controls.HTMLEditorExt;
 import org.harry.jesus.fxutils.controls.media.MediaControl;
 import org.harry.jesus.fxutils.controls.media.PlayBible;
+import org.harry.jesus.fxutils.graphics.ImageMaker;
 import org.harry.jesus.jesajautils.*;
-import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
-import org.harry.jesus.jesajautils.browse.ParStyle;
 import org.harry.jesus.jesajautils.browse.TextStyle;
 import org.harry.jesus.jesajautils.editor.HTMLToPDF;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
@@ -53,7 +45,6 @@ import org.tinylog.Logger;
 //import org.reactfx.util.Either;
 
 
-import javax.imageio.ImageIO;
 import javax.xml.bind.JAXBElement;
 import java.io.*;
 import java.math.BigInteger;
@@ -114,8 +105,6 @@ public class MainController {
     BorderPane borderPane = null;
 
     BibleTextUtils utils;
-
-    List<BIBLEBOOK> theBooks = new ArrayList<>();
 
     TextRendering rendering = null;
 
@@ -207,7 +196,7 @@ public class MainController {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 editPlanDayIndex = newValue.intValue();
                 Day theDay = planDays.getDay().get(editPlanDayIndex);
-                String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses());
+                String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses(), null);
                 setPlanOutputSelected(theDay, versHtml);
 
 
@@ -290,7 +279,7 @@ public class MainController {
                         bibleStudy.getSelectedMapSorted());
                 Optional<Image> result = new CreatePictureDialog().showPictureCreateDialog(vers);
                 if (result.isPresent()) {
-                    CreatePictureDialog.saveToFile(result.get());
+                    ImageMaker.saveToFile(result.get());
                 }
                 bibleStudy.clearSelected();
             }
@@ -355,7 +344,7 @@ public class MainController {
                 List<Vers> verses = new ArrayList<>();
                 verses.add(vers);
                 String versHtml = HTMLRendering.renderVerses(bibleStudy.getSelected(), utils, verses);
-                copyHtmlToClip(new StringBuffer(versHtml));
+                copyHtmlToClip(new StringBuffer(versHtml), DataFormat.HTML);
                 bibleStudy.clearSelected();
             }
         });
@@ -373,7 +362,7 @@ public class MainController {
                         bibleStudy.getArea(),
                         bibleStudy.getSelectedMapSorted());
                 theDay.getVerses().add(vers);
-                String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses());
+                String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses(), null);
                 setPlanOutputSelected(theDay, versHtml);
                 bibleStudy.clearSelected();
             }
@@ -423,7 +412,7 @@ public class MainController {
 
     @FXML
     public void showVersePics(ActionEvent event) {
-
+        ShowPicGallery.showTheVersePictures();
     }
 
     @FXML
@@ -530,7 +519,7 @@ public class MainController {
     public void openPlan(ActionEvent event) {
         InputStream input = JesusMisc.showOpenDialog(notesTable);
         planDays = PersistenceLayer.loadPlan(input);
-        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, planDays.getDay().get(0).getVerses());
+        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, planDays.getDay().get(0).getVerses(), null);
         setPlanOutputSelected(planDays.getDay().get(0), versHtml);
         for(Day day:planDays.getDay()) {
             planList.getItems().add(day.getTitle());
@@ -559,7 +548,7 @@ public class MainController {
         Day newDay = nextPlanDay();
         planList.getItems().add(newDay.getTitle());
         planDays.getDay().add(newDay);
-        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, newDay.getVerses());
+        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, newDay.getVerses(), null);
         setPlanOutputSelected(newDay, versHtml);
     }
 
@@ -567,7 +556,7 @@ public class MainController {
     public void copyToPlanDay(ActionEvent event) {
         int index = resultlist.getSelectionModel().getSelectedIndex();
         BibleFulltextEngine.BibleTextKey link = verseKeys.get(index);
-        BIBLEBOOK book = theBooks.get(link.getBook() - 1);
+        BIBLEBOOK book = bibleStudy.getTheBooks().get(link.getBook() - 1);
         JAXBElement<CHAPTER> jaxbChapter = book.getCHAPTER().get(link.getChapter() - 1);
         CHAPTER chapter = jaxbChapter.getValue();
         List<Day> dayList = ensureFirstDay();
@@ -578,7 +567,7 @@ public class MainController {
         vers.setVtext(resultlist.getItems().get(index));
         vers.getVers().add(BigInteger.valueOf(link.getVers()));
         theDay.getVerses().add(vers);
-        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses());
+        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses(), null);
         setPlanOutputSelected(theDay, versHtml);
     }
 
@@ -587,7 +576,7 @@ public class MainController {
         List<Day> dayList = ensureFirstDay();
         Day theDay = dayList.get(editPlanDayIndex);
         storeDevotional(theDay);
-        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses());
+        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses(), null);
         setPlanOutputSelected(theDay, versHtml);
     }
 
@@ -642,7 +631,7 @@ public class MainController {
         StringBuffer htmlBuffer = new StringBuffer();
         int index = resultlist.getSelectionModel().getSelectedIndex();
         BibleFulltextEngine.BibleTextKey link = verseKeys.get(index);
-        BIBLEBOOK book = theBooks.get(link.getBook() - 1);
+        BIBLEBOOK book = bibleStudy.getTheBooks().get(link.getBook() - 1);
         JAXBElement<CHAPTER> jaxbChapter = book.getCHAPTER().get(link.getChapter() - 1);
         CHAPTER chapter = jaxbChapter.getValue();
         String listText = resultlist.getItems().get(index);
@@ -650,7 +639,7 @@ public class MainController {
         StringBuffer buffer = HTMLRendering.buildVersHTML(link, listText.substring(0, endIndex + 1), chapter);
         HTMLRendering.renderVers(htmlBuffer, buffer.toString(),null);
 
-        copyHtmlToClip(htmlBuffer);
+        copyHtmlToClip(htmlBuffer, DataFormat.HTML);
 
 
     }
@@ -659,7 +648,7 @@ public class MainController {
     public void copyHighlight(ActionEvent event) {
         Integer row = highlightsTab.getSelectionModel().getSelectedIndex();
         Vers vers = highlights.getHighlight().get(row);
-        BIBLEBOOK book = theBooks.get(vers.getBook().intValue() - 1);
+        BIBLEBOOK book = bibleStudy.getTheBooks().get(vers.getBook().intValue() - 1);
         JAXBElement<CHAPTER> jaxbChapter = book.getCHAPTER().get(vers.getChapter().intValue() - 1);
         CHAPTER chapter = jaxbChapter.getValue();
         HighlightsEntry entry = highlightsTab.getItems().get(row);
@@ -675,7 +664,7 @@ public class MainController {
             StringBuffer buffer = HTMLRendering.buildVersHTML(link, listText.substring(startIndex, endIndex + 1), chapter);
             startIndex = endIndex + 1;
             HTMLRendering.renderVers(htmlBuffer, buffer.toString(), null);
-            copyHtmlToClip(htmlBuffer);
+            copyHtmlToClip(htmlBuffer, DataFormat.HTML);
         }
 
     }
@@ -687,16 +676,16 @@ public class MainController {
         List<Day> dayList = ensureFirstDay();
         Day theDay = dayList.get(editPlanDayIndex);
         theDay.getVerses().add(vers);
-        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses());
+        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses(), null);
         setPlanOutputSelected(theDay, versHtml);
     }
 
 
-    private void copyHtmlToClip(StringBuffer htmlBuffer) {
+    private void copyHtmlToClip(StringBuffer htmlBuffer, DataFormat format) {
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         final ClipboardContent content = new ClipboardContent();
 
-        content.putHtml(htmlBuffer.toString());
+        content.put(format, htmlBuffer.toString());
         clipboard.setContent(content);
     }
 
@@ -709,11 +698,11 @@ public class MainController {
         Note note = noteList.getVersenote().get(row);
         String noteText = note.getNote();
         List<Vers> verses = note.getVerslink();
-        HTMLRendering.renderVerses(bibleStudy.getSelected(), utils,verses);
         StringBuffer htmlBuffer = new StringBuffer();
-        htmlBuffer.append(HTMLRendering.renderVerses(bibleStudy.getSelected(), utils,verses));
-        htmlBuffer.append("<p>" + noteText + "<p>");
-        copyHtmlToClip(htmlBuffer);
+        htmlBuffer.append(
+                HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(),
+                        utils,verses, noteText));
+        copyHtmlToClip(htmlBuffer, DataFormat.HTML);
 
     }
 
@@ -725,7 +714,7 @@ public class MainController {
         Day theDay = dayList.get(editPlanDayIndex);
         List<Vers> verses = note.getVerslink();
         theDay.getVerses().addAll(verses);
-        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses());
+        String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, theDay.getVerses(), null);
         setPlanOutputSelected(theDay, versHtml);
     }
 
@@ -738,7 +727,7 @@ public class MainController {
             objIN.close();
             resultlist.getItems().clear();
             for (BibleFulltextEngine.BibleTextKey versKey: verseKeys) {
-                BIBLEBOOK book = theBooks.get(versKey.getBook() - 1);
+                BIBLEBOOK book = bibleStudy.getTheBooks().get(versKey.getBook() - 1);
                 CHAPTER chapter = book.getCHAPTER().get(versKey.getChapter() -1).getValue();
                 Map.Entry<BibleFulltextEngine.BibleTextKey, String> entry  =
                         utils.getVersEntry(chapter, versKey);
