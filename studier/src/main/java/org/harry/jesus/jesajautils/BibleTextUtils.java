@@ -411,7 +411,7 @@ public class BibleTextUtils {
         StringBuffer versBuffer = new StringBuffer();
         int index = 0;
         String [] linkArr = links.split(";");
-        versBuffer.append(linkArr[index] + ": ");
+        versBuffer.append(linkArr[index] + ":\n");
         for (Map.Entry<Integer, IndexRange> entry: selectedVersesMap.entrySet()) {
 
             Integer versNo = entry.getKey();
@@ -421,11 +421,11 @@ public class BibleTextUtils {
                 versBuffer.append(vText);
             } else if ((index + 1) < (linkArr.length)) {
                 index++;
-                versBuffer.append(linkArr[index] + ": ");
+                versBuffer.append(linkArr[index] + ":\n");
                 String vText = area.getText(entry.getValue());
                 versBuffer.append(vText);
             }
-
+            versBuffer.append('\n');
         }
         vers.setVtext(versBuffer.toString());
         return vers;
