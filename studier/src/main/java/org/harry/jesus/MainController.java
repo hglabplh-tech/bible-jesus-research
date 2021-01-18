@@ -12,6 +12,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseEvent;
@@ -52,6 +53,7 @@ import org.tinylog.Logger;
 //import org.reactfx.util.Either;
 
 
+import javax.imageio.ImageIO;
 import javax.xml.bind.JAXBElement;
 import java.io.*;
 import java.math.BigInteger;
@@ -271,6 +273,25 @@ public class MainController {
                     HighlightsEntry entry = getHighlightsEntry(vers);
                     highlightsTab.getItems().add(entry);
                 }
+            }
+        });
+        mItem = new MenuItem();
+        mItem.setText("Create Verses Image");
+        contMenu.getItems().add(mItem);
+        mItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                List<Vers> versList = new ArrayList<>();
+                Vers vers = BibleTextUtils.generateVerses(utils,
+                        bibleStudy.getActBook(),
+                        bibleStudy.getActChapter(),
+                        bibleStudy.getArea(),
+                        bibleStudy.getSelectedMapSorted());
+                Optional<Image> result = new CreatePictureDialog().showPictureCreateDialog(vers);
+                if (result.isPresent()) {
+                    CreatePictureDialog.saveToFile(result.get());
+                }
+
             }
         });
         mItem = new MenuItem();
