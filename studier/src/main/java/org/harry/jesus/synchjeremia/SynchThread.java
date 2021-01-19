@@ -15,6 +15,7 @@ public class SynchThread extends TimerTask {
 
     public static final String APP_DIR = System.getProperty("user.home") + "/.bibleStudy";
 
+    private static final String VERSE_IMG_SUB = "verseimages";
     private static final String NOTES_XML = "notes.xml";
 
     private static final String HIGHLIGHT_XML = "highlight.xml";
@@ -28,6 +29,8 @@ public class SynchThread extends TimerTask {
     private static final String APP_SETTINGS_XML = "appSettings.xml";
 
     public  static final File appDir;
+
+    public  static final File verseImageDir;
 
     private static final File renderObj;
 
@@ -49,6 +52,10 @@ public class SynchThread extends TimerTask {
         appDir = new File(APP_DIR);
         if (!appDir.exists()) {
             appDir.mkdirs();
+        }
+        verseImageDir = new File(appDir, VERSE_IMG_SUB);
+        if (!verseImageDir.exists()) {
+            verseImageDir.mkdirs();
         }
         renderObj = new File(appDir, RENDER_OBJ);
         historyObj = new File(appDir, HISTORY_OBJ);

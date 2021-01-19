@@ -1,6 +1,8 @@
 package org.harry.jesus.fxutils;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -15,8 +17,12 @@ import jesus.harry.org.versnotes._1.Vers;
 import org.harry.jesus.fxutils.graphics.ImageMaker;
 import org.harry.jesus.jesajautils.Tuple;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -30,7 +36,14 @@ public class CreatePictureDialog {
 
     private ChoiceBox<Float> fontSizeBox = new ChoiceBox<>();
 
+    private ChoiceBox<Font> fontsBox = new ChoiceBox<>();
+
     private ImageView imageArea = new ImageView();
+
+    private GraphicsEnvironment ge;
+
+    private List<Font> awtFonts = new ArrayList<>();
+
 
     public CreatePictureDialog() {
         fontSizeBox.getItems().add(10f);
@@ -42,7 +55,14 @@ public class CreatePictureDialog {
         fontSizeBox.getItems().add(40f);
         fontSizeBox.getItems().add(45f);
         fontSizeBox.getItems().add(50f);
-        fontSizeBox.getSelectionModel().select(25f);
+        fontSizeBox.setValue(25f);
+        ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+        String[] names = ge.getAvailableFontFamilyNames();
+        Font[] allFonts = ge.getAllFonts();
+        awtFonts = Arrays.asList(allFonts);
+        fontsBox.getItems().addAll(awtFonts);
+
     }
 
     /**
@@ -81,28 +101,46 @@ public class CreatePictureDialog {
 // Enable/Disable login button depending on whether a passwordKey was entered.
 
 
-        Button setTextButton = new Button ("Show Result");
-        grid.add(setTextButton,0,0);
-
         picker.setEditable(true);
         picker.setValue(javafx.scene.paint.Color.GREEN);
         grid.add(picker, 0, 1);
 
         grid.add(fontSizeBox, 1, 1);
+
+        grid.add(fontsBox, 2, 1);
         InputStream imageIN = JesusMisc.showOpenDialog(dialog.getDialogPane());
         if (imageIN != null) {
             source = new Image(imageIN);
-            Tuple<Integer, Integer> widthHeightTuple = ImageMaker.getZoomValues(source, 1000);
-            imageArea.setPreserveRatio(false);
-            imageArea.setFitWidth(widthHeightTuple.getFirst());
-            imageArea.setFitHeight(widthHeightTuple.getSecond());
-            imageArea.setImage(source);
+            BufferedImage bImage = SwingFXUtils.fromFXImage(source, null);
+            Optional<BufferedImage> scaled = ImageMaker.createScaledImage(700, 500, bImage);
+            if (scaled.isPresent()) {
+                source = SwingFXUtils.toFXImage(scaled.get(), null);
+                Tuple<Integer, Integer> widthHeightTuple = ImageMaker.getZoomValues(source, 1000);
+                imageArea.setPreserveRatio(false);
+                imageArea.setFitWidth(widthHeightTuple.getFirst());
+                imageArea.setFitHeight(widthHeightTuple.getSecond());
+                imageArea.setImage(source);
+            }
         } else {
             source = new Image(
                     CreatePictureDialog.class.getResourceAsStream("/graphics/buddy.jpg"));
         }
-        setTextButton.setOnAction(new ShowButtonHandler(theVers, source));
-
+        picker.setOnAction(new ShowButtonHandler(theVers, source));
+        Image finalSource = source;
+        fontSizeBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                fontSizeBox.setValue(fontSizeBox.getItems().get(newValue.intValue()));
+                new ShowButtonHandler(theVers, finalSource).handle(new ActionEvent());
+            }
+        });
+        fontsBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                fontsBox.setValue(fontsBox.getItems().get(newValue.intValue()));
+                new ShowButtonHandler(theVers, finalSource).handle(new ActionEvent());
+            }
+        });
 
         dialog.getDialogPane().setContent(grid);
 
@@ -119,6 +157,7 @@ public class CreatePictureDialog {
             return null;
         });
 
+        fontsBox.getSelectionModel().select(awtFonts.get(0));
 
         return dialog.showAndWait();
     }
@@ -142,6 +181,7 @@ public class CreatePictureDialog {
                         .createImage(theVers.getVtext(),
                                 ImageMaker.convertColor(picker.getValue()),
                                 fontSizeBox.getValue(),
+                                fontsBox.getValue(),
                                 bImage);
                 if (result.isPresent()) {
                     Image fxResult = SwingFXUtils.toFXImage(result.get(), null);

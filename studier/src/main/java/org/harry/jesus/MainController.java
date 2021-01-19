@@ -33,6 +33,7 @@ import org.harry.jesus.fxutils.controls.HTMLEditorExt;
 import org.harry.jesus.fxutils.controls.media.MediaControl;
 import org.harry.jesus.fxutils.controls.media.PlayBible;
 import org.harry.jesus.fxutils.graphics.ImageMaker;
+import org.harry.jesus.fxutils.graphics.RandomGraphics;
 import org.harry.jesus.jesajautils.*;
 import org.harry.jesus.jesajautils.browse.TextStyle;
 import org.harry.jesus.jesajautils.editor.HTMLToPDF;
@@ -279,7 +280,9 @@ public class MainController {
                         bibleStudy.getSelectedMapSorted());
                 Optional<Image> result = new CreatePictureDialog().showPictureCreateDialog(vers);
                 if (result.isPresent()) {
-                    ImageMaker.saveToFile(result.get());
+                    // only when generating sample images
+                    //RandomGraphics.paint();
+                    ImageMaker.saveToFile(result.get(), null);
                 }
                 bibleStudy.clearSelected();
             }

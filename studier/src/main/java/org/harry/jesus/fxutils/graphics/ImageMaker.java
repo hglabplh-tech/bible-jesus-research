@@ -13,18 +13,17 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Optional;
 import java.util.UUID;
 
 public class ImageMaker {
     public static Optional<BufferedImage> createImage (String verseText,
                                                        Color color, Float size,
+                                                       Font font,
                                                        final BufferedImage image)  {
         try {
             Graphics graphics = image.getGraphics();
-            graphics.setFont(graphics.getFont().deriveFont(size));
+            graphics.setFont(font.deriveFont(size));
             graphics.setColor(color);
             StringBuffer cookedText = getCookedText(verseText, image, graphics);
             setTextToImage(graphics, cookedText, image);
@@ -34,6 +33,42 @@ public class ImageMaker {
             Logger.trace(ex);
             return Optional.empty();
         }
+    }
+
+    public static Optional<BufferedImage> createScaledImage (int cx, int cy,
+                                                       final BufferedImage image)  {
+        try {
+            java.awt.Image scaledImg = image.getScaledInstance(cx, cy, 0);
+            return Optional.of(toBufferedImage(scaledImg));
+        } catch (Exception ex) {
+            Logger.trace(ex);
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Converts a given Image into a BufferedImage
+     *
+     * @param img The Image to be converted
+     * @return The converted BufferedImage
+     */
+    public static BufferedImage toBufferedImage(java.awt.Image img)
+    {
+        if (img instanceof BufferedImage)
+        {
+            return (BufferedImage) img;
+        }
+
+        // Create a buffered image with transparency
+        BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+        // Draw the image on to the buffered image
+        Graphics2D bGr = bimage.createGraphics();
+        bGr.drawImage(img, 0, 0, null);
+        bGr.dispose();
+
+        // Return the buffered image
+        return bimage;
     }
 
     private static void setTextToImage(Graphics graphics, StringBuffer cookedText,
@@ -46,7 +81,7 @@ public class ImageMaker {
             Integer textPixelsWidth = fMetrics.stringWidth(out);
             Integer xPos = ((imgWidth - textPixelsWidth) / 2);
             graphics.drawString(out, xPos, y);
-            y = y + 70;
+            y = y + fMetrics.getHeight() + (fMetrics.getHeight() / 3);
         }
     }
 
@@ -56,7 +91,7 @@ public class ImageMaker {
         Integer imgWidth = image.getWidth();
         Integer fTextWidth = fMetrics.stringWidth(verseText);
         //Integer everageWitdth = fTextWidth / verseText.length();
-        Integer everageWitdth = fMetrics.stringWidth("EB");
+        Integer everageWitdth = fMetrics.stringWidth("E");
         Integer charsPerLine = imgWidth / everageWitdth;
         int cut = 0;
         StringBuffer cookedText = new StringBuffer();
@@ -81,8 +116,16 @@ public class ImageMaker {
                 (float) fx.getOpacity());
     }
 
-    public static void saveToFile(Image image) {
-        File outputFile = new File(SynchThread.appDir, UUID.randomUUID().toString() + ".png");
+    public static void saveToFile(Image image, String subDir) {
+        File outDir = SynchThread.verseImageDir;
+        if (subDir != null) {
+            outDir = new File (SynchThread.verseImageDir, subDir);
+            if (!outDir.exists()) {
+                outDir.mkdirs();
+            }
+        }
+        File outputFile = new File(outDir,
+                UUID.randomUUID().toString() + ".png");
         BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
         try {
             ImageIO.write(bImage, "png", outputFile);
