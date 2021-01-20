@@ -19,7 +19,6 @@ import org.pmw.tinylog.Logger;
 import javax.xml.bind.JAXBElement;
 import java.io.*;
 import java.math.BigInteger;
-import java.net.URL;
 import java.util.*;
 
 
@@ -274,7 +273,8 @@ public class BibleTextUtils {
             }
         })) {
 
-            Tuple<Dictionary, String> actAccordance = BibleReader.loadBibleAccordance(accordanceFile);
+            Tuple<Dictionary, String> actAccordance = BibleReader.loadBibleDictionary(
+                   accordanceFile);
             String fileName = accordanceFile.getName();
             fileName = fileName.substring(0, fileName.indexOf(".xml"));
             DictionaryRef accRef = new DictionaryRef()
@@ -283,11 +283,11 @@ public class BibleTextUtils {
                     .setPathToBook(accordanceFile.getAbsolutePath());
             AccordanceUtil util = new AccordanceUtil(
                     Arrays.asList(new Tuple<String, Dictionary>(fileName, actAccordance.getFirst())));
-            Optional <BibleBookInstance> instance = bibleInstances.stream().filter(e -> {
-                Optional<Tuple<String,Dictionary>> opt = util.findAccordance(actAccordance.getFirst(),
+            Optional<BibleBookInstance> instance = bibleInstances.stream().filter(e -> {
+                Optional<Tuple<String, Dictionary>> opt = util.findAccordance(actAccordance.getFirst(),
                         e.getBible().getINFORMATION().getValue());
                 return opt.isPresent();
-                    }).findFirst();
+            }).findFirst();
             if (instance.isPresent()) {
                 instance.get().setOptDictAccRefTuple(actAccordance.getFirst(), accRef);
             }
@@ -296,8 +296,6 @@ public class BibleTextUtils {
             accRef.setDictionaryID(id);
             accRef.setDictionaryName(name);
             dictInstances.add(new DictionaryInstance(accRef, actAccordance.getFirst()));
-
-
         }
 
     }

@@ -451,7 +451,10 @@ public class MainController {
     public void showVersePics(ActionEvent event) {
         ShowPicGallery.showTheVersePictures();
     }
-
+    @FXML
+    public void editDict(ActionEvent event) {
+        EditDictionary.showEditDictionary();
+    }
     @FXML
     public void about(ActionEvent event) {
 

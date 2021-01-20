@@ -4,16 +4,20 @@ package org.harry.jesus.jesajautils;
 import generated.Dictionary;
 import generated.XMLBIBLE;
 
+import jesus.harry.org.plan._1.Plan;
 import org.tinylog.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 
 import java.io.FileInputStream;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.MessageDigest;
 
 public class BibleReader {
@@ -44,7 +48,7 @@ public class BibleReader {
         }
     }
 
-    public static Tuple<Dictionary, String> loadBibleAccordance(File inFile)  {
+    public static Tuple<Dictionary, String> loadBibleDictionary(File inFile)  {
         JAXBContext jaxbContext;
 
 
@@ -69,6 +73,47 @@ public class BibleReader {
             Logger.trace("bible not loaded error ->: " + ex.getMessage());
             Logger.trace(ex);
             throw new IllegalStateException("bible not loaded", ex);
+        }
+    }
+
+    public static Dictionary loadBibleDictionary(InputStream stream)  {
+        JAXBContext jaxbContext;
+
+
+        try {
+            Logger.trace("About to unmarshall.....");
+            jaxbContext = JAXBContext.newInstance(Dictionary.class);
+            Unmarshaller umarshall  = jaxbContext.createUnmarshaller();
+            Logger.trace("About to unmarshall unmarshaller created.....");
+            Dictionary root = (Dictionary) umarshall.unmarshal(stream);
+            Logger.trace("About to unmarshall ok.....");
+            stream.close();
+
+            return root;
+
+        }
+        catch (Exception ex) {
+            Logger.trace("bible not loaded error ->: " + ex.getMessage());
+            Logger.trace(ex);
+            throw new IllegalStateException("bible not loaded", ex);
+        }
+    }
+
+
+    public static void storeDictionary(Dictionary root, OutputStream out) {
+        JAXBContext jaxbContext;
+        try {
+            Logger.trace("About to unmarshall.....");
+            jaxbContext = JAXBContext.newInstance(Dictionary.class);
+            Marshaller marshall = jaxbContext.createMarshaller();
+            marshall.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            Logger.trace("About to unmarshall unmarshaller created.....");
+            marshall.marshal(root, out);
+            Logger.trace("About to unmarshall ok.....");
+            out.close();
+        } catch (Exception ex) {
+            Logger.trace("dictionary not stored error ->: " + ex.getMessage());
+            Logger.trace(ex);
         }
     }
 
