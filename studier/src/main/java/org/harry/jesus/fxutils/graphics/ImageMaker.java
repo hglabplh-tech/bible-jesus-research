@@ -116,7 +116,7 @@ public class ImageMaker {
                 (float) fx.getOpacity());
     }
 
-    public static void saveToFile(Image image, String subDir) {
+    public static Optional<String> saveToFile(Image image, String subDir) {
         File outDir = SynchThread.verseImageDir;
         if (subDir != null) {
             outDir = new File (SynchThread.verseImageDir, subDir);
@@ -129,9 +129,16 @@ public class ImageMaker {
         BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
         try {
             ImageIO.write(bImage, "png", outputFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            return Optional.of(outputFile.getAbsolutePath());
+        } catch (IOException ex) {
+            Logger.trace(ex);
+            Logger.trace("Save Image: "
+                    + outputFile.getAbsolutePath()
+                    + "\nfailed with: "
+                    + ex.getMessage());
+            return Optional.empty();
         }
+
     }
 
     public static Tuple<Integer, Integer> getZoomValues(Image source, Integer relation) {

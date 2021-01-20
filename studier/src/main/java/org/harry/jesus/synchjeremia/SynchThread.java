@@ -6,6 +6,7 @@ import org.harry.jesus.jesajautils.Tuple;
 import org.harry.jesus.jesajautils.configjaxbser.AppSettingsPersistence;
 import org.harry.jesus.jesajautils.configjaxbser.BaseConfig;
 import org.harry.jesus.jesajautils.configjaxbser.BibleAppConfig;
+import org.harry.jesus.jesajautils.graphicsjaxb.VerseImagePersistence;
 import org.pmw.tinylog.Logger;
 
 import java.io.*;
@@ -14,6 +15,8 @@ import java.util.*;
 public class SynchThread extends TimerTask {
 
     public static final String APP_DIR = System.getProperty("user.home") + "/.bibleStudy";
+
+    public static final String APP_TEST_DIR = System.getProperty("user.home") + "/.bibleStudyDevelop";
 
     private static final String VERSE_IMG_SUB = "verseimages";
     private static final String NOTES_XML = "notes.xml";
@@ -27,6 +30,8 @@ public class SynchThread extends TimerTask {
     private static final String SETTINGS_PROP = "application.properties";
 
     private static final String APP_SETTINGS_XML = "appSettings.xml";
+
+    private static final String VERSE_IMAGES_XML = "verseImages.xml";
 
     public  static final File appDir;
 
@@ -44,12 +49,19 @@ public class SynchThread extends TimerTask {
 
     public  static final File appSettings;
 
+    public static final File verseImageXML;
+
     private static Timer timer = new Timer();
 
 
 
     static {
-        appDir = new File(APP_DIR);
+        String value = System.getenv("bibleStudyTest");
+        if (value!= null) {
+            appDir = new File(APP_TEST_DIR);
+        } else {
+            appDir = new File(APP_DIR);
+        }
         if (!appDir.exists()) {
             appDir.mkdirs();
         }
@@ -63,6 +75,7 @@ public class SynchThread extends TimerTask {
         highlightsXML = new File(appDir, HIGHLIGHT_XML);
         appProps = new File(appDir, SETTINGS_PROP);
         appSettings = new File(appDir, APP_SETTINGS_XML);
+        verseImageXML = new File(appDir, VERSE_IMAGES_XML);
         timer.schedule (new SynchThread()
            , (long)(1000L * 120L), (long)(1000L * 60L));
     }
@@ -77,6 +90,13 @@ public class SynchThread extends TimerTask {
                 storeHighlights(context);
                 //ApplicationProperties.storeApplicationProperties();
                 storeApplicationSettings(context);
+                try {
+                    VerseImagePersistence.storeAppSettings(context.getVerseImages(),
+                            new FileOutputStream(verseImageXML));
+                } catch (FileNotFoundException ex) {
+                    Logger.trace(ex);
+                    Logger.trace("Verse Images definition not stored: " + ex.getMessage());
+                }
             }
 
 

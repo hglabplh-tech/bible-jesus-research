@@ -13,6 +13,8 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.StackPane;
 import org.harry.jesus.fxutils.graphics.ImageMaker;
 import org.harry.jesus.jesajautils.Tuple;
+import org.harry.jesus.jesajautils.graphicsjaxb.VerseImageData;
+import org.harry.jesus.synchjeremia.BibleThreadPool;
 import org.harry.jesus.synchjeremia.SynchThread;
 
 import java.io.File;
@@ -24,7 +26,7 @@ import java.util.List;
 
 public class ShowPictureControl extends StackPane {
 
-    ListView<String> graphicsList  = null;
+    ListView<VerseImageData> graphicsList  = null;
 
     List<Image> imageList = new ArrayList<>();
 
@@ -33,19 +35,11 @@ public class ShowPictureControl extends StackPane {
         this.setMinWidth(900);
         createAndSetPictureList();
         if (graphicsList != null) {
-            File dir = SynchThread.verseImageDir;
-            File[] paths = dir.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    if (name.endsWith(".png")) {
-                        return true;
-                    }
-                    return false;
-                }
-            });
-            for (File path : paths) {
-                graphicsList.getItems().add(0, path.getAbsolutePath());
-                imageList.add(0, getImageByName(path.getAbsolutePath()));
+            BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
+
+            for (VerseImageData data: context.getVerseImages().getVerseImageMapping().values()) {
+                graphicsList.getItems().add(0, data);
+                imageList.add(0, getImageByName(data.getImagePath()));
             }
         }
     }
@@ -72,23 +66,23 @@ public class ShowPictureControl extends StackPane {
         });
 
         graphicsList.setContextMenu(contMenu);
-        graphicsList.setCellFactory(param -> new ListCell<String>() {
+        graphicsList.setCellFactory(param -> new ListCell<VerseImageData>() {
             private ImageView imageView = new ImageView();
             @Override
-            public void updateItem(String name, boolean empty) {
-                super.updateItem(name, empty);
+            public void updateItem(VerseImageData data, boolean empty) {
+                super.updateItem(data, empty);
                 if (empty) {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    Image image = getImageByName(name);
+                    Image image = getImageByName(data.getImagePath());
                     Tuple<Integer, Integer> widthHeightTuple =
                             ImageMaker.getZoomValues(image, 400);
                     imageView.setPreserveRatio(false);
                     imageView.setFitWidth(widthHeightTuple.getFirst());
                     imageView.setFitHeight(widthHeightTuple.getSecond());
                     imageView.setImage(image);
-                    setText(name);
+                    setText(data.getVerseLink());
                     setGraphic(imageView);
                 }
             }

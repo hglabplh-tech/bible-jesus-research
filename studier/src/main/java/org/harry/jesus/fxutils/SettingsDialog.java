@@ -91,6 +91,7 @@ public class SettingsDialog {
                 if (path.isPresent()) {
                     String biblePath = path.get();
                     bibleDirField.setText(biblePath);
+                    context.getAppSettings().getBaseConfig().setBiblesDir(biblePath);
                     BibleThreadPool.getContext().setAppSettings(config);
                     SynchThread.storeApplicationSettings(context);
                 }
@@ -103,6 +104,7 @@ public class SettingsDialog {
                 if (path.isPresent()) {
                     String biblePath = path.get();
                     accordanceField.setText(biblePath);
+                    context.getAppSettings().getBaseConfig().setDictionariesDir(biblePath);
                     BibleThreadPool.getContext().setAppSettings(config);
                     SynchThread.storeApplicationSettings(context);
                 }
@@ -115,6 +117,7 @@ public class SettingsDialog {
                 if (path.isPresent()) {
                     String selectedPath = path.get();
                     mediaDirField.setText(selectedPath);
+                    context.getAppSettings().getBaseConfig().setMediaPath(selectedPath);
                     BibleThreadPool.getContext().setAppSettings(config);
                     SynchThread.storeApplicationSettings(context);
                 }

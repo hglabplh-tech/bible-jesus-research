@@ -34,12 +34,15 @@ import org.harry.jesus.fxutils.controls.media.MediaControl;
 import org.harry.jesus.fxutils.controls.media.PlayBible;
 import org.harry.jesus.fxutils.graphics.ImageMaker;
 import org.harry.jesus.fxutils.graphics.RandomGraphics;
+import org.harry.jesus.fxutils.graphics.ShapeGraphics;
 import org.harry.jesus.jesajautils.*;
 import org.harry.jesus.jesajautils.browse.TextStyle;
 import org.harry.jesus.jesajautils.editor.HTMLToPDF;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 import org.harry.jesus.jesajautils.fulltext.StatisticsCollector;
 
+import org.harry.jesus.jesajautils.graphicsjaxb.VerseImageData;
+import org.harry.jesus.jesajautils.graphicsjaxb.VerseImagePersistence;
 import org.harry.jesus.synchjeremia.*;
 import org.tinylog.Logger;
 
@@ -154,6 +157,16 @@ public class MainController {
         SynchThread.loadHighlights(context);
         String mediaPath = context.getAppSettings().getBaseConfig().getMediaPath();
         SynchThread.loadApplicationSettings(context);
+        try {
+            if (SynchThread.verseImageXML.exists()) {
+                context.setVerseImages(VerseImagePersistence
+                        .loadAppSettings(
+                                new FileInputStream(SynchThread.verseImageXML)));
+            }
+        } catch (FileNotFoundException ex) {
+            org.pmw.tinylog.Logger.trace(ex);
+            org.pmw.tinylog.Logger.trace("Verse Images definition not loaded: " + ex.getMessage());
+        }
         utils = BibleTextUtils.getInstance();
 
         if (utils.getBibleInstances().size() > 0) {
@@ -280,9 +293,30 @@ public class MainController {
                         bibleStudy.getSelectedMapSorted());
                 Optional<Image> result = new CreatePictureDialog().showPictureCreateDialog(vers);
                 if (result.isPresent()) {
-                    // only when generating sample images
-                    //RandomGraphics.paint();
-                    ImageMaker.saveToFile(result.get(), null);
+                    Optional<String> absoluteName = ImageMaker.saveToFile(result.get(), null);
+                    if (absoluteName.isPresent()) {
+                        try {
+                            VerseImageData data= new VerseImageData();
+                            data.setImagePath(absoluteName.get());
+                            data.setVerseLink("["
+                                    + utils.getBookLabelAsClass(
+                                            utils.getBookLabels()
+                                                    .get(vers.getBook().intValue() - 1))
+                                    .getLongName()
+                                    + " "
+                                    + vers.getChapter()
+                                    + "," + vers.getVers().get(0)
+                                    + "]");
+                            context.getVerseImages()
+                                    .getVerseImageMapping()
+                                    .put(absoluteName.get(), data);
+                            VerseImagePersistence.storeAppSettings(context.getVerseImages(),
+                                    new FileOutputStream(SynchThread.verseImageXML));
+                        } catch (FileNotFoundException ex) {
+                            org.pmw.tinylog.Logger.trace(ex);
+                            org.pmw.tinylog.Logger.trace("Verse Images definition not stored: " + ex.getMessage());
+                        }
+                    }
                 }
                 bibleStudy.clearSelected();
             }

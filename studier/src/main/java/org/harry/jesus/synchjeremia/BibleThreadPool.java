@@ -6,6 +6,7 @@ import org.harry.jesus.jesajautils.Tuple;
 import org.harry.jesus.jesajautils.configjaxbser.BibleAppConfig;
 import org.harry.jesus.jesajautils.configjaxbser.BibleRef;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
+import org.harry.jesus.jesajautils.graphicsjaxb.VerseImageRoot;
 
 import java.util.*;
 
@@ -52,6 +53,8 @@ public class BibleThreadPool {
         List<HistoryEntry> history = new ArrayList<>();
 
         BibleAppConfig appSettings = new BibleAppConfig();
+
+        VerseImageRoot verseImages = new VerseImageRoot();
 
         public List<BibleFulltextEngine.BibleTextKey> getVerseKeys() {
             return verseKeys;
@@ -112,6 +115,15 @@ public class BibleThreadPool {
 
         public void addHistoryEntry(HistoryEntry entry) {
             history.add(0, entry);
+        }
+
+        public VerseImageRoot getVerseImages() {
+            return verseImages;
+        }
+
+        public ThreadBean setVerseImages(VerseImageRoot verseImages) {
+            this.verseImages = verseImages;
+            return this;
         }
     }
 }
