@@ -47,13 +47,21 @@ public class CreatePictureDialog {
 
     public CreatePictureDialog() {
         fontSizeBox.getItems().add(10f);
+        fontSizeBox.getItems().add(12f);
         fontSizeBox.getItems().add(15f);
+        fontSizeBox.getItems().add(17f);
         fontSizeBox.getItems().add(20f);
+        fontSizeBox.getItems().add(22f);
         fontSizeBox.getItems().add(25f);
+        fontSizeBox.getItems().add(27f);
         fontSizeBox.getItems().add(30f);
+        fontSizeBox.getItems().add(32f);
         fontSizeBox.getItems().add(35f);
+        fontSizeBox.getItems().add(37f);
         fontSizeBox.getItems().add(40f);
+        fontSizeBox.getItems().add(42f);
         fontSizeBox.getItems().add(45f);
+        fontSizeBox.getItems().add(47f);
         fontSizeBox.getItems().add(50f);
         fontSizeBox.setValue(25f);
         ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -91,23 +99,14 @@ public class CreatePictureDialog {
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
-
-
-
         Image source;
-
-
         grid.add(imageArea, 0, 2, 2, 1);
 // Enable/Disable login button depending on whether a passwordKey was entered.
-
-
         picker.setEditable(true);
         picker.setValue(javafx.scene.paint.Color.GREEN);
         grid.add(picker, 0, 1);
-
         grid.add(fontSizeBox, 1, 1);
-
-        grid.add(fontsBox, 2, 1);
+        grid.add(fontsBox, 0, 0);
         InputStream imageIN = JesusMisc.showOpenDialog(dialog.getDialogPane());
         if (imageIN != null) {
             source = new Image(imageIN);
