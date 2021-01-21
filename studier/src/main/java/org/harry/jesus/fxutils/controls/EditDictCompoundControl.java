@@ -281,6 +281,7 @@ public class EditDictCompoundControl extends BorderPane {
         for (String link: seeBox.getItems()) {
             SeeType see = new SeeType();
             see.setContent(link);
+            see.setTarget("x-self");
             pElement = new JAXBElement(new QName("see"), SeeType.class, see);
             paragraph.getContent().add(pElement);
         }

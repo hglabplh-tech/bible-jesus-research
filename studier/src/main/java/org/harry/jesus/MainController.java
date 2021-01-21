@@ -406,7 +406,6 @@ public class MainController {
 
         });
         contMenu.getItems().add(mItem);
-        contMenu.getItems().add(mItem);
         mItem = new MenuItem();
         mItem.setText("copy Link for dictionary");
         mItem.setOnAction(new EventHandler<ActionEvent>() {
