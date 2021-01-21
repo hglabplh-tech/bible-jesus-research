@@ -1,6 +1,5 @@
 package org.harry.jesus.fxutils;
 
-import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -12,13 +11,11 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public class JesusMisc {
-    public static OutputStream showSaveDialog(Node node) {
+    public static OutputStream showSaveDialog(Node node, FileExtension fileExt) {
         FileChooser fDialog = new FileChooser();
         fDialog.setTitle("Select Path");
         fDialog.getExtensionFilters()
-                .addAll(Arrays.asList(new FileChooser.ExtensionFilter("HTML doc(*.html)", "*.html"),
-                        new FileChooser.ExtensionFilter("PDF doc(*.pdf)", "*.pdf"),
-                        new FileChooser.ExtensionFilter("XML doc(*.xml)", "*.xml")));
+                .addAll(Arrays.asList(fileExt.getThisFilter()));
         File currentDir = new File(System.getProperty("user.home", "C:\\")).getAbsoluteFile();
 
         fDialog.setInitialDirectory(currentDir);
@@ -36,8 +33,10 @@ public class JesusMisc {
         return null;
     }
 
-    public static InputStream showOpenDialog(Node node) {
+    public static InputStream showOpenDialog(Node node, FileExtension fileExt) {
         FileChooser fDialog = new FileChooser();
+        fDialog.getExtensionFilters()
+                .addAll(Arrays.asList(fileExt.getThisFilter()));
         fDialog.setTitle("Select Path");
         File currentDir = new File(System.getProperty("user.home", "C:\\")).getAbsoluteFile();
 
@@ -82,6 +81,22 @@ public class JesusMisc {
             return selectedDirectoryOpt;
         } else {
             return Optional.empty();
+        }
+    }
+
+    public enum FileExtension {
+        HTML_EXT(new FileChooser.ExtensionFilter("HTML doc(*.html)", "*.html")),
+        PDF_EXT(new FileChooser.ExtensionFilter("PDF doc(*.pdf)", "*.pdf")),
+        XML_EXT(new FileChooser.ExtensionFilter("XML doc(*.xml)", "*.xml")),
+        ALL_EXT(new FileChooser.ExtensionFilter("ALL graphic doc(*.*)", "*.*"));
+        private final FileChooser.ExtensionFilter thisFilter;
+
+        FileExtension(FileChooser.ExtensionFilter extFilter) {
+            thisFilter = extFilter;
+        }
+
+        public FileChooser.ExtensionFilter getThisFilter() {
+            return thisFilter;
         }
     }
 }

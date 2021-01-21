@@ -33,8 +33,6 @@ import org.harry.jesus.fxutils.controls.HTMLEditorExt;
 import org.harry.jesus.fxutils.controls.media.MediaControl;
 import org.harry.jesus.fxutils.controls.media.PlayBible;
 import org.harry.jesus.fxutils.graphics.ImageMaker;
-import org.harry.jesus.fxutils.graphics.RandomGraphics;
-import org.harry.jesus.fxutils.graphics.ShapeGraphics;
 import org.harry.jesus.jesajautils.*;
 import org.harry.jesus.jesajautils.browse.TextStyle;
 import org.harry.jesus.jesajautils.editor.HTMLToPDF;
@@ -581,7 +579,7 @@ public class MainController {
 
     @FXML
     public void openPlan(ActionEvent event) {
-        InputStream input = JesusMisc.showOpenDialog(notesTable);
+        InputStream input = JesusMisc.showOpenDialog(notesTable, JesusMisc.FileExtension.XML_EXT);
         planDays = PersistenceLayer.loadPlan(input);
         String versHtml = HTMLRendering.renderVersesASDoc(bibleStudy.getSelected(), utils, planDays.getDay().get(0).getVerses(), null);
         setPlanOutputSelected(planDays.getDay().get(0), versHtml);
@@ -594,7 +592,7 @@ public class MainController {
 
     @FXML
     public void savePlan(ActionEvent event) {
-        OutputStream os = JesusMisc.showSaveDialog(notesTable);
+        OutputStream os = JesusMisc.showSaveDialog(notesTable, JesusMisc.FileExtension.XML_EXT);
         PersistenceLayer.storePlan(planDays, os);
     }
 
@@ -656,7 +654,7 @@ public class MainController {
     @FXML
     public void loadDev(ActionEvent event) {
         byte [] buffer = new byte[4096];
-        InputStream stream = JesusMisc.showOpenDialog(notesTable);
+        InputStream stream = JesusMisc.showOpenDialog(notesTable, JesusMisc.FileExtension.HTML_EXT);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             int read = stream.read(buffer);
@@ -673,13 +671,15 @@ public class MainController {
 
     @FXML
     public void saveDev(ActionEvent event) {
-        OutputStream os = JesusMisc.showSaveDialog(notesTable);
+        OutputStream os = JesusMisc.showSaveDialog(notesTable, JesusMisc.FileExtension.HTML_EXT);
         String htmlText = devotionalEdit.getHtmlText();
         try {
-            PrintWriter writer = new PrintWriter(os);
-            writer.print(htmlText);
-            writer.close();
-            os.close();
+            if (os != null) {
+                PrintWriter writer = new PrintWriter(os);
+                writer.print(htmlText);
+                writer.close();
+                os.close();
+            }
         } catch(IOException ex) {
             Logger.trace("close html file failed");
         }
@@ -784,7 +784,7 @@ public class MainController {
 
     @FXML
     public void loadSearch(ActionEvent event) {
-        InputStream is = JesusMisc.showOpenDialog(notesTable);
+        InputStream is = JesusMisc.showOpenDialog(notesTable, JesusMisc.FileExtension.XML_EXT);
         try {
             ObjectInputStream objIN = new ObjectInputStream(is);
             this.verseKeys = (List<BibleFulltextEngine.BibleTextKey>)objIN.readObject();
@@ -805,7 +805,7 @@ public class MainController {
 
     @FXML
     public void saveSearch(ActionEvent event) {
-        OutputStream os = JesusMisc.showSaveDialog(notesTable);
+        OutputStream os = JesusMisc.showSaveDialog(notesTable, JesusMisc.FileExtension.XML_EXT);
         try {
             ObjectOutputStream objOut = new ObjectOutputStream(os);
             objOut.writeObject(this.verseKeys);
@@ -819,7 +819,7 @@ public class MainController {
     @FXML
     public void toPDF(ActionEvent event) {
         String htmlText = devotionalEdit.getHtmlText();
-        OutputStream pdfOut = JesusMisc.showSaveDialog(notesTable);
+        OutputStream pdfOut = JesusMisc.showSaveDialog(notesTable, JesusMisc.FileExtension.PDF_EXT);
         HTMLToPDF.convertTo(htmlText, pdfOut);
     }
 
@@ -834,7 +834,7 @@ public class MainController {
 
     @FXML
     public void loadNotes(ActionEvent event) {
-        InputStream input = JesusMisc.showOpenDialog(notesTable);
+        InputStream input = JesusMisc.showOpenDialog(notesTable, JesusMisc.FileExtension.XML_EXT);
         Versnotes notes = PersistenceLayer.loadNotes(input);
         noteList.getVersenote().addAll(notes.getVersenote());
 
@@ -917,7 +917,7 @@ public class MainController {
 
     @FXML
     public void saveNotes(ActionEvent event) {
-        OutputStream os = JesusMisc.showSaveDialog(notesTable);
+        OutputStream os = JesusMisc.showSaveDialog(notesTable, JesusMisc.FileExtension.XML_EXT);
         PersistenceLayer.storeNotes(noteList, os);
     }
 

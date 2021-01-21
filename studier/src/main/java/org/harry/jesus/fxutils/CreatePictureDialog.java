@@ -8,7 +8,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
 import javafx.scene.control.Dialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -107,7 +106,8 @@ public class CreatePictureDialog {
         grid.add(picker, 0, 1);
         grid.add(fontSizeBox, 1, 1);
         grid.add(fontsBox, 0, 0);
-        InputStream imageIN = JesusMisc.showOpenDialog(dialog.getDialogPane());
+        InputStream imageIN = JesusMisc.showOpenDialog(dialog.getDialogPane(),
+                JesusMisc.FileExtension.ALL_EXT);
         if (imageIN != null) {
             source = new Image(imageIN);
             BufferedImage bImage = SwingFXUtils.fromFXImage(source, null);
