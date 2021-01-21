@@ -406,6 +406,31 @@ public class MainController {
 
         });
         contMenu.getItems().add(mItem);
+        contMenu.getItems().add(mItem);
+        mItem = new MenuItem();
+        mItem.setText("copy Link for dictionary");
+        mItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                List<Day> dayList = ensureFirstDay();
+                Day theDay = dayList.get(dayList.size() - 1);
+                Vers vers = BibleTextUtils.generateVerses(utils,
+                        bibleStudy.getActBook(),
+                        bibleStudy.getActChapter(),
+                        bibleStudy.getArea(),
+                        bibleStudy.getSelectedMapSorted());
+                theDay.getVerses().add(vers);
+                StringBuffer buffer = new StringBuffer();
+                buffer.append(vers.getBook())
+                        .append(';')
+                        .append(vers.getChapter())
+                        .append( ';')
+                        .append(vers.getVers().get(0));
+                copyHtmlToClip(buffer, DataFormat.PLAIN_TEXT);
+            }
+
+        });
+        contMenu.getItems().add(mItem);
         bibleStudy.getArea().contextMenuObjectProperty().setValue(contMenu);
     }
 

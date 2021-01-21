@@ -2,6 +2,7 @@ package org.harry.jesus.fxutils.controls;
 
 import com.itextpdf.text.pdf.parser.clipper.ClipperBase;
 import generated.*;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -11,6 +12,8 @@ import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import jesus.harry.org.versnotes._1.Note;
+import jesus.harry.org.versnotes._1.Vers;
 import org.harry.jesus.fxutils.JesusMisc;
 import org.harry.jesus.jesajautils.BibleReader;
 import org.harry.jesus.jesajautils.Tuple;
@@ -55,6 +58,8 @@ public class EditDictCompoundControl extends BorderPane {
     private Button saveDict;
 
     private Button newItem;
+
+    private Button editInfo;
 
     public EditDictCompoundControl() {
         super();
@@ -123,12 +128,14 @@ public class EditDictCompoundControl extends BorderPane {
         newItem = new Button(" New Item");
         loadDict = new Button("Load Dictionary");
         saveDict = new Button("Save Dictionary");
+        editInfo = new Button("Edit dictionary Information");
         this.setBottom(bottomPane);
         bottomPane.add(addToList, 0, 0);
         bottomPane.add(newDict, 1, 0);
         bottomPane.add(newItem, 2, 0);
         bottomPane.add(loadDict, 3, 0);
         bottomPane.add(saveDict, 4, 0);
+        bottomPane.add(editInfo, 5, 0);
 
         itemsListView = new ListView<>();
         this.setLeft(itemsListView);
@@ -230,6 +237,13 @@ public class EditDictCompoundControl extends BorderPane {
                 clearControls();
             }
         });
+
+        editInfo.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                showInformationDiaog();
+            }
+        });
     }
 
     private void clearControls() {
@@ -323,5 +337,144 @@ public class EditDictCompoundControl extends BorderPane {
         }
         descriptionText.setText(descriptionTextBuff.toString());
     }
+
+    public void showInformationDiaog() {
+
+
+        // Create the custom dialog.
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Set dictionary information");
+
+
+// Set the button types.
+        ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.OK);
+
+        ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().addAll(cancelButtonType, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+        Label titleLab = new Label("title:");
+        TextField titleField = new TextField();
+        grid.add(titleLab, 0, 0);
+        grid.add(titleField, 1, 0);
+        Label creatorLab = new Label("creator:");
+        TextField creatorField = new TextField();
+        grid.add(creatorLab, 0, 1);
+        grid.add(creatorField, 1, 1);
+
+        Label descriptionLab = new Label("description:");
+        TextField descriptionField = new TextField();
+        grid.add(descriptionLab, 0, 2);
+        grid.add(descriptionField, 1, 2);
+
+        Label idLab = new Label("identifier:");
+        TextField idField = new TextField();
+        grid.add(idLab, 0, 3);
+        grid.add(idField, 1, 3);
+
+        Label dateLab = new Label("date:");
+        TextField dateField = new TextField();
+        grid.add(dateLab, 0, 4);
+        grid.add(dateField, 1, 4);
+
+        Label rightsLab = new Label("rights:");
+        TextField rightsField = new TextField();
+        grid.add(rightsLab, 0, 5);
+        grid.add(rightsField, 1, 5);
+
+        dialog.getDialogPane().setContent(grid);
+
+        final TINFORMATION[] dictionaryInfo = {dictionary.getINFORMATION()};
+        if (dictionaryInfo[0] != null) {
+            for (JAXBElement element : dictionaryInfo[0].getTitleOrCreatorOrDescription()) {
+                if (element.getName().getLocalPart().equals("title")) {
+                    titleField.setText((String) element.getValue());
+                } else if (element.getName().getLocalPart().equals("creator")) {
+                    creatorField.setText((String) element.getValue());
+                } else if (element.getName().getLocalPart().equals("description")) {
+                    descriptionField.setText((String) element.getValue());
+                } else if (element.getName().getLocalPart().equals("identifier")) {
+                    idField.setText((String) element.getValue());
+                } else if (element.getName().getLocalPart().equals("date")) {
+                    dateField.setText((String) element.getValue());
+                } else if (element.getName().getLocalPart().equals("rights")) {
+                    rightsField.setText((String) element.getValue());
+                }
+            }
+
+
+            Platform.runLater(() -> titleField.requestFocus());
+
+            dialog.setResultConverter(dialogButton -> {
+                if (dialogButton == saveButtonType) {
+                    if (dictionaryInfo[0] == null) {
+                        dictionaryInfo[0] = new TINFORMATION();
+                        dictionary.setINFORMATION(dictionaryInfo[0]);
+                    }
+                    dictionaryInfo[0].getTitleOrCreatorOrDescription().clear();
+                    JAXBElement pElement =
+                            new JAXBElement(new QName("title"),
+                                    String.class, titleField.getText());
+                    dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
+                    pElement =
+                            new JAXBElement(new QName("creator"),
+                                    String.class, creatorField.getText());
+                    dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
+                    pElement =
+                            new JAXBElement(new QName("description"),
+                                    String.class, descriptionField.getText());
+                    dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
+                    pElement =
+                            new JAXBElement(new QName("identifier"),
+                                    String.class, idField.getText());
+                    dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
+                    pElement =
+                            new JAXBElement(new QName("date"),
+                                    String.class, dateField.getText());
+                    dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
+                    pElement =
+                            new JAXBElement(new QName("rights"),
+                                    String.class, rightsField.getText());
+                    dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
+
+
+                }
+                return null;
+            });
+            dialog.showAndWait();
+            /*for (JAXBElement element : dictionaryInfo.getTitleOrCreatorOrDescription()) {
+
+
+
+                } else if (element.getName().getLocalPart().equals("publisher")) {
+                    htmlBuffer.append("<br>publisher: " + element.getValue());
+
+                } else if (element.getName().getLocalPart().equals("subject")) {
+                    htmlBuffer.append("<br>subject: " + element.getValue());
+                } else if (element.getName().getLocalPart().equals("contributors")) {
+                    htmlBuffer.append("<br>contributors: " + element.getValue());
+                } else if (element.getName().getLocalPart().equals("type")) {
+                    htmlBuffer.append("<br>type: " + element.getValue());
+
+                } else if (element.getName().getLocalPart().equals("format")) {
+                    htmlBuffer.append("<br>format: " + element.getValue());
+                } else if (element.getName().getLocalPart().equals("source")) {
+                    htmlBuffer.append("<br>source: " + element.getValue());
+                } else if (element.getName().getLocalPart().equals("language")) {
+                    htmlBuffer.append("<br>language: " + element.getValue());
+                } else if (element.getName().getLocalPart().equals("coverage")) {
+                    htmlBuffer.append("<br>coverage: " + element.getValue());
+
+                }
+            }
+            htmlBuffer.append("</span></p><hr>"); */
+        }
+    }
+
+
 
 }
