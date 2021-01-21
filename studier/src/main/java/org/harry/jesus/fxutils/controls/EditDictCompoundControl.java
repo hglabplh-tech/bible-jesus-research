@@ -20,10 +20,14 @@ import org.harry.jesus.jesajautils.Tuple;
 import org.pmw.tinylog.Logger;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
@@ -358,10 +362,12 @@ public class EditDictCompoundControl extends BorderPane {
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
+
         Label titleLab = new Label("title:");
         TextField titleField = new TextField();
         grid.add(titleLab, 0, 0);
         grid.add(titleField, 1, 0);
+
         Label creatorLab = new Label("creator:");
         TextField creatorField = new TextField();
         grid.add(creatorLab, 0, 1);
@@ -378,9 +384,9 @@ public class EditDictCompoundControl extends BorderPane {
         grid.add(idField, 1, 3);
 
         Label dateLab = new Label("date:");
-        TextField dateField = new TextField();
+        DatePicker datePicker = new DatePicker();
         grid.add(dateLab, 0, 4);
-        grid.add(dateField, 1, 4);
+        grid.add(datePicker, 1, 4);
 
         Label rightsLab = new Label("rights:");
         TextField rightsField = new TextField();
@@ -401,7 +407,13 @@ public class EditDictCompoundControl extends BorderPane {
                 } else if (element.getName().getLocalPart().equals("identifier")) {
                     idField.setText((String) element.getValue());
                 } else if (element.getName().getLocalPart().equals("date")) {
-                    dateField.setText((String) element.getValue());
+                    XMLGregorianCalendar xmlDate =
+                            (XMLGregorianCalendar)element.getValue();
+                    LocalDate localDate = LocalDate.of(
+                            xmlDate.getYear(),
+                            xmlDate.getMonth(),
+                            xmlDate.getDay());
+                    datePicker.setValue(localDate);
                 } else if (element.getName().getLocalPart().equals("rights")) {
                     rightsField.setText((String) element.getValue());
                 }
@@ -433,10 +445,20 @@ public class EditDictCompoundControl extends BorderPane {
                             new JAXBElement(new QName("identifier"),
                                     String.class, idField.getText());
                     dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
-                    pElement =
-                            new JAXBElement(new QName("date"),
-                                    String.class, dateField.getText());
-                    dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
+                    LocalDate localDate = datePicker.getValue();
+                    try {
+                        XMLGregorianCalendar xmlDate =
+                                DatatypeFactory.newInstance()
+                                        .newXMLGregorianCalendar(localDate.toString());
+                        pElement =
+                                new JAXBElement(new QName("date"),
+                                        XMLGregorianCalendar.class, xmlDate);
+                        dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
+                    } catch (DatatypeConfigurationException e) {
+                        e.printStackTrace();
+                    }
+
+
                     pElement =
                             new JAXBElement(new QName("rights"),
                                     String.class, rightsField.getText());
