@@ -6,6 +6,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.event.EventTarget;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
@@ -500,7 +501,7 @@ public class EditDictCompoundControl extends BorderPane {
         grid.add(creatorField, 1, 1);
 
         Label descriptionLab = new Label("description:");
-        TextField descriptionField = new TextField();
+        TextArea descriptionField = new TextArea();
         grid.add(descriptionLab, 0, 2);
         grid.add(descriptionField, 1, 2);
 
@@ -534,7 +535,7 @@ public class EditDictCompoundControl extends BorderPane {
                     idField.setText((String) element.getValue());
                 } else if (element.getName().getLocalPart().equals("date")) {
                     XMLGregorianCalendar xmlDate =
-                            (XMLGregorianCalendar)element.getValue();
+                            (XMLGregorianCalendar) element.getValue();
                     LocalDate localDate = LocalDate.of(
                             xmlDate.getYear(),
                             xmlDate.getMonth(),
@@ -546,55 +547,8 @@ public class EditDictCompoundControl extends BorderPane {
             }
 
 
-            Platform.runLater(() -> titleField.requestFocus());
-
-            dialog.setResultConverter(dialogButton -> {
-                if (dialogButton == saveButtonType) {
-                    if (dictionaryInfo[0] == null) {
-                        dictionaryInfo[0] = new TINFORMATION();
-                        dictionary.setINFORMATION(dictionaryInfo[0]);
-                    }
-                    dictionaryInfo[0].getTitleOrCreatorOrDescription().clear();
-                    JAXBElement pElement =
-                            new JAXBElement(new QName("title"),
-                                    String.class, titleField.getText());
-                    dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
-                    pElement =
-                            new JAXBElement(new QName("creator"),
-                                    String.class, creatorField.getText());
-                    dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
-                    pElement =
-                            new JAXBElement(new QName("description"),
-                                    String.class, descriptionField.getText());
-                    dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
-                    pElement =
-                            new JAXBElement(new QName("identifier"),
-                                    String.class, idField.getText());
-                    dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
-                    LocalDate localDate = datePicker.getValue();
-                    try {
-                        XMLGregorianCalendar xmlDate =
-                                DatatypeFactory.newInstance()
-                                        .newXMLGregorianCalendar(localDate.toString());
-                        pElement =
-                                new JAXBElement(new QName("date"),
-                                        XMLGregorianCalendar.class, xmlDate);
-                        dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
-                    } catch (DatatypeConfigurationException e) {
-                        e.printStackTrace();
-                    }
 
 
-                    pElement =
-                            new JAXBElement(new QName("rights"),
-                                    String.class, rightsField.getText());
-                    dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
-
-
-                }
-                return null;
-            });
-            dialog.showAndWait();
             /*for (JAXBElement element : dictionaryInfo.getTitleOrCreatorOrDescription()) {
 
 
@@ -622,8 +576,56 @@ public class EditDictCompoundControl extends BorderPane {
             }
             htmlBuffer.append("</span></p><hr>"); */
         }
+        Platform.runLater(() -> titleField.requestFocus());
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == saveButtonType) {
+                if (dictionaryInfo[0] == null) {
+                    dictionaryInfo[0] = new TINFORMATION();
+                    dictionary.setINFORMATION(dictionaryInfo[0]);
+                }
+                dictionaryInfo[0].getTitleOrCreatorOrDescription().clear();
+                JAXBElement pElement =
+                        new JAXBElement(new QName("title"),
+                                String.class, titleField.getText());
+                dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
+                pElement =
+                        new JAXBElement(new QName("creator"),
+                                String.class, creatorField.getText());
+                dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
+                pElement =
+                        new JAXBElement(new QName("description"),
+                                String.class, descriptionField.getText());
+                dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
+                pElement =
+                        new JAXBElement(new QName("identifier"),
+                                String.class, idField.getText());
+                dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
+                LocalDate localDate = datePicker.getValue();
+                if (localDate != null) {
+                    try {
+                        XMLGregorianCalendar xmlDate =
+                                DatatypeFactory.newInstance()
+                                        .newXMLGregorianCalendar(localDate.toString());
+                        pElement =
+                                new JAXBElement(new QName("date"),
+                                        XMLGregorianCalendar.class, xmlDate);
+                        dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
+                    } catch (DatatypeConfigurationException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+
+                pElement =
+                        new JAXBElement(new QName("rights"),
+                                String.class, rightsField.getText());
+                dictionaryInfo[0].getTitleOrCreatorOrDescription().add(pElement);
+
+
+            }
+            return null;
+        });
+        dialog.showAndWait();
     }
-
-
-
 }
