@@ -35,7 +35,8 @@ public class BibleTextUtils {
 
     private static List<String> installedDicts = Arrays.asList(
             "SF_2005-12-09_GER_LUTH1912-KOK_(DIE LUTHERBIBEL VON 1912 - KONKORDANZ).xml",
-            "SF_2006-03-08_GER_ELB1905-KOK_(DIE ELBERFELDERBIBEL VON 1905 - KONKORDANZ).xml"
+            "SF_2006-03-08_GER_ELB1905-KOK_(DIE ELBERFELDERBIBEL VON 1905 - KONKORDANZ).xml",
+            "HarrysComments.xml"
 
     );
     private static List<String> installedBibles = Arrays.asList(
