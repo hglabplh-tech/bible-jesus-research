@@ -12,6 +12,20 @@ import java.util.Optional;
 
 public class JesusMisc {
     public static OutputStream showSaveDialog(Node node, FileExtension fileExt) {
+        Optional<File> optFile = showSaveDialogFile(node, fileExt);
+        if (optFile.isPresent()) {
+            try {
+                FileOutputStream stream = new FileOutputStream(optFile.get());
+                return stream;
+            } catch (IOException ex) {
+                Logger.trace("Save file not there error : " + ex.getMessage());
+                return null;
+            }
+        }
+        return null;
+    }
+
+    public static Optional<File> showSaveDialogFile(Node node, FileExtension fileExt) {
         FileChooser fDialog = new FileChooser();
         fDialog.setTitle("Select Path");
         fDialog.getExtensionFilters()
@@ -22,18 +36,26 @@ public class JesusMisc {
         Window parent = node.getScene().getWindow();
         File file = fDialog.showSaveDialog(parent);
         if (file != null) {
-            try {
-                FileOutputStream stream = new FileOutputStream(file);
-                return stream;
-            } catch (IOException ex) {
-                Logger.trace("Save file not there error : " + ex.getMessage());
-                return null;
+            return Optional.of(file);
+        }
+        return Optional.empty();
+    }
+
+
+    public static InputStream showOpenDialog(Node node, FileExtension fileExt) {
+        Optional<File> optFile = showOpenDialogFile(node,fileExt);
+        try {
+            if (optFile.isPresent()) {
+                return new FileInputStream(optFile.get());
             }
+        } catch (IOException ex) {
+            Logger.trace("Save file not there error : " + ex.getMessage());
+            return null;
         }
         return null;
     }
 
-    public static InputStream showOpenDialog(Node node, FileExtension fileExt) {
+    public static Optional<File> showOpenDialogFile(Node node, FileExtension fileExt) {
         FileChooser fDialog = new FileChooser();
         fDialog.getExtensionFilters()
                 .addAll(Arrays.asList(fileExt.getThisFilter()));
@@ -43,19 +65,18 @@ public class JesusMisc {
         fDialog.setInitialDirectory(currentDir);
         Window parent = node.getScene().getWindow();
         File file = fDialog.showOpenDialog(parent);
-        try {
-            if (file != null) {
-                return new FileInputStream(file);
-            }
-        } catch (IOException ex) {
-            Logger.trace("Save file not there error : " + ex.getMessage());
-            return null;
+        if (file != null) {
+            return Optional.of(file);
         }
-        return null;
+
+        return Optional.empty();
     }
 
-    public static String showOpenDialogString(Node node) {
+
+    public static String showOpenDialogString(Node node, FileExtension fileExt) {
         FileChooser fDialog = new FileChooser();
+        fDialog.getExtensionFilters()
+                .addAll(Arrays.asList(fileExt.getThisFilter()));
         fDialog.setTitle("Select Path");
         File currentDir = new File(System.getProperty("user.home", "C:\\")).getAbsoluteFile();
 
@@ -65,7 +86,13 @@ public class JesusMisc {
         if (file != null) {
             return file.getAbsolutePath();
         }
-        return System.getProperty("usert.home");
+        try {
+            File temp = File.createTempFile("temp", ".bin");
+            return temp.getAbsolutePath();
+        } catch (IOException ex) {
+            return null;
+        }
+
     }
 
     public static Optional<String> showDirectorySelector(Node node) {

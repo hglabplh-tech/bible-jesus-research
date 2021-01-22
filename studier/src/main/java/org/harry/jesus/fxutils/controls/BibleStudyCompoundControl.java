@@ -19,6 +19,7 @@ import org.fxmisc.richtext.GenericStyledArea;
 import org.harry.jesus.fxutils.*;
 import org.harry.jesus.fxutils.controls.media.MediaControl;
 import org.harry.jesus.fxutils.controls.media.PlayBible;
+import org.harry.jesus.fxutils.event.SetLinkEvent;
 import org.harry.jesus.jesajautils.*;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.ParStyle;
@@ -524,5 +525,9 @@ public class BibleStudyCompoundControl extends BorderPane {
 
     public void clearSelected() {
         this.selectedVersesMap.clear();
+    }
+
+    public ReadFunctionsControl getTopControls() {
+        return topControls;
     }
 }

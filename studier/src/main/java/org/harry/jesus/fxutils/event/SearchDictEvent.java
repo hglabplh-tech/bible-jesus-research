@@ -1,10 +1,7 @@
-package org.harry.jesus.fxutils;
+package org.harry.jesus.fxutils.event;
 
 import javafx.event.Event;
 import javafx.event.EventType;
-import org.harry.jesus.jesajautils.BibleTextUtils;
-
-import java.awt.*;
 
 public class SearchDictEvent extends Event {
 

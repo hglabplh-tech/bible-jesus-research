@@ -1,4 +1,4 @@
-package org.harry.jesus.fxutils;
+package org.harry.jesus.fxutils.event;
 
 import javafx.event.*;
 import org.harry.jesus.jesajautils.BibleTextUtils;

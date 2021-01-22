@@ -1,6 +1,7 @@
 package org.harry.jesus.fxutils.controls;
 
 import generated.*;
+import generated.Dictionary;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -8,26 +9,27 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import org.harry.jesus.fxutils.JesusMisc;
+import org.harry.jesus.fxutils.event.DeployDictionary;
+import org.harry.jesus.jesajautils.AccordanceUtil;
 import org.harry.jesus.jesajautils.BibleReader;
+import org.harry.jesus.jesajautils.configjaxbser.DictionaryRef;
+import org.tinylog.Logger;
 
+import javax.swing.text.html.Option;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class EditDictCompoundControl extends BorderPane {
@@ -81,8 +83,13 @@ public class EditDictCompoundControl extends BorderPane {
 
     private Integer actItemsIndex = 0;
 
-    public EditDictCompoundControl() {
+    private Node nodeFromPrimary;
+
+    private Optional<File> outFile = Optional.empty();
+
+    public EditDictCompoundControl(Node nodeFromPrimary) {
         super();
+        this.nodeFromPrimary = nodeFromPrimary;
         GridPane centerPane = new GridPane();
         centerPane.setHgap(10);
         centerPane.setVgap(10);
@@ -188,6 +195,29 @@ public class EditDictCompoundControl extends BorderPane {
             }
         });
         itemsListMenu.getItems().add(deleteItem);
+        deleteItem = new MenuItem("Deploy Dictionary");
+        deleteItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if (outFile.isPresent()) {
+                    String dictID = AccordanceUtil
+                            .getIdFromInfo(dictionary.getINFORMATION());
+                    String dictName = AccordanceUtil
+                            .getNameFromInfo(dictionary.getINFORMATION());
+                    String fileName = outFile.get().getName();
+                    fileName = fileName.substring(0, fileName.indexOf(".xml"));
+                    DictionaryRef ref = new DictionaryRef()
+                            .setDictionaryID(dictID)
+                            .setDictionaryName(dictName)
+                            .setPathToBook(outFile.get().getAbsolutePath())
+                            .setFilename(fileName);
+                    DeployDictionary eventToFire = new DeployDictionary(ref);
+                    nodeFromPrimary.fireEvent(eventToFire);
+                }
+
+            }
+        });
+        itemsListMenu.getItems().add(deleteItem);
         itemsListView.setContextMenu(itemsListMenu);
         this.setLeft(itemsListView);
         descrListView = new ListView<>();
@@ -247,15 +277,22 @@ public class EditDictCompoundControl extends BorderPane {
             @Override
             public void handle(ActionEvent event) {
                 descrToItem.clear();
-                InputStream inStream = JesusMisc.showOpenDialog(loadDict, JesusMisc.FileExtension.XML_EXT);
-                dictionary = BibleReader.loadBibleDictionary(inStream);
-                for(TItem item: dictionary.getItem()) {
-                    itemsListView.getItems().add(item.getId());
+                outFile = JesusMisc.showOpenDialogFile(loadDict,
+                        JesusMisc.FileExtension.XML_EXT);
+                try {
+                    InputStream inStream = new FileInputStream(outFile.get());
+                    dictionary = BibleReader.loadBibleDictionary(inStream);
+                    for (TItem item : dictionary.getItem()) {
+                        itemsListView.getItems().add(item.getId());
+                    }
+                    if (itemsListView.getItems().size() >= 1) {
+                        itemsListView.getSelectionModel().select(0);
+                    }
+                    actItemsIndex = 0;
+                } catch (IOException ex) {
+                    Logger.trace(ex);
+                    Logger.trace("Load failed with: " + ex.getMessage());
                 }
-                if (itemsListView.getItems().size() >= 1) {
-                    itemsListView.getSelectionModel().select(0);
-                }
-                actItemsIndex = 0;
             }
         });
 
@@ -295,18 +332,7 @@ public class EditDictCompoundControl extends BorderPane {
         saveDict.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                OutputStream stream = JesusMisc.showSaveDialog(saveDict, JesusMisc.FileExtension.XML_EXT);
-                Integer index = 0;
-               /* for (TItem item: dictionary.getItem()) {
-                    List<TParagraph> pList = descrToItem.get(index);
-                    for (TParagraph paragraph; pList) {
-                        item.getContent().add()
-                    }
-                    index++;
-                } */
-                if (stream != null) {
-                    BibleReader.storeDictionary(dictionary, stream);
-                }
+                saveDictionary();
             }
         });
 
@@ -352,6 +378,26 @@ public class EditDictCompoundControl extends BorderPane {
             }
         });
 
+    }
+
+    private void saveDictionary() {
+        if (!outFile.isPresent()) {
+            outFile = JesusMisc
+                    .showSaveDialogFile(saveDict, JesusMisc.FileExtension.XML_EXT);
+        }
+        if (outFile.isPresent()) {
+            try {
+                OutputStream stream = new FileOutputStream(outFile.get());
+                Integer index = 0;
+                if (stream != null) {
+                    BibleReader.storeDictionary(dictionary, stream);
+                }
+            } catch (IOException ex) {
+                Logger.trace(ex);
+                Logger.trace("Save failed with: " + ex.getMessage());
+
+            }
+        }
     }
 
     private void clearControls() {

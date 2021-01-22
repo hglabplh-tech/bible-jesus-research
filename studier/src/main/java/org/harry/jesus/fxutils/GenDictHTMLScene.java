@@ -178,8 +178,18 @@ public class GenDictHTMLScene {
         public void buildAccParagraphEntryHTML(BibleTextUtils utils,
                                                StringBuffer htmlBuffer,
                                                TParagraph paragraph) {
+            StringBuffer tempBuffer = new StringBuffer();
             int indexHyper = 0;
+            String idString = null;
+            if (paragraph.getId() != null) {
+                idString = "<H6 id=\"" +
+                        paragraph.getId()
+                        + "\">"
+                        + escapeHtml4(paragraph.getId())
+                        + "</H6>\n";
+            }
             List<Serializable> objects = paragraph.getContent();
+            String title = null;
             for (Serializable pContent : paragraph.getContent()) {
                 if (pContent instanceof JAXBElement) {
 
@@ -187,15 +197,14 @@ public class GenDictHTMLScene {
                     Object thisContent = ((JAXBElement) pContent).getValue();
                     if (jaxbElement.getName().getLocalPart().equals("title")) {
                         indexHyper = 0;
-                        String title = (String) thisContent;
-                        htmlBuffer.append("<p>description title: "
-                                + escapeHtml4(title)
-                                + "</p>\n"
-                        );
+                        String titleCont = (String) thisContent;
+                        title = "<p>description title: "
+                                + escapeHtml4(titleCont)
+                                + "</p>\n";
                     } else if (jaxbElement.getName().getLocalPart().equals("see")) {
                         indexHyper = 0;
                         SeeType see = (SeeType) jaxbElement.getValue();
-                        buildSee(see, htmlBuffer);
+                        buildSee(see, tempBuffer);
                     } else if (thisContent instanceof BibLinkType) {
                         indexHyper = 0;
                         BibLinkType bibleLink = (BibLinkType) thisContent;
@@ -205,23 +214,30 @@ public class GenDictHTMLScene {
                                 + bibleLink.getVn1() + "]\n");
                     } else if (thisContent instanceof RefLinkType) {
                         if (indexHyper == 0) {
-                            htmlBuffer.append("<p>");
+                            tempBuffer.append("<p>");
                         } else if ((indexHyper % 5) == 0) {
-                            htmlBuffer.append("<br>");
+                            tempBuffer.append("<br>");
                         } else {
-                            htmlBuffer.append(" , ");
+                            tempBuffer.append(" , ");
                         }
 
                         RefLinkType refLink = (RefLinkType) thisContent;
-                        setRefLinkToBuffer(utils, htmlBuffer, refLink);
+                        setRefLinkToBuffer(utils, tempBuffer, refLink);
                         indexHyper++;
                     }
 
+
                 } else if (pContent instanceof String) {
-                    htmlBuffer.append(pContent);
+                    tempBuffer.append(pContent);
                 }
             }
-
+            if (idString != null) {
+                htmlBuffer.append(idString);
+            }
+            if (title != null) {
+                htmlBuffer.append(title);
+            }
+            htmlBuffer.append(tempBuffer.toString());
         }
 
         private void setRefLinkToBuffer(BibleTextUtils utils, StringBuffer htmlBuffer, RefLinkType refLink) {

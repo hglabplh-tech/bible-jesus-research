@@ -18,30 +18,34 @@ public class AccordanceUtil {
 
 
     public static String getIdFromInfo(TINFORMATION info) {
-        List<JAXBElement<?>> elements =
-                info.getTitleOrCreatorOrDescription();
-        for (JAXBElement<?> element: elements) {
-            if (element.getName().getLocalPart().equals("identifier")) {
-                String id = (String)element.getValue();
-                return id;
-            }
+        if (info != null) {
+            List<JAXBElement<?>> elements =
+                    info.getTitleOrCreatorOrDescription();
+            for (JAXBElement<?> element : elements) {
+                if (element.getName().getLocalPart().equals("identifier")) {
+                    String id = (String) element.getValue();
+                    return id;
+                }
 
+            }
         }
-        return "";
+        return "none";
 
     }
 
     public static String getNameFromInfo(TINFORMATION info) {
-        List<JAXBElement<?>> elements =
-                info.getTitleOrCreatorOrDescription();
-        for (JAXBElement<?> element: elements) {
-            if (element.getName().getLocalPart().equals("title")) {
-                String id = (String)element.getValue();
-                return id;
-            }
+        if (info != null) {
+            List<JAXBElement<?>> elements =
+                    info.getTitleOrCreatorOrDescription();
+            for (JAXBElement<?> element : elements) {
+                if (element.getName().getLocalPart().equals("title")) {
+                    String id = (String) element.getValue();
+                    return id;
+                }
 
+            }
         }
-        return "";
+        return "none";
 
     }
 

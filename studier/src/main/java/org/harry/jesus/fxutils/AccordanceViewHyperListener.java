@@ -4,15 +4,13 @@ import generated.XMLBIBLE;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
-import javafx.scene.control.IndexRange;
-import javafx.scene.paint.Color;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.codefx.libfx.control.webview.WebViewHyperlinkListener;
+import org.harry.jesus.fxutils.event.SetLinkEvent;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.HTMLRendering;
 import org.harry.jesus.jesajautils.LinkHandler;
-import org.harry.jesus.jesajautils.TextRendering;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 
 

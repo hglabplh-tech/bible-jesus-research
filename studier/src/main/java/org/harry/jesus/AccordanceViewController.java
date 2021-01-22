@@ -5,16 +5,13 @@ import generated.XMLBIBLE;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import org.codefx.libfx.control.webview.WebViews;
 
 import org.harry.jesus.fxutils.AccordanceViewHyperListener;
 import org.harry.jesus.fxutils.JScriptWebViewUtils;
-import org.harry.jesus.fxutils.SearchDictEvent;
+import org.harry.jesus.fxutils.event.SearchDictEvent;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 

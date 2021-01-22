@@ -3,14 +3,11 @@ import javafx.scene.Node;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
-import javafx.scene.web.WebEngine;
 import org.fxmisc.richtext.GenericStyledArea;
 import org.fxmisc.richtext.StyledTextArea;
 import org.fxmisc.richtext.TextExt;
 import org.fxmisc.richtext.model.*;
-import org.harry.jesus.fxutils.SearchDictEvent;
-import org.harry.jesus.jesajautils.browse.ParStyle;
-import org.harry.jesus.jesajautils.browse.TextStyle;
+import org.harry.jesus.fxutils.event.SearchDictEvent;
 import org.reactfx.util.Either;
 
 import java.util.ArrayList;

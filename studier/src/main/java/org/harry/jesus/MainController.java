@@ -8,6 +8,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
@@ -32,6 +33,7 @@ import org.harry.jesus.fxutils.controls.BibleStudyCompoundControl;
 import org.harry.jesus.fxutils.controls.HTMLEditorExt;
 import org.harry.jesus.fxutils.controls.media.MediaControl;
 import org.harry.jesus.fxutils.controls.media.PlayBible;
+import org.harry.jesus.fxutils.event.SetLinkEvent;
 import org.harry.jesus.fxutils.graphics.ImageMaker;
 import org.harry.jesus.jesajautils.*;
 import org.harry.jesus.jesajautils.browse.TextStyle;
@@ -475,7 +477,8 @@ public class MainController {
     }
     @FXML
     public void editDict(ActionEvent event) {
-        EditDictionary.showEditDictionary();
+        Node nodeOfPrim = bibleStudy.getTopControls().getDictionaries();
+        EditDictionary.showEditDictionary(nodeOfPrim);
     }
     @FXML
     public void about(ActionEvent event) {

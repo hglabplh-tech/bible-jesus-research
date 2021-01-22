@@ -1,6 +1,7 @@
 package org.harry.jesus.fxutils;
 
 import org.codefx.libfx.control.webview.WebViewHyperlinkListener;
+import org.harry.jesus.fxutils.event.SetLinkEvent;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.LinkHandler;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;

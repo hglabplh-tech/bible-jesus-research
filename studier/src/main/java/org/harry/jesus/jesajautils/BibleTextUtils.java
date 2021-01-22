@@ -263,6 +263,7 @@ public class BibleTextUtils {
      * @param context the thread context
      */
     public void loadAccordancesDownLoaded(File accordancePath, BibleThreadPool.ThreadBean context) {
+        dictInstances.clear();
         for (File accordanceFile : accordancePath.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
