@@ -12,11 +12,11 @@ import java.io.OutputStream;
 
 /**
  * Class for storing and loading the highlits of vedrses
- * @version: $Revision:$
- * @author: $Author:$
- * @date: $Date:$
+ * @version: $Revision$
+ * @author: $Author$
+ * @date: $Date$
  *
- * $Id:$
+ * $Id$
  */
 public class HighlightsPersistence {
 
