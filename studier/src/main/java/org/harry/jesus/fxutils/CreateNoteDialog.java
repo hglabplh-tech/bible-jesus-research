@@ -19,7 +19,7 @@ public class CreateNoteDialog {
     /**
      * This method creates and calls the dialog to define a production place of a signature
      * @param note the note to add
-     *
+     * @return the ready edited note
      */
     public static Optional<Note> showNoteCreateDialog(Note note) {
         // Create the custom dialog.

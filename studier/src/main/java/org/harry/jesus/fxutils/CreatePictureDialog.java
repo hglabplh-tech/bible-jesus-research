@@ -75,7 +75,7 @@ public class CreatePictureDialog {
     /**
      * This method creates and calls the dialog to create verse images
      * @param theVers vers to be created as image
-     *
+     * @return the optional image generated
      */
     public  Optional<Image> showPictureCreateDialog(Vers theVers) {
         // Create the custom dialog.

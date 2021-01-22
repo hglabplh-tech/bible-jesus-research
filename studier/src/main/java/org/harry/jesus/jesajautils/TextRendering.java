@@ -231,7 +231,7 @@ public class TextRendering {
     /**
      * This method selects a verse by the given ÄIndexRange in the text
      * @param range the range by which we search for the verse in the text
-     * @param toggler
+     * @param toggler toggle selected / not selected
      * @return the selected the entry for the verse
      */
     public Map.Entry<Integer, IndexRange> selectVerseByGivenRange(IndexRange range, Boolean toggler) {
@@ -250,6 +250,7 @@ public class TextRendering {
     /**
      * This method selects a verse by the given ÄIndexRange in the text
      * @param range the range by which we search for the verse in the text
+     * @param color the optional given back-color
      * @return the selected the entry for the verse
      */
     public Map.Entry<Integer, IndexRange> selectVerseColorByGivenRange(IndexRange range, Color color) {

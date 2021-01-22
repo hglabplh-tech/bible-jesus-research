@@ -1,4 +1,11 @@
 package org.harry.jesus.danielpersistence.xmlpersist;
+/**
+ * Class Information
+ * @version $Revision$
+ * @author $Author$
+ *
+ * $Id$
+ */
 
 import jesus.harry.org.highlights._1.Highlights;
 import jesus.harry.org.versnotes._1.Versnotes;
@@ -12,9 +19,8 @@ import java.io.OutputStream;
 
 /**
  * Class for storing and loading the highlits of vedrses
- * @version: $Revision$
- * @author: $Author$
- * @date: $Date$
+ * @version $Revision$
+ * @author $Author$
  *
  * $Id$
  */

@@ -26,8 +26,9 @@ public class ReadLinksDialog {
 
     /**
      * This method creates and calls the dialog to define a production place of a signature
-
-     *
+     * @param utils the bible text utils instance
+     * @param area the bible read area
+     * @param htmlText the html content
      */
     public static void showReadLinkDialog(BibleTextUtils utils,
                                           FoldableStyledArea area, String htmlText) {

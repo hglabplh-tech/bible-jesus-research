@@ -30,8 +30,8 @@ public class ViewAccordanceDialog {
 
     /**
      * This method creates and calls the dialog to define a production place of a signature
-
-     *
+     * @param area the area control
+     * @param accFName the file name of the dictionary
      */
     public static void showAccordanceDialog(FoldableStyledArea area,
                                             String accFName) {
@@ -74,6 +74,14 @@ public class ViewAccordanceDialog {
         }
     }
 
+    /**
+     *
+     * @param fxml the fxml file
+     * @param area the bible reader area
+     * @param html the html content
+     * @return the parent control
+     * @throws IOException a I/O exception occured
+     */
     public static Parent loadFXML(String fxml,
                                   FoldableStyledArea area,
                                   String html) throws IOException {
