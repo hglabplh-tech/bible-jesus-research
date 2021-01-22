@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
         xmlns:vs="http://org.harry.jesus/versnotes/1.0"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
         targetNamespace="http://org.harry.jesus/versnotes/1.0"
         elementFormDefault="qualified">
     <element name="versnotes">
@@ -13,14 +13,17 @@
     </element>
 
     <complexType name="Vers">
+        <xsd:annotation>
+            <xsd:documentation>This element defines a vers </xsd:documentation>
+        </xsd:annotation>
         <sequence>
-            <element name = "vers" type="xs:integer" minOccurs="1" maxOccurs="unbounded"/>
-            <element name="vtext" type="xs:string"/>
+            <element name = "vers" type="xsd:integer" minOccurs="1" maxOccurs="unbounded"/>
+            <element name="vtext" type="xsd:string"/>
         </sequence>
 
-        <attribute  name = "book" type="xs:integer" use="required"/>
-        <attribute name = "chapter" type="xs:integer" use="required"/>
-        <attribute name="backcolor" type="xs:string" use="optional"/>
+        <attribute  name = "book" type="xsd:integer" use="required"/>
+        <attribute name = "chapter" type="xsd:integer" use="required"/>
+        <attribute name="backcolor" type="xsd:string" use="optional"/>
     </complexType>
 
     <complexType name="Note" >

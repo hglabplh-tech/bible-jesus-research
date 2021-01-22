@@ -2,7 +2,7 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
         xmlns:pl="http://org.harry.jesus/plan/1.0"
         xmlns:vs="http://org.harry.jesus/versnotes/1.0"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
         targetNamespace="http://org.harry.jesus/plan/1.0"
         elementFormDefault="qualified">
     <import namespace="http://org.harry.jesus/versnotes/1.0" schemaLocation="versnotes.xsd"/>
@@ -16,7 +16,7 @@
 
     <complexType name="Day">
         <sequence>
-            <element name="devotional" type="xs:base64Binary"  minOccurs="1" maxOccurs="1"/>
+            <element name="devotional" type="xsd:base64Binary"  minOccurs="1" maxOccurs="1"/>
             <element name="verses" type="vs:Vers" minOccurs="1" maxOccurs="unbounded"/>
         </sequence>
         <attribute name="title" type="string" use="required"/>

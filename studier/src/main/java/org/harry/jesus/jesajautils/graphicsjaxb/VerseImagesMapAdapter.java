@@ -4,6 +4,9 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The type Verse images map adapter.
+ */
 class VerseImagesMapAdapter extends XmlAdapter<VerseImageMapElements[],
         Map<String, VerseImageData>> {
     @Override

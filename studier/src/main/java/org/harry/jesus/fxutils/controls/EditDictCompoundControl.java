@@ -32,6 +32,9 @@ import java.time.LocalDate;
 import java.util.*;
 
 
+/**
+ * The type Edit dict compound control.
+ */
 public class EditDictCompoundControl extends BorderPane {
 
     private Dictionary dictionary = new Dictionary();
@@ -87,6 +90,11 @@ public class EditDictCompoundControl extends BorderPane {
 
     private Optional<File> outFile = Optional.empty();
 
+    /**
+     * Instantiates a new Edit dict compound control.
+     *
+     * @param nodeFromPrimary the node from primary
+     */
     public EditDictCompoundControl(Node nodeFromPrimary) {
         super();
         this.nodeFromPrimary = nodeFromPrimary;
@@ -225,6 +233,9 @@ public class EditDictCompoundControl extends BorderPane {
         initLiseners();
     }
 
+    /**
+     * Init liseners.
+     */
     public void initLiseners() {
        /** refLinkBox.getEditor().focusedProperty()
                 .addListener((obs, wasFocused, isNowFocused) -> {
@@ -516,6 +527,9 @@ public class EditDictCompoundControl extends BorderPane {
         descriptionText.setText(descriptionTextBuff.toString());
     }
 
+    /**
+     * Show information diaog.
+     */
     public void showInformationDiaog() {
 
 

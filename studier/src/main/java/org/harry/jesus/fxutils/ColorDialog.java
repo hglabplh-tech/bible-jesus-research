@@ -13,8 +13,16 @@ import jesus.harry.org.versnotes._1.Note;
 
 import java.util.Optional;
 
+/**
+ * The type Color dialog.
+ */
 public class ColorDialog {
 
+    /**
+     * Call color dialog optional.
+     *
+     * @return the optional
+     */
     public static Optional<Color> callColorDialog() {
         final ColorPicker colorPicker = new ColorPicker();
         colorPicker.setValue(Color.CORAL);

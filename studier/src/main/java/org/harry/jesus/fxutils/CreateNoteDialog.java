@@ -12,12 +12,14 @@ import java.util.Optional;
 
 /**
  * Class for a Store Password Diialog to store passwords for sites.
+ *
  * @author Harald Glab-Plhak
  */
 public class CreateNoteDialog {
 
     /**
      * This method creates and calls the dialog to define a production place of a signature
+     *
      * @param note the note to add
      * @return the ready edited note
      */

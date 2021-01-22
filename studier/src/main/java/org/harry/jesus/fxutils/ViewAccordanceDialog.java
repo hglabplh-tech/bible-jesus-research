@@ -22,15 +22,20 @@ import java.net.URL;
 
 /**
  * Class for a Store Password Diialog to store passwords for sites.
+ *
  * @author Harald Glab-Plhak
  */
 public class ViewAccordanceDialog {
 
+    /**
+     * The constant fxmlLoader.
+     */
     public static FXMLLoader fxmlLoader = null;
 
     /**
      * This method creates and calls the dialog to define a production place of a signature
-     * @param area the area control
+     *
+     * @param area     the area control
      * @param accFName the file name of the dictionary
      */
     public static void showAccordanceDialog(FoldableStyledArea area,
@@ -75,6 +80,7 @@ public class ViewAccordanceDialog {
     }
 
     /**
+     * Load fxml parent.
      *
      * @param fxml the fxml file
      * @param area the bible reader area

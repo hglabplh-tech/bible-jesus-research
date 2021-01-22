@@ -14,6 +14,9 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import java.util.Optional;
 
+/**
+ * The type X path search.
+ */
 public class XPathSearch {
 
     private final XMLBIBLE actBible;
@@ -22,11 +25,21 @@ public class XPathSearch {
 
     private XPathFactory factory;
 
+    /**
+     * Instantiates a new X path search.
+     *
+     * @param actBible the act bible
+     */
     public XPathSearch(XMLBIBLE actBible) {
         this.actBible = actBible;
         this.actBibleDoc = initialize();
     }
 
+    /**
+     * Initialize optional.
+     *
+     * @return the optional
+     */
     public Optional<Document> initialize() {
         try {
             JAXBContext ctx = JAXBContext.newInstance(XMLBIBLE.class);
@@ -43,6 +56,12 @@ public class XPathSearch {
         }
     }
 
+    /**
+     * Search node list optional.
+     *
+     * @param xPathExpr the x path expr
+     * @return the optional
+     */
     public Optional<NodeList> searchNodeList(String xPathExpr) {
         try {
             XPath xpath = factory.newXPath();
@@ -54,6 +73,12 @@ public class XPathSearch {
         }
     }
 
+    /**
+     * Search node optional.
+     *
+     * @param xPathExpr the x path expr
+     * @return the optional
+     */
     public Optional<Node> searchNode(String xPathExpr) {
         try {
             XPath xpath = factory.newXPath();

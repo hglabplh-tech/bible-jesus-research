@@ -18,12 +18,24 @@ import org.fxmisc.richtext.model.Codec;
  */
 public class TextStyle {
 
+    /**
+     * The constant CSS_BOLD.
+     */
     public final static String CSS_BOLD = "font-style:bold";
 
+    /**
+     * The constant CSS_ITALIC.
+     */
     public final static String CSS_ITALIC = "font-style:italic";
 
+    /**
+     * The constant EMPTY.
+     */
     public static final TextStyle EMPTY = new TextStyle();
 
+    /**
+     * The constant CODEC.
+     */
     public static final Codec<TextStyle> CODEC = new Codec<TextStyle>() {
 
         private final Codec<Optional<String>> OPT_STRING_CODEC =
@@ -106,16 +118,76 @@ public class TextStyle {
     };
 
 
-
+    /**
+     * Bold text style.
+     *
+     * @param bold the bold
+     * @return the text style
+     */
     public static TextStyle bold(boolean bold) { return EMPTY.updateBold(bold); }
+
+    /**
+     * Italic text style.
+     *
+     * @param italic the italic
+     * @return the text style
+     */
     public static TextStyle italic(boolean italic) { return EMPTY.updateItalic(italic); }
+
+    /**
+     * Underline text style.
+     *
+     * @param underline the underline
+     * @return the text style
+     */
     public static TextStyle underline(boolean underline) { return EMPTY.updateUnderline(underline); }
+
+    /**
+     * Strikethrough text style.
+     *
+     * @param strikethrough the strikethrough
+     * @return the text style
+     */
     public static TextStyle strikethrough(boolean strikethrough) { return EMPTY.updateStrikethrough(strikethrough); }
+
+    /**
+     * Font size text style.
+     *
+     * @param fontSize the font size
+     * @return the text style
+     */
     public static TextStyle fontSize(int fontSize) { return EMPTY.updateFontSize(fontSize); }
+
+    /**
+     * Font family text style.
+     *
+     * @param family the family
+     * @return the text style
+     */
     public static TextStyle fontFamily(String family) { return EMPTY.updateFontFamily(family); }
+
+    /**
+     * Text color text style.
+     *
+     * @param color the color
+     * @return the text style
+     */
     public static TextStyle textColor(Color color) { return EMPTY.updateTextColor(color); }
+
+    /**
+     * Background color text style.
+     *
+     * @param color the color
+     * @return the text style
+     */
     public static TextStyle backgroundColor(Color color) { return EMPTY.updateBackgroundColor(color); }
 
+    /**
+     * Css color string.
+     *
+     * @param color the color
+     * @return the string
+     */
     static String cssColor(Color color) {
         int red = (int) (color.getRed() * 255);
         int green = (int) (color.getGreen() * 255);
@@ -123,15 +195,42 @@ public class TextStyle {
         return "rgb(" + red + ", " + green + ", " + blue + ")";
     }
 
+    /**
+     * The Bold.
+     */
     final Optional<Boolean> bold;
+    /**
+     * The Italic.
+     */
     final Optional<Boolean> italic;
+    /**
+     * The Underline.
+     */
     final Optional<Boolean> underline;
+    /**
+     * The Strikethrough.
+     */
     final Optional<Boolean> strikethrough;
+    /**
+     * The Font size.
+     */
     final Optional<Integer> fontSize;
+    /**
+     * The Font family.
+     */
     final Optional<String> fontFamily;
+    /**
+     * The Text color.
+     */
     final Optional<Color> textColor;
+    /**
+     * The Background color.
+     */
     final Optional<Color> backgroundColor;
 
+    /**
+     * Instantiates a new Text style.
+     */
     public TextStyle() {
         this(
                 Optional.empty(),
@@ -145,6 +244,18 @@ public class TextStyle {
         );
     }
 
+    /**
+     * Instantiates a new Text style.
+     *
+     * @param bold            the bold
+     * @param italic          the italic
+     * @param underline       the underline
+     * @param strikethrough   the strikethrough
+     * @param fontSize        the font size
+     * @param fontFamily      the font family
+     * @param textColor       the text color
+     * @param backgroundColor the background color
+     */
     public TextStyle(
             Optional<Boolean> bold,
             Optional<Boolean> italic,
@@ -204,6 +315,11 @@ public class TextStyle {
         return String.join(",", styles);
     }
 
+    /**
+     * To css string.
+     *
+     * @return the string
+     */
     public String toCss() {
         StringBuilder sb = new StringBuilder();
 
@@ -260,6 +376,12 @@ public class TextStyle {
         return sb.toString();
     }
 
+    /**
+     * From css text style.
+     *
+     * @param styleString the style string
+     * @return the text style
+     */
     public static TextStyle fromCss(String styleString) {
         TextStyle style = new  TextStyle();
         if(styleString.contains(CSS_BOLD) || styleString.contains("-fx-font-weight: bold")) {
@@ -273,6 +395,12 @@ public class TextStyle {
     }
 
 
+    /**
+     * Update with text style.
+     *
+     * @param mixin the mixin
+     * @return the text style
+     */
     public TextStyle updateWith(TextStyle mixin) {
         return new TextStyle(
                 mixin.bold.isPresent() ? mixin.bold : bold,
@@ -285,42 +413,100 @@ public class TextStyle {
                 mixin.backgroundColor.isPresent() ? mixin.backgroundColor : backgroundColor);
     }
 
+    /**
+     * Update bold text style.
+     *
+     * @param bold the bold
+     * @return the text style
+     */
     public TextStyle updateBold(boolean bold) {
         return new TextStyle(Optional.of(bold), italic, underline, strikethrough, fontSize, fontFamily, textColor, backgroundColor);
     }
 
+    /**
+     * Update italic text style.
+     *
+     * @param italic the italic
+     * @return the text style
+     */
     public TextStyle updateItalic(boolean italic) {
         return new TextStyle(bold, Optional.of(italic), underline, strikethrough, fontSize, fontFamily, textColor, backgroundColor);
     }
 
+    /**
+     * Update underline text style.
+     *
+     * @param underline the underline
+     * @return the text style
+     */
     public TextStyle updateUnderline(boolean underline) {
         return new TextStyle(bold, italic, Optional.of(underline), strikethrough, fontSize, fontFamily, textColor, backgroundColor);
     }
 
+    /**
+     * Update strikethrough text style.
+     *
+     * @param strikethrough the strikethrough
+     * @return the text style
+     */
     public TextStyle updateStrikethrough(boolean strikethrough) {
         return new TextStyle(bold, italic, underline, Optional.of(strikethrough), fontSize, fontFamily, textColor, backgroundColor);
     }
 
+    /**
+     * Update font size text style.
+     *
+     * @param fontSize the font size
+     * @return the text style
+     */
     public TextStyle updateFontSize(int fontSize) {
         return new TextStyle(bold, italic, underline, strikethrough, Optional.of(fontSize), fontFamily, textColor, backgroundColor);
     }
 
+    /**
+     * Update font family text style.
+     *
+     * @param fontFamily the font family
+     * @return the text style
+     */
     public TextStyle updateFontFamily(String fontFamily) {
         return new TextStyle(bold, italic, underline, strikethrough, fontSize, Optional.of(fontFamily), textColor, backgroundColor);
     }
 
+    /**
+     * Update text color text style.
+     *
+     * @param textColor the text color
+     * @return the text style
+     */
     public TextStyle updateTextColor(Color textColor) {
         return new TextStyle(bold, italic, underline, strikethrough, fontSize, fontFamily, Optional.of(textColor), backgroundColor);
     }
 
+    /**
+     * Update background color text style.
+     *
+     * @param backgroundColor the background color
+     * @return the text style
+     */
     public TextStyle updateBackgroundColor(Color backgroundColor) {
         return new TextStyle(bold, italic, underline, strikethrough, fontSize, fontFamily, textColor, Optional.of(backgroundColor));
     }
 
+    /**
+     * Gets text color.
+     *
+     * @return the text color
+     */
     public Optional<Color> getTextColor() {
         return textColor;
     }
 
+    /**
+     * Gets background color.
+     *
+     * @return the background color
+     */
     public Optional<Color> getBackgroundColor() {
         return backgroundColor;
     }

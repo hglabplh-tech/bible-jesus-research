@@ -25,8 +25,8 @@ import java.util.*;
 /**
  * Class to read bibles from zefania XML and to read Dictionaries
  * and access their content
- * @author Harald Glab-Plhak
- * (C) Harald Glab-Plhak
+ *
+ * @author Harald Glab-Plhak (C) Harald Glab-Plhak
  */
 public class BibleTextUtils {
 
@@ -150,6 +150,7 @@ public class BibleTextUtils {
 
     /**
      * Return the singleton instance if there is none the one and only is created
+     *
      * @return the singleton
      */
     public static BibleTextUtils getInstance()  {
@@ -173,6 +174,7 @@ public class BibleTextUtils {
 
     /**
      * Return the selected bible
+     *
      * @return the selected bible
      */
     public XMLBIBLE getSelected() {
@@ -181,6 +183,7 @@ public class BibleTextUtils {
 
     /**
      * Set the actual selected bible
+     *
      * @param selected the new selected bible
      * @return the bible text utils instance builder setter
      */
@@ -191,6 +194,7 @@ public class BibleTextUtils {
 
     /**
      * Return the book label map
+     *
      * @return the book label map
      */
     public Map<Integer, BookLabel> getBookLabMap() {
@@ -218,6 +222,11 @@ public class BibleTextUtils {
         loadBiblesFromRef(context.getBibleRefList());
     }
 
+    /**
+     * Search selected for dict.
+     *
+     * @param dictionaryRef the dictionary ref
+     */
     public static void searchSelectedForDict(DictionaryRef dictionaryRef) {
         XMLBIBLE selected = getInstance().getSelected();
         BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
@@ -238,6 +247,12 @@ public class BibleTextUtils {
         BibleTextUtils.getInstance().setSelected(selected);
     }
 
+    /**
+     * Search selected for bible optional.
+     *
+     * @param bibleRef the bible ref
+     * @return the optional
+     */
     public static Optional<DictionaryInstance> searchSelectedForBible(BibleRef bibleRef) {
         BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
         BiblesDictConfig dictConf = context.getAppSettings().getDictConfig();
@@ -259,8 +274,9 @@ public class BibleTextUtils {
 
     /**
      * Load the dictionaries placed in the dictionary directory of the user
+     *
      * @param accordancePath the dictionaries path
-     * @param context the thread context
+     * @param context        the thread context
      */
     public void loadAccordancesDownLoaded(File accordancePath, BibleThreadPool.ThreadBean context) {
         dictInstances.clear();
@@ -323,7 +339,8 @@ public class BibleTextUtils {
 
     /**
      * Build a verse text entry from a single search result
-     * @param key the bible text key which was from the search result
+     *
+     * @param key      the bible text key which was from the search result
      * @param versText the text of the verse
      * @return The entry as string
      */
@@ -353,6 +370,12 @@ public class BibleTextUtils {
         return versLink;
     }
 
+    /**
+     * Detect verses range for link list.
+     *
+     * @param verses the verses
+     * @return the list
+     */
     public static List<Tuple<Integer, Integer>> detectVersesRangeForLink(List<Object> verses) {
         List<Tuple<Integer, Integer>> result = new ArrayList<>();
         int sequence;
@@ -398,6 +421,16 @@ public class BibleTextUtils {
         return sequence;
     }
 
+    /**
+     * Generate verses vers.
+     *
+     * @param utils             the utils
+     * @param actBook           the act book
+     * @param actChapter        the act chapter
+     * @param area              the area
+     * @param selectedVersesMap the selected verses map
+     * @return the vers
+     */
     public static Vers generateVerses(BibleTextUtils utils, BookLabel actBook, Integer actChapter,
                                       FoldableStyledArea area, Map<Integer, IndexRange> selectedVersesMap) {
         Vers vers = new Vers();
@@ -430,6 +463,11 @@ public class BibleTextUtils {
         return vers;
     }
 
+    /**
+     * Gets bible infos.
+     *
+     * @return the bible infos
+     */
     public List<String> getBibleInfos() {
         List<String> result = new ArrayList<>();
         for (BibleBookInstance inst : bibleInstances) {
@@ -438,14 +476,30 @@ public class BibleTextUtils {
         return result;
     }
 
+    /**
+     * Gets bible instances.
+     *
+     * @return the bible instances
+     */
     public List<BibleBookInstance> getBibleInstances() {
         return Collections.unmodifiableList(bibleInstances);
     }
 
+    /**
+     * Gets dict instances.
+     *
+     * @return the dict instances
+     */
     public List<DictionaryInstance> getDictInstances() {
         return Collections.unmodifiableList(dictInstances);
     }
 
+    /**
+     * Gets bible book info.
+     *
+     * @param bible the bible
+     * @return the bible book info
+     */
     public List<String> getBibleBookInfo(XMLBIBLE bible) {
         List<String> csvBooksList = new ArrayList<>();
         List<JAXBElement<BIBLEBOOK>> books = bible.getBIBLEBOOK();
@@ -458,14 +512,32 @@ public class BibleTextUtils {
         return csvBooksList;
     }
 
+    /**
+     * Gets book labels.
+     *
+     * @return the book labels
+     */
     public List<String> getBookLabels() {
         return this.bookLabels;
     }
 
+    /**
+     * Gets book label as class.
+     *
+     * @param label the label
+     * @return the book label as class
+     */
     public BookLabel getBookLabelAsClass(String label) {
         return new BookLabel(label);
     }
 
+    /**
+     * Gets book by label.
+     *
+     * @param bible     the bible
+     * @param bookLabel the book label
+     * @return the book by label
+     */
     public Optional<BIBLEBOOK> getBookByLabel(XMLBIBLE bible, String bookLabel) {
         BookLabel label = new BookLabel(bookLabel);
         Integer bookNo = label.getBookNumber();
@@ -480,7 +552,12 @@ public class BibleTextUtils {
     }
 
 
-
+    /**
+     * Gets books.
+     *
+     * @param bible the bible
+     * @return the books
+     */
     public List<BIBLEBOOK> getBooks(XMLBIBLE bible) {
         List<BIBLEBOOK> result = new ArrayList<>();
         for (JAXBElement<BIBLEBOOK> xmlBook: bible.getBIBLEBOOK()) {
@@ -489,6 +566,12 @@ public class BibleTextUtils {
         return result;
     }
 
+    /**
+     * Gets chapters.
+     *
+     * @param book the book
+     * @return the chapters
+     */
     public List<CHAPTER> getChapters(BIBLEBOOK book) {
         List<CHAPTER> result = new ArrayList<>();
         for (JAXBElement<CHAPTER> xmlChapter: book.getCHAPTER()) {
@@ -497,6 +580,13 @@ public class BibleTextUtils {
         return result;
     }
 
+    /**
+     * Gets verses.
+     *
+     * @param chapter    the chapter
+     * @param bookNumber the book number
+     * @return the verses
+     */
     public Map<BibleFulltextEngine.BibleTextKey, String> getVerses(CHAPTER chapter, Integer bookNumber) {
         Map<BibleFulltextEngine.BibleTextKey, String> result = new LinkedHashMap<>();
         for (JAXBElement xmlVers: chapter.getPROLOGOrCAPTIONOrVERS()) {
@@ -518,6 +608,13 @@ public class BibleTextUtils {
         return result;
     }
 
+    /**
+     * Gets vers entry.
+     *
+     * @param chapter the chapter
+     * @param key     the key
+     * @return the vers entry
+     */
     public Map.Entry<BibleFulltextEngine.BibleTextKey, String> getVersEntry(CHAPTER chapter,
                                                                       BibleFulltextEngine.BibleTextKey key) {
         StringBuffer buffer = new StringBuffer();
@@ -569,6 +666,13 @@ public class BibleTextUtils {
     }
 
 
+    /**
+     * Gets chapter.
+     *
+     * @param book      the book
+     * @param chapterNo the chapter no
+     * @return the chapter
+     */
     public Optional<CHAPTER> getChapter(BIBLEBOOK book, Integer chapterNo) {
         Optional<CHAPTER> result = Optional.empty();
         Optional<JAXBElement<CHAPTER>> optChapter = book.getCHAPTER().stream()
@@ -580,6 +684,13 @@ public class BibleTextUtils {
         return result;
     }
 
+    /**
+     * Generate vers link string.
+     *
+     * @param verses the verses
+     * @param label  the label
+     * @return the string
+     */
     public String generateVersLink(List<Vers> verses, BookLabel label) {
         StringBuffer buffer = new StringBuffer();
         for (Vers vers : verses) {
@@ -594,6 +705,9 @@ public class BibleTextUtils {
         return buffer.toString();
     }
 
+    /**
+     * The type Book link.
+     */
     public static class BookLink implements Serializable {
 
         private final String bookLabel;
@@ -602,28 +716,61 @@ public class BibleTextUtils {
 
         private final List<Integer> verses;
 
+        /**
+         * Instantiates a new Book link.
+         *
+         * @param bookLabel the book label
+         * @param chapter   the chapter
+         */
         public BookLink(String bookLabel, Integer chapter) {
             this(bookLabel, chapter, Arrays.asList(1));
         }
 
+        /**
+         * Instantiates a new Book link.
+         *
+         * @param bookLabel the book label
+         * @param chapter   the chapter
+         * @param verses    the verses
+         */
         public BookLink(String bookLabel, Integer chapter, List<Integer> verses) {
             this.bookLabel = bookLabel;
             this.chapter = chapter;
             this.verses = verses;
         }
 
+        /**
+         * Gets book label.
+         *
+         * @return the book label
+         */
         public String getBookLabel() {
             return bookLabel;
         }
 
+        /**
+         * Gets book label class.
+         *
+         * @return the book label class
+         */
         public BookLabel getBookLabelClass() {
             return new BookLabel(bookLabel);
         }
 
+        /**
+         * Gets chapter.
+         *
+         * @return the chapter
+         */
         public Integer getChapter() {
             return chapter;
         }
 
+        /**
+         * Gets verses.
+         *
+         * @return the verses
+         */
         public List<Integer> getVerses() {
             return verses;
         }
@@ -660,6 +807,9 @@ public class BibleTextUtils {
         }
     }
 
+    /**
+     * The type Book label.
+     */
     public static class BookLabel {
 
         private Integer bookNumber = 0;
@@ -668,6 +818,11 @@ public class BibleTextUtils {
 
         private String longName = "";
 
+        /**
+         * Instantiates a new Book label.
+         *
+         * @param label the label
+         */
         public BookLabel(String label) {
             String [] temp = label.split(",");
             bookNumber = Integer.parseInt(temp[0]);
@@ -675,20 +830,38 @@ public class BibleTextUtils {
             shortName = temp[2];
         }
 
+        /**
+         * Gets book number.
+         *
+         * @return the book number
+         */
         public Integer getBookNumber() {
             return bookNumber;
         }
 
+        /**
+         * Gets short name.
+         *
+         * @return the short name
+         */
         public String getShortName() {
             return shortName;
         }
 
+        /**
+         * Gets long name.
+         *
+         * @return the long name
+         */
         public String getLongName() {
             return longName;
         }
     }
 
 
+    /**
+     * The type Bible book instance.
+     */
     public static class BibleBookInstance {
 
         private final BibleRef bibleRef;
@@ -697,23 +870,51 @@ public class BibleTextUtils {
 
         private Optional<Tuple<Dictionary, DictionaryRef>> optDictAccRefTuple = Optional.empty();
 
+        /**
+         * Instantiates a new Bible book instance.
+         *
+         * @param bibleRef the bible ref
+         * @param bible    the bible
+         */
         public BibleBookInstance(BibleRef bibleRef, XMLBIBLE bible) {
             this.bibleRef = bibleRef;
             this.bible = bible;
         }
 
+        /**
+         * Gets bible ref.
+         *
+         * @return the bible ref
+         */
         public BibleRef getBibleRef() {
             return bibleRef;
         }
 
+        /**
+         * Gets bible.
+         *
+         * @return the bible
+         */
         public XMLBIBLE getBible() {
             return bible;
         }
 
+        /**
+         * Gets opt dict acc ref tuple.
+         *
+         * @return the opt dict acc ref tuple
+         */
         public Optional<Tuple<Dictionary, DictionaryRef>> getOptDictAccRefTuple() {
             return optDictAccRefTuple;
         }
 
+        /**
+         * Sets opt dict acc ref tuple.
+         *
+         * @param dictionary the dictionary
+         * @param accRef     the acc ref
+         * @return the opt dict acc ref tuple
+         */
         public BibleBookInstance setOptDictAccRefTuple(Dictionary dictionary,
                                                        DictionaryRef accRef) {
             this.optDictAccRefTuple = Optional.of(new Tuple<>(dictionary, accRef));
@@ -722,6 +923,9 @@ public class BibleTextUtils {
     }
 
 
+    /**
+     * The type Dictionary instance.
+     */
     public static class DictionaryInstance {
 
         private final DictionaryRef dictionaryRef;
@@ -730,23 +934,50 @@ public class BibleTextUtils {
 
         private final Dictionary dictionary;
 
+        /**
+         * Instantiates a new Dictionary instance.
+         *
+         * @param dictionaryRef the dictionary ref
+         * @param dictionary    the dictionary
+         */
         public DictionaryInstance(DictionaryRef dictionaryRef, Dictionary dictionary) {
             this.dictionaryRef = dictionaryRef;
             this.dictionary = dictionary;
         }
 
+        /**
+         * Gets dictionary ref.
+         *
+         * @return the dictionary ref
+         */
         public DictionaryRef getDictionaryRef() {
             return dictionaryRef;
         }
 
+        /**
+         * Gets dictionary.
+         *
+         * @return the dictionary
+         */
         public Dictionary getDictionary() {
             return dictionary;
         }
 
+        /**
+         * Gets opt bible ref tuple.
+         *
+         * @return the opt bible ref tuple
+         */
         public Optional<Tuple<XMLBIBLE, BibleRef>> getOptBibleRefTuple() {
             return optBibleRefTuple;
         }
 
+        /**
+         * Sets bible ref tuple.
+         *
+         * @param bibleRefTuple the bible ref tuple
+         * @return the bible ref tuple
+         */
         public DictionaryInstance setBibleRefTuple(Tuple<XMLBIBLE, BibleRef> bibleRefTuple) {
             this.optBibleRefTuple = Optional.of(bibleRefTuple);
             return this;

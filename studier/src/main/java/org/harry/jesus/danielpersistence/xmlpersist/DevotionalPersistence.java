@@ -9,10 +9,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 
-
+/**
+ * The type Devotional persistence.
+ */
 public class DevotionalPersistence {
 
 
+    /**
+     * Load devotional devotional.
+     *
+     * @param stream the stream
+     * @return the devotional
+     */
     public static Devotional loadDevotional(InputStream stream) {
         JAXBContext jaxbContext;
 
@@ -37,6 +45,12 @@ public class DevotionalPersistence {
         }
     }
 
+    /**
+     * Store devotional.
+     *
+     * @param root the root
+     * @param out  the out
+     */
     public static void storeDevotional(Devotional root, OutputStream out) {
         JAXBContext jaxbContext;
         try {

@@ -2,6 +2,9 @@ package org.harry.jesus.jesajautils.binding;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
+/**
+ * The type Adapter cdata.
+ */
 public class AdapterCDATA extends XmlAdapter<String, String> {
 
     @Override

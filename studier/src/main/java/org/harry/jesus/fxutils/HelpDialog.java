@@ -14,8 +14,16 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+/**
+ * The type Help dialog.
+ */
 public class HelpDialog {
 
+    /**
+     * Show help.
+     *
+     * @param resource the resource
+     */
     public static void showHelp (String resource)  {
 
         Dialog<Void> dialog = new Dialog<>();

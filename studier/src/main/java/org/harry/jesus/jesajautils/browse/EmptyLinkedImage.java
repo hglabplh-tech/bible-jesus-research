@@ -2,6 +2,9 @@ package org.harry.jesus.jesajautils.browse;
 
 import javafx.scene.Node;
 
+/**
+ * The type Empty linked image.
+ */
 public class EmptyLinkedImage implements LinkedImage {
 
     @Override

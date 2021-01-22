@@ -18,16 +18,21 @@ import java.net.URL;
 
 /**
  * Class for a Store Password Diialog to store passwords for sites.
+ *
  * @author Harald Glab-Plhak
  */
 public class ReadLinksDialog {
 
+    /**
+     * The constant fxmlLoader.
+     */
     public static FXMLLoader fxmlLoader = null;
 
     /**
      * This method creates and calls the dialog to define a production place of a signature
-     * @param utils the bible text utils instance
-     * @param area the bible read area
+     *
+     * @param utils    the bible text utils instance
+     * @param area     the bible read area
      * @param htmlText the html content
      */
     public static void showReadLinkDialog(BibleTextUtils utils,
@@ -45,6 +50,16 @@ public class ReadLinksDialog {
         }
     }
 
+    /**
+     * Load fxml parent.
+     *
+     * @param fxml     the fxml
+     * @param utils    the utils
+     * @param area     the area
+     * @param htmlText the html text
+     * @return the parent
+     * @throws IOException the io exception
+     */
     public static Parent loadFXML(String fxml, BibleTextUtils utils, FoldableStyledArea area,
                                   String htmlText) throws IOException {
         URL resourceURL = BibleStudy.class.getResource("/fxml/" + fxml + ".fxml");

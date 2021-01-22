@@ -10,7 +10,17 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.Optional;
 
+/**
+ * The type Jesus misc.
+ */
 public class JesusMisc {
+    /**
+     * Show save dialog output stream.
+     *
+     * @param node    the node
+     * @param fileExt the file ext
+     * @return the output stream
+     */
     public static OutputStream showSaveDialog(Node node, FileExtension fileExt) {
         Optional<File> optFile = showSaveDialogFile(node, fileExt);
         if (optFile.isPresent()) {
@@ -25,6 +35,13 @@ public class JesusMisc {
         return null;
     }
 
+    /**
+     * Show save dialog file optional.
+     *
+     * @param node    the node
+     * @param fileExt the file ext
+     * @return the optional
+     */
     public static Optional<File> showSaveDialogFile(Node node, FileExtension fileExt) {
         FileChooser fDialog = new FileChooser();
         fDialog.setTitle("Select Path");
@@ -42,6 +59,13 @@ public class JesusMisc {
     }
 
 
+    /**
+     * Show open dialog input stream.
+     *
+     * @param node    the node
+     * @param fileExt the file ext
+     * @return the input stream
+     */
     public static InputStream showOpenDialog(Node node, FileExtension fileExt) {
         Optional<File> optFile = showOpenDialogFile(node,fileExt);
         try {
@@ -55,6 +79,13 @@ public class JesusMisc {
         return null;
     }
 
+    /**
+     * Show open dialog file optional.
+     *
+     * @param node    the node
+     * @param fileExt the file ext
+     * @return the optional
+     */
     public static Optional<File> showOpenDialogFile(Node node, FileExtension fileExt) {
         FileChooser fDialog = new FileChooser();
         fDialog.getExtensionFilters()
@@ -73,6 +104,13 @@ public class JesusMisc {
     }
 
 
+    /**
+     * Show open dialog string string.
+     *
+     * @param node    the node
+     * @param fileExt the file ext
+     * @return the string
+     */
     public static String showOpenDialogString(Node node, FileExtension fileExt) {
         FileChooser fDialog = new FileChooser();
         fDialog.getExtensionFilters()
@@ -95,6 +133,12 @@ public class JesusMisc {
 
     }
 
+    /**
+     * Show directory selector optional.
+     *
+     * @param node the node
+     * @return the optional
+     */
     public static Optional<String> showDirectorySelector(Node node) {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("JavaFX Projects");
@@ -111,10 +155,25 @@ public class JesusMisc {
         }
     }
 
+    /**
+     * The enum File extension.
+     */
     public enum FileExtension {
+        /**
+         * The Html ext.
+         */
         HTML_EXT(new FileChooser.ExtensionFilter("HTML doc(*.html)", "*.html")),
+        /**
+         * The Pdf ext.
+         */
         PDF_EXT(new FileChooser.ExtensionFilter("PDF doc(*.pdf)", "*.pdf")),
+        /**
+         * The Xml ext.
+         */
         XML_EXT(new FileChooser.ExtensionFilter("XML doc(*.xml)", "*.xml")),
+        /**
+         * The All ext.
+         */
         ALL_EXT(new FileChooser.ExtensionFilter("ALL graphic doc(*.*)", "*.*"));
         private final FileChooser.ExtensionFilter thisFilter;
 
@@ -122,6 +181,11 @@ public class JesusMisc {
             thisFilter = extFilter;
         }
 
+        /**
+         * Gets this filter.
+         *
+         * @return the this filter
+         */
         public FileChooser.ExtensionFilter getThisFilter() {
             return thisFilter;
         }

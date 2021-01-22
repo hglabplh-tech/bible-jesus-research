@@ -27,6 +27,9 @@ public class BibleStudy extends Application {
 
     private static Scene scene;
 
+    /**
+     * The constant fxmlLoader.
+     */
     public static FXMLLoader fxmlLoader = null;
 
 
@@ -56,6 +59,14 @@ public class BibleStudy extends Application {
     }
 
 
+    /**
+     * Load fxml parent.
+     *
+     * @param fxml the fxml
+     * @param css  the css
+     * @return the parent
+     * @throws IOException the io exception
+     */
     public static Parent loadFXML(String fxml, CSS css) throws IOException {
         URL resourceURL = BibleStudy.class.getResource("/fxml/" + fxml + ".fxml");
         fxmlLoader = new FXMLLoader(resourceURL);
@@ -71,16 +82,24 @@ public class BibleStudy extends Application {
     }
 
 
-
-
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
     public static void main(String[] args) {
         launch();
     }
 
 
-
+    /**
+     * The enum Css.
+     */
     public static enum CSS {
 
+        /**
+         * Bible css.
+         */
         BIBLE(BibleStudy.class.getResource("/fxml/biblestudy.css").toExternalForm()),
         ;
 
@@ -92,6 +111,11 @@ public class BibleStudy extends Application {
             this.url = url;
         }
 
+        /**
+         * Gets url.
+         *
+         * @return the url
+         */
         public String getUrl() {
             return url;
         }

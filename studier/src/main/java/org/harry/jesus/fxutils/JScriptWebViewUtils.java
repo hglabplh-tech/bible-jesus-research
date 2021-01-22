@@ -7,8 +7,17 @@ import org.pmw.tinylog.Logger;
 
 import java.lang.reflect.Field;
 
+/**
+ * The type J script web view utils.
+ */
 public class JScriptWebViewUtils {
 
+    /**
+     * Find string.
+     *
+     * @param engine the engine
+     * @param text   the text
+     */
     public static void findString(WebEngine engine, String text) {
         try {
             WebPage page = Accessor.getPageFor(engine);

@@ -12,6 +12,9 @@ import javax.swing.event.HyperlinkEvent;
 import java.net.URL;
 import java.util.List;
 
+/**
+ * The type Web view hyper listener.
+ */
 public class WebViewHyperListener implements WebViewHyperlinkListener {
 
     private final BibleTextUtils utils;
@@ -19,7 +22,12 @@ public class WebViewHyperListener implements WebViewHyperlinkListener {
     private final FoldableStyledArea area;
 
 
-
+    /**
+     * Instantiates a new Web view hyper listener.
+     *
+     * @param utils the utils
+     * @param area  the area
+     */
     public WebViewHyperListener(BibleTextUtils utils, FoldableStyledArea area) {
         this.utils = utils;
         this.area = area;
@@ -42,6 +50,12 @@ public class WebViewHyperListener implements WebViewHyperlinkListener {
     }
 
 
+    /**
+     * Gets real bible link.
+     *
+     * @param href the href
+     * @return the real bible link
+     */
     public static String getRealBibleLink(String href) {
         href = href.replace("http://bible/", "");
         href = href.replace("\\", " ");

@@ -20,7 +20,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.MessageDigest;
 
+/**
+ * The type Bible reader.
+ */
 public class BibleReader {
+    /**
+     * Load bible tuple.
+     *
+     * @param inFile the in file
+     * @return the tuple
+     */
     public static Tuple<XMLBIBLE, String> loadBible(File inFile)  {
         JAXBContext jaxbContext;
 
@@ -48,6 +57,12 @@ public class BibleReader {
         }
     }
 
+    /**
+     * Load bible dictionary tuple.
+     *
+     * @param inFile the in file
+     * @return the tuple
+     */
     public static Tuple<Dictionary, String> loadBibleDictionary(File inFile)  {
         JAXBContext jaxbContext;
 
@@ -76,6 +91,12 @@ public class BibleReader {
         }
     }
 
+    /**
+     * Load bible dictionary dictionary.
+     *
+     * @param stream the stream
+     * @return the dictionary
+     */
     public static Dictionary loadBibleDictionary(InputStream stream)  {
         JAXBContext jaxbContext;
 
@@ -100,6 +121,12 @@ public class BibleReader {
     }
 
 
+    /**
+     * Store dictionary.
+     *
+     * @param root the root
+     * @param out  the out
+     */
     public static void storeDictionary(Dictionary root, OutputStream out) {
         JAXBContext jaxbContext;
         try {

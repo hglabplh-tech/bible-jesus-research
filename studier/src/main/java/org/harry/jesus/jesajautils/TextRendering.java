@@ -19,6 +19,7 @@ import java.util.*;
 /**
  * This class is fr the rendering (setting styles to the whole text or to areas of the text)
  * of the text area for the displayed chapter
+ *
  * @author Harald Glab-Plhak
  */
 public class TextRendering {
@@ -73,10 +74,11 @@ public class TextRendering {
 
     /**
      * The Ctor for the rendering
-     * @param bibleUtils the text utils class instance
-     * @param area the text area
+     *
+     * @param bibleUtils   the text utils class instance
+     * @param area         the text area
      * @param actBookLabel the actual book label
-     * @param actChapter the actual chapter
+     * @param actChapter   the actual chapter
      */
     public TextRendering(BibleTextUtils bibleUtils,
                          FoldableStyledArea area,
@@ -90,12 +92,19 @@ public class TextRendering {
         this.actChapter = actChapter;
     }
 
+    /**
+     * Gets chapter map.
+     *
+     * @return the chapter map
+     */
     public Map<Integer, IndexRange> getChapterMap() {
         return Collections.unmodifiableMap(chapterMap);
     }
+
     /**
      * store the color for a vers
-     * @param versList the list of verses affected
+     *
+     * @param versList    the list of verses affected
      * @param chosenColor the chosen color
      */
     public static void storeVersRendering(List<Vers> versList, Color chosenColor) {
@@ -126,6 +135,11 @@ public class TextRendering {
         }
     }
 
+    /**
+     * Show bible info.
+     *
+     * @param bible the bible
+     */
     public void showBibleInfo(XMLBIBLE bible) {
         StringBuffer textBuffer = new StringBuffer();
         textBuffer.append("Bible Book Information\n\n\n");
@@ -177,6 +191,7 @@ public class TextRendering {
 
     /**
      * get the notes inside the chapter
+     *
      * @return the notes list
      */
     public List<String> getNotes() {
@@ -185,6 +200,7 @@ public class TextRendering {
 
     /**
      * render the links
+     *
      * @param bible the bible
      * @param links the links
      * @return the content returned
@@ -206,8 +222,9 @@ public class TextRendering {
     }
 
     /**
+     * Render boolean.
      *
-     * @param bible the bible
+     * @param bible     the bible
      * @param bookLabel the book label
      * @param chapterNo the chapter number
      * @return rendering ok ?
@@ -230,7 +247,8 @@ public class TextRendering {
 
     /**
      * This method selects a verse by the given ÄIndexRange in the text
-     * @param range the range by which we search for the verse in the text
+     *
+     * @param range   the range by which we search for the verse in the text
      * @param toggler toggle selected / not selected
      * @return the selected the entry for the verse
      */
@@ -249,6 +267,7 @@ public class TextRendering {
 
     /**
      * This method selects a verse by the given ÄIndexRange in the text
+     *
      * @param range the range by which we search for the verse in the text
      * @param color the optional given back-color
      * @return the selected the entry for the verse
@@ -270,6 +289,7 @@ public class TextRendering {
 
     /**
      * set the area text with it's styles
+     *
      * @param strContent the actual content
      */
     public void setAreaText(StringBuffer strContent) {
@@ -291,6 +311,13 @@ public class TextRendering {
         }
     }
 
+    /**
+     * Sets range color.
+     *
+     * @param area  the area
+     * @param color the color
+     * @param range the range
+     */
     public static void setRangeColor(FoldableStyledArea area, String color, IndexRange range) {
         BaseConfig base = BibleThreadPool.getContext().getAppSettings().getBaseConfig();
         Integer fontSize = base.getFontSize();
@@ -303,6 +330,13 @@ public class TextRendering {
         area.setStyle(range.getStart(), range.getEnd(), theStyle);
     }
 
+    /**
+     * Merge range style.
+     *
+     * @param area  the area
+     * @param style the style
+     * @param range the range
+     */
     public static void mergeRangeStyle(FoldableStyledArea area, TextStyle style, IndexRange range) {
         BaseConfig base = BibleThreadPool.getContext().getAppSettings().getBaseConfig();
         Integer fontSize = base.getFontSize();
@@ -315,6 +349,13 @@ public class TextRendering {
         area.setStyle(range.getStart(), range.getEnd(), theStyle);
     }
 
+    /**
+     * Refresh area style.
+     *
+     * @param textArea the text area
+     * @param range    the range
+     * @param toggle   the toggle
+     */
     public static void refreshAreaStyle(FoldableStyledArea textArea, IndexRange range, Boolean toggle) {
         BaseConfig base = BibleThreadPool.getContext().getAppSettings().getBaseConfig();
         Integer fontSize = base.getFontSize();

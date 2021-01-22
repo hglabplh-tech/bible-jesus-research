@@ -37,16 +37,19 @@ public class SettingsDialog {
 
     /**
      * This method creates and calls the dialog to define the settings for this application
-
-     *
      */
-
     BibleAppConfig config = null;
 
+    /**
+     * Instantiates a new Settings dialog.
+     */
     public SettingsDialog() {
 
     }
 
+    /**
+     * Show app settings dialog.
+     */
     public void showAppSettingsDialog() {
         // Create the custom dialog.
         BibleThreadPool.ThreadBean context = BibleThreadPool.getContext();
@@ -270,12 +273,31 @@ public class SettingsDialog {
         return box;
     }
 
+    /**
+     * Sets preview.
+     *
+     * @param area     the area
+     * @param style    the style
+     * @param font     the font
+     * @param fontSize the font size
+     * @return the preview
+     */
     public static TextStyle setPreview(FoldableStyledArea area, TextStyle style,
                             String font, Integer fontSize) {
 
         return setPreview(area, style, font, fontSize, null);
     }
 
+    /**
+     * Sets preview.
+     *
+     * @param area     the area
+     * @param style    the style
+     * @param font     the font
+     * @param fontSize the font size
+     * @param range    the range
+     * @return the preview
+     */
     public static TextStyle setPreview(FoldableStyledArea area, TextStyle style,
                                        String font, Integer fontSize, IndexRange range) {
         String text = area.getText();

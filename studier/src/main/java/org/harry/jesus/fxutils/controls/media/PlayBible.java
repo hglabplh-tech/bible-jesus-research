@@ -10,6 +10,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Optional;
 
+/**
+ * The type Play bible.
+ */
 public class PlayBible {
 
     private static final String MP3_SUFFIX = ".mp3";
@@ -20,11 +23,20 @@ public class PlayBible {
 
     private MediaPlayer mediaPlayer;
 
+    /**
+     * Instantiates a new Play bible.
+     *
+     * @param mediaPath the media path
+     * @param mView     the m view
+     */
     public PlayBible(String mediaPath, MediaView mView) {
         this.mView = mView;
         this.mediaPath = mediaPath;
     }
 
+    /**
+     * Stop chapter.
+     */
     public void stopChapter() {
         if (this.mediaPlayer != null) {
             this.mediaPlayer.stop();
@@ -32,6 +44,12 @@ public class PlayBible {
     }
 
 
+    /**
+     * Play chapter media player.
+     *
+     * @param link the link
+     * @return the media player
+     */
     public MediaPlayer  playChapter(BibleTextUtils.BookLink link) {
         Optional<File> chapterMP3 = getMP3File(link);
         try {
@@ -49,6 +67,12 @@ public class PlayBible {
         return mediaPlayer;
     }
 
+    /**
+     * Gets mp 3 file.
+     *
+     * @param link the link
+     * @return the mp 3 file
+     */
     public Optional<File> getMP3File(BibleTextUtils.BookLink link) {
         File mediaDirFile= new File(mediaPath);
         if (mediaDirFile.exists()) {
@@ -60,10 +84,18 @@ public class PlayBible {
         return Optional.empty();
     }
 
+    /**
+     * The type Media filter.
+     */
     public static class MediaFilter implements FilenameFilter {
 
         private final BibleTextUtils.BookLink link;
 
+        /**
+         * Instantiates a new Media filter.
+         *
+         * @param link the link
+         */
         public MediaFilter(BibleTextUtils.BookLink link)  {
             this.link = link;
         }

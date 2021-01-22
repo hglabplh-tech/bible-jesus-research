@@ -14,9 +14,17 @@ import java.util.Optional;
 
 import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
 
+/**
+ * The type Html rendering.
+ */
 public class HTMLRendering {
 
 
+    /**
+     * Build head.
+     *
+     * @param htmlBuffer the html buffer
+     */
     public static void buildHead(StringBuffer htmlBuffer) {
         htmlBuffer.append("<!DOCTYPE html>\n" +
                 "<html>\n" +
@@ -30,11 +38,24 @@ public class HTMLRendering {
                 " </head>\n<body>\n");
     }
 
+    /**
+     * Build foot.
+     *
+     * @param htmlBuffer the html buffer
+     */
     public static void buildFoot(StringBuffer htmlBuffer) {
         htmlBuffer.append("</body>\n" +
                 "</html>");
     }
 
+    /**
+     * Build vers html string buffer.
+     *
+     * @param link     the link
+     * @param linkText the link text
+     * @param chapter  the chapter
+     * @return the string buffer
+     */
     public static StringBuffer buildVersHTML(BibleFulltextEngine.BibleTextKey link, String linkText, CHAPTER chapter) {
         StringBuffer buffer = new StringBuffer();
         buffer.append(linkText + " ");
@@ -42,6 +63,13 @@ public class HTMLRendering {
         return buffer;
     }
 
+    /**
+     * Gets vers text.
+     *
+     * @param versNumber the vers number
+     * @param chapter    the chapter
+     * @param buffer     the buffer
+     */
     public static void getVersText(Integer versNumber,CHAPTER chapter, StringBuffer buffer) {
         for (Object obj: chapter.getPROLOGOrCAPTIONOrVERS()) {
             Object thing = ((JAXBElement)obj).getValue();
@@ -58,6 +86,14 @@ public class HTMLRendering {
         }
     }
 
+    /**
+     * Render link string.
+     *
+     * @param utils the utils
+     * @param bible the bible
+     * @param links the links
+     * @return the string
+     */
     public static String renderLink(BibleTextUtils utils, XMLBIBLE bible,
                                                 List<BibleTextUtils.BookLink> links) {
         StringBuffer htmlContent = new StringBuffer();
@@ -95,6 +131,14 @@ public class HTMLRendering {
         return htmlContent.toString();
     }
 
+    /**
+     * Render full chapter string.
+     *
+     * @param utils the utils
+     * @param bible the bible
+     * @param links the links
+     * @return the string
+     */
     public static String renderFullChapter(BibleTextUtils utils, XMLBIBLE bible,
                                     List<BibleTextUtils.BookLink> links) {
         StringBuffer htmlContent = new StringBuffer();
@@ -140,6 +184,12 @@ public class HTMLRendering {
         return htmlContent.toString();
     }
 
+    /**
+     * Build heading.
+     *
+     * @param htmlBuffer the html buffer
+     * @param idText     the id text
+     */
     public static void buildHeading(StringBuffer htmlBuffer, String idText) {
         htmlBuffer.append("<H5 id=\"" +
                 idText
@@ -148,13 +198,25 @@ public class HTMLRendering {
                 + ")</H5>\n");
     }
 
+    /**
+     * Build link internal.
+     *
+     * @param link       the link
+     * @param htmlBuffer the html buffer
+     */
     public static void buildLinkInternal(String link, StringBuffer htmlBuffer) {
             htmlBuffer.append("http://_self/#"
                     + link);
     }
 
 
-
+    /**
+     * Generate hyper link string.
+     *
+     * @param buffer the buffer
+     * @param link   the link
+     * @return the string
+     */
     public static String generateHyperLink(StringBuffer buffer, String link) {
         String href = "http://bible/"+ link;
         href = href.replace(",", "/vers/");
@@ -167,8 +229,13 @@ public class HTMLRendering {
     }
 
 
-
-
+    /**
+     * Note to html.
+     *
+     * @param noteText   the note text
+     * @param buffer     the buffer
+     * @param htmlBuffer the html buffer
+     */
     public static void noteToHTML(String noteText, StringBuffer buffer, StringBuffer htmlBuffer) {
         htmlBuffer.append("<hr><p><span style=\"font-size: small; font-family: &quot;Times New Roman&quot;;\">")
                 .append(buffer.toString())
@@ -178,6 +245,13 @@ public class HTMLRendering {
                 .append("</p><hr>");
     }
 
+    /**
+     * Render vers.
+     *
+     * @param htmlBuffer the html buffer
+     * @param buffer     the buffer
+     * @param color      the color
+     */
     public static void renderVers(StringBuffer htmlBuffer, String buffer, Color color) {
         if (color == null) {
             htmlBuffer.append("<hr><p><span style=\"font-size: small; font-family: &quot;Times New Roman&quot;;\">")
@@ -191,6 +265,15 @@ public class HTMLRendering {
         }
     }
 
+    /**
+     * Render verses as doc string.
+     *
+     * @param selected the selected
+     * @param utils    the utils
+     * @param verses   the verses
+     * @param noteText the note text
+     * @return the string
+     */
     public static String renderVersesASDoc(XMLBIBLE selected,
                                            BibleTextUtils utils, List<Vers> verses, String noteText) {
         StringBuffer buffer = new StringBuffer().append("<html><title>Some selected verses</title><body>");
@@ -202,6 +285,14 @@ public class HTMLRendering {
         return buffer.toString();
     }
 
+    /**
+     * Render verses string.
+     *
+     * @param selected the selected
+     * @param utils    the utils
+     * @param verses   the verses
+     * @return the string
+     */
     public static String renderVerses(XMLBIBLE selected, BibleTextUtils utils, List<Vers> verses) {
         StringBuffer buffer = new StringBuffer();
         for (Vers vers: verses) {

@@ -8,6 +8,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The type Verse image root.
+ */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
         "verseImageMap"
@@ -16,10 +19,18 @@ import java.util.Map;
 @XmlRootElement
 public class VerseImageRoot {
 
+    /**
+     * The Verse image map.
+     */
     @XmlJavaTypeAdapter(VerseImagesMapAdapter.class)
     protected Map<String, VerseImageData> verseImageMap = new HashMap<>();
 
 
+    /**
+     * Gets verse image mapping.
+     *
+     * @return the verse image mapping
+     */
     public Map<String, VerseImageData> getVerseImageMapping() {
         return verseImageMap;
     }

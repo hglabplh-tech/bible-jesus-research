@@ -18,12 +18,21 @@ package org.harry.jesus.fxutils.graphics;
 import java.awt.*;
 import java.awt.geom.*;
 
+/**
+ * The type Wobble stroke.
+ */
 public class WobbleStroke implements Stroke {
 	private float detail = 2;
 	private float amplitude = 2;
 	private static final float FLATNESS = 1;
 
-	public WobbleStroke( float detail, float amplitude ) {
+    /**
+     * Instantiates a new Wobble stroke.
+     *
+     * @param detail    the detail
+     * @param amplitude the amplitude
+     */
+    public WobbleStroke( float detail, float amplitude ) {
 		this.detail	= detail;
 		this.amplitude	= amplitude;
 	}

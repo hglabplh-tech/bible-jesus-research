@@ -16,7 +16,20 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * The type Image maker.
+ */
 public class ImageMaker {
+    /**
+     * Create image optional.
+     *
+     * @param verseText the verse text
+     * @param color     the color
+     * @param size      the size
+     * @param font      the font
+     * @param image     the image
+     * @return the optional
+     */
     public static Optional<BufferedImage> createImage (String verseText,
                                                        Color color, Float size,
                                                        Font font,
@@ -35,6 +48,14 @@ public class ImageMaker {
         }
     }
 
+    /**
+     * Create scaled image optional.
+     *
+     * @param cx    the cx
+     * @param cy    the cy
+     * @param image the image
+     * @return the optional
+     */
     public static Optional<BufferedImage> createScaledImage (int cx, int cy,
                                                        final BufferedImage image)  {
         try {
@@ -109,6 +130,12 @@ public class ImageMaker {
         return cookedText;
     }
 
+    /**
+     * Convert color color.
+     *
+     * @param fx the fx
+     * @return the color
+     */
     public static Color convertColor(javafx.scene.paint.Color fx) {
         return  new Color((float) fx.getRed(),
                 (float) fx.getGreen(),
@@ -116,6 +143,13 @@ public class ImageMaker {
                 (float) fx.getOpacity());
     }
 
+    /**
+     * Save to file optional.
+     *
+     * @param image  the image
+     * @param subDir the sub dir
+     * @return the optional
+     */
     public static Optional<String> saveToFile(Image image, String subDir) {
         File outDir = SynchThread.verseImageDir;
         if (subDir != null) {
@@ -141,6 +175,13 @@ public class ImageMaker {
 
     }
 
+    /**
+     * Gets zoom values.
+     *
+     * @param source   the source
+     * @param relation the relation
+     * @return the zoom values
+     */
     public static Tuple<Integer, Integer> getZoomValues(Image source, Integer relation) {
         double ratio = source.getWidth() / source.getHeight();
         int width = 0;
@@ -158,6 +199,12 @@ public class ImageMaker {
         return new Tuple<>(width,height);
     }
 
+    /**
+     * Get bytes from image byte [ ].
+     *
+     * @param image the image
+     * @return the byte [ ]
+     */
     public static byte [] getBytesFromImage(Image image) {
         try {
             BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);

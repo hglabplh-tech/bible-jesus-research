@@ -49,8 +49,14 @@ import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+/**
+ * The type Media control.
+ */
 public class MediaControl extends BorderPane {
 
+    /**
+     * The Play button.
+     */
     final Button playButton = new Button(">");
     private MediaPlayer mp;
     private MediaView mediaView;
@@ -63,6 +69,12 @@ public class MediaControl extends BorderPane {
     private Slider volumeSlider;
     private HBox mediaBar;
 
+    /**
+     * Instantiates a new Media control.
+     *
+     * @param mp    the mp
+     * @param mView the m view
+     */
     public MediaControl(final MediaPlayer mp, MediaView mView) {
         this.mp = mp;
         setStyle("-fx-background-color: #bfc2c7;");
@@ -201,10 +213,21 @@ public class MediaControl extends BorderPane {
         setBottom(mediaBar);
     }
 
+    /**
+     * Gets mp.
+     *
+     * @return the mp
+     */
     public MediaPlayer getMp() {
         return mp;
     }
 
+    /**
+     * Sets mp.
+     *
+     * @param mp the mp
+     * @return the mp
+     */
     public MediaControl setMp(MediaPlayer mp) {
         this.mp = mp;
         mp.currentTimeProperty().addListener(new InvalidationListener() {
@@ -252,6 +275,9 @@ public class MediaControl extends BorderPane {
         return this;
     }
 
+    /**
+     * Update values.
+     */
     protected void updateValues() {
         if (playTime != null && timeSlider != null && volumeSlider != null) {
             Platform.runLater(new Runnable() {

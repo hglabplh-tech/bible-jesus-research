@@ -6,6 +6,9 @@ import java.util.Map;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
+/**
+ * The type Dict bible map adapter.
+ */
 class DictBibleMapAdapter extends XmlAdapter<DictBibleMapElements[], Map<DictionaryRef, BibleRef>> {
     public DictBibleMapElements[] marshal(Map<DictionaryRef, BibleRef> arg0) throws Exception {
         DictBibleMapElements[] dictBibleMapElements = new DictBibleMapElements[arg0.size()];

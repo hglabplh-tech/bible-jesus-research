@@ -12,16 +12,34 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * The type Bible fulltext engine.
+ */
 public class BibleFulltextEngine {
 
+    /**
+     * The constant INSENSITIVE.
+     */
     public static final int INSENSITIVE = Pattern.CASE_INSENSITIVE;
 
+    /**
+     * The constant OR_OP.
+     */
     public static final String OR_OP = "OR";
 
+    /**
+     * The constant WILDCARD.
+     */
     public static final String WILDCARD = "*";
 
+    /**
+     * The constant NOT.
+     */
     public static final String NOT = "-";
 
+    /**
+     * The constant operatorMap.
+     */
     public static final Map<String, String> operatorMap= new HashMap<>();
 
     static {
@@ -35,6 +53,11 @@ public class BibleFulltextEngine {
 
     private final XMLBIBLE bible;
 
+    /**
+     * Instantiates a new Bible fulltext engine.
+     *
+     * @param bible the bible
+     */
     public BibleFulltextEngine(XMLBIBLE bible) {
         this.bible = bible;
         List<BIBLEBOOK> books = util.getBooks(bible);
@@ -47,9 +70,22 @@ public class BibleFulltextEngine {
         System.err.println("End of engine construct");
     }
 
+    /**
+     * Gets util.
+     *
+     * @return the util
+     */
     public static BibleTextUtils getUtil() {
         return util;
     }
+
+    /**
+     * Search plain map.
+     *
+     * @param plainQuery the plain query
+     * @param collector  the collector
+     * @return the map
+     */
 // (.*)
     public Map<BibleTextKey, String> searchPlain(String plainQuery, StatisticsCollector collector) {
         Map<BibleTextKey, String> hits = new LinkedHashMap<>();
@@ -68,6 +104,14 @@ public class BibleFulltextEngine {
         return hits;
     }
 
+    /**
+     * Search pattern map.
+     *
+     * @param patternQuery the pattern query
+     * @param flags        the flags
+     * @param collector    the collector
+     * @return the map
+     */
     public Map<BibleTextKey, String> searchPattern(String patternQuery, int flags, StatisticsCollector collector) {
         Map<BibleTextKey, String> hits = new LinkedHashMap<>();
         Map.Entry<BibleTextKey, String> lastentry = null;
@@ -85,6 +129,14 @@ public class BibleFulltextEngine {
         return hits;
     }
 
+    /**
+     * Search pattern fuzzy map.
+     *
+     * @param patternQuery the pattern query
+     * @param flags        the flags
+     * @param collector    the collector
+     * @return the map
+     */
     public Map<BibleTextKey, String> searchPatternFuzzy(String patternQuery, int flags, StatisticsCollector collector) {
         Map<BibleTextKey, String> hits = new LinkedHashMap<>();
         Map.Entry<BibleTextKey, String> lastentry = null;
@@ -102,6 +154,14 @@ public class BibleFulltextEngine {
         return hits;
     }
 
+    /**
+     * Pattern match boolean.
+     *
+     * @param toSearch    the to search
+     * @param patternList the pattern list
+     * @param flags       the flags
+     * @return the boolean
+     */
     public static boolean patternMatch(String toSearch, List<String> patternList, int flags) {
         boolean result = false;
         for (String patternString: patternList) {
@@ -113,6 +173,14 @@ public class BibleFulltextEngine {
         return result;
     }
 
+    /**
+     * Pattern match fuzzy boolean.
+     *
+     * @param toSearch    the to search
+     * @param patternList the pattern list
+     * @param flags       the flags
+     * @return the boolean
+     */
     public static boolean patternMatchFuzzy(String toSearch, List<String> patternList, int flags) {
         boolean result = false;
         for (String patternString: patternList) {
@@ -126,6 +194,12 @@ public class BibleFulltextEngine {
         return result;
     }
 
+    /**
+     * Pattern from mini google list.
+     *
+     * @param rawPattern the raw pattern
+     * @return the list
+     */
     public static List<String> patternFromMiniGoogle(String rawPattern) {
         int index = rawPattern.indexOf(OR_OP);
         int start = 0;
@@ -145,6 +219,9 @@ public class BibleFulltextEngine {
         return patternList;
     }
 
+    /**
+     * The type Bible text key.
+     */
     public static class BibleTextKey implements Serializable {
 
         private final Integer book;
@@ -153,20 +230,42 @@ public class BibleFulltextEngine {
         
         private final Integer vers;
 
+        /**
+         * Instantiates a new Bible text key.
+         *
+         * @param book    the book
+         * @param chapter the chapter
+         * @param vers    the vers
+         */
         public BibleTextKey(Integer book, Integer chapter, Integer vers) {
             this.book = book;
             this.chapter = chapter;
             this.vers = vers;
         }
 
+        /**
+         * Gets book.
+         *
+         * @return the book
+         */
         public Integer getBook() {
             return book;
         }
 
+        /**
+         * Gets chapter.
+         *
+         * @return the chapter
+         */
         public Integer getChapter() {
             return chapter;
         }
 
+        /**
+         * Gets vers.
+         *
+         * @return the vers
+         */
         public Integer getVers() {
             return vers;
         }

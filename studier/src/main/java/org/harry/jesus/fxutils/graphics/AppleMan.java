@@ -9,12 +9,28 @@ import java.util.Arrays;
 import java.util.List;
 
 
+/**
+ * The type Apple man.
+ */
 public class AppleMan {
 
+    /**
+     * The Color list.
+     */
     static List<Color> colorList = Arrays.asList(Color.WHITE, Color.YELLOW,
             Color.RED, Color.BLUE, Color.CYAN, Color.MAGENTA);
+    /**
+     * The Width.
+     */
     static int width = 700;
+    /**
+     * The Height.
+     */
     static int height = 500;
+
+    /**
+     * Paint.
+     */
     public static void paint() {
         int x = 0;
         int y = 0;
@@ -45,6 +61,15 @@ public class AppleMan {
         Image img = SwingFXUtils.toFXImage(bimage, null);
         ImageMaker.saveToFile(img, null);
     }
+
+    /**
+     * Iter zahl int.
+     *
+     * @param cx    the cx
+     * @param cy    the cy
+     * @param maxIt the max it
+     * @return the int
+     */
     public static int iterZahl(final double cx, final double cy, int maxIt) {
 // bestimmt Anzahl der Iterationen
         int zaehler = 0;
@@ -57,6 +82,14 @@ public class AppleMan {
         } while (zx*zx + zy*zy <= 4.0 && zaehler < maxIt);
         return zaehler;
     }
+
+    /**
+     * Zeichne mandelbrotmenge.
+     *
+     * @param g      the g
+     * @param liRand the li rand
+     * @param obRand the ob rand
+     */
     public static void zeichneMandelbrotmenge(Graphics2D g, int liRand, int obRand) {
         int colIndex = 0;
         double xa = -2.02, xe = 0.7, ya = -1.2, ye = 1.2; // Ratio 17:15

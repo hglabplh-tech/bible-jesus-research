@@ -6,7 +6,19 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * The type Link handler.
+ */
 public class LinkHandler {
+    /**
+     * Build vers link enhanced string.
+     *
+     * @param utils      the utils
+     * @param bookNumber the book number
+     * @param chapter    the chapter
+     * @param versNoList the vers no list
+     * @return the string
+     */
     public static String buildVersLinkEnhanced(BibleTextUtils utils, Integer bookNumber, Integer chapter, List versNoList) {
         String versLink = "";
         StringBuffer linkBuffer = new StringBuffer();
@@ -40,6 +52,13 @@ public class LinkHandler {
         return linkBuffer.toString();
     }
 
+    /**
+     * Generate links fuzzy string.
+     *
+     * @param utils the utils
+     * @param text  the text
+     * @return the string
+     */
     public static String generateLinksFuzzy(BibleTextUtils utils, final String text) {
         List<BibleTextUtils.BookLabel> labelList = getTransformedLabels(utils);
         List<BibleTextUtils.BookLink> links = parseLinks(utils, text);
@@ -63,6 +82,13 @@ public class LinkHandler {
         return buffer.toString();
     }
 
+    /**
+     * Parse links fuzzy list.
+     *
+     * @param utils the utils
+     * @param text  the text
+     * @return the list
+     */
     public static List<BibleTextUtils.BookLink> parseLinksFuzzy(BibleTextUtils utils, final String text) {
         List<BibleTextUtils.BookLabel> labelList = getTransformedLabels(utils);
         List<BibleTextUtils.BookLink> bookLink = new ArrayList<>();
@@ -146,6 +172,13 @@ public class LinkHandler {
        return bookLink;
     }
 
+    /**
+     * Collect labels with begin index map.
+     *
+     * @param utils the utils
+     * @param text  the text
+     * @return the map
+     */
     public static Map<String, List<Integer>> collectLabelsWithBeginIndex(BibleTextUtils utils, String text) {
         Map<String, List<Integer>> result = new LinkedHashMap<>();
         List<BibleTextUtils.BookLabel> labelList = getTransformedLabels(utils);
@@ -170,6 +203,13 @@ public class LinkHandler {
         return result;
     }
 
+    /**
+     * Cut string tuple.
+     *
+     * @param toCut     the to cut
+     * @param startVers the start vers
+     * @return the tuple
+     */
     public static Tuple<Integer, Integer> cutString (String toCut, int startVers) {
         String lastPart = toCut.substring(startVers);
         int semiColonInd = lastPart.indexOf(";");
@@ -206,6 +246,14 @@ public class LinkHandler {
             return new Tuple<>(res, nextLinkINQueue);
         }
     }
+
+    /**
+     * Parse links list.
+     *
+     * @param bibleTextUtils the bible text utils
+     * @param text           the text
+     * @return the list
+     */
     public static List<BibleTextUtils.BookLink> parseLinks(BibleTextUtils bibleTextUtils, String text) {
         List<BibleTextUtils.BookLink> links = new ArrayList<>();
         int start = 0;

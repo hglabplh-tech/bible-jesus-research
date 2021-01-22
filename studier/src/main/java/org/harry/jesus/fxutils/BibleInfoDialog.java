@@ -8,8 +8,16 @@ import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.Tuple;
 import org.harry.jesus.jesajautils.configjaxbser.DictionaryRef;
 
+/**
+ * The type Bible info dialog.
+ */
 public class BibleInfoDialog {
 
+    /**
+     * Call bible info dialog.
+     *
+     * @param instance the instance
+     */
     public static void callBibleInfoDialog(BibleTextUtils.BibleBookInstance instance) {
         Dialog<Void> dialog = new Dialog<>();
 

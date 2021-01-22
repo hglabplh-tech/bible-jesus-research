@@ -27,6 +27,7 @@ import java.util.Optional;
 
 /**
  * Class for a Store Password Diialog to store passwords for sites.
+ *
  * @author Harald Glab-Plhak
  */
 public class CreatePictureDialog {
@@ -44,6 +45,9 @@ public class CreatePictureDialog {
     private List<Font> awtFonts = new ArrayList<>();
 
 
+    /**
+     * Instantiates a new Create picture dialog.
+     */
     public CreatePictureDialog() {
         fontSizeBox.getItems().add(10f);
         fontSizeBox.getItems().add(12f);
@@ -74,6 +78,7 @@ public class CreatePictureDialog {
 
     /**
      * This method creates and calls the dialog to create verse images
+     *
      * @param theVers vers to be created as image
      * @return the optional image generated
      */
@@ -167,6 +172,12 @@ public class CreatePictureDialog {
 
         private final Vers theVers;
 
+        /**
+         * Instantiates a new Show button handler.
+         *
+         * @param theVers the the vers
+         * @param source  the source
+         */
         public ShowButtonHandler(Vers theVers,Image source) {
             this.source = source;
             this.theVers = theVers;

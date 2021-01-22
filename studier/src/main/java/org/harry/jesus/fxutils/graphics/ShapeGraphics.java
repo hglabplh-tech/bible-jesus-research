@@ -14,16 +14,40 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 
+/**
+ * The type Shape graphics.
+ */
 public class ShapeGraphics {
 
+    /**
+     * The Max graphics.
+     */
     static final Integer MAX_GRAPHICS = 25;
+    /**
+     * The Color list.
+     */
     static List<Color> colorList = Arrays.asList(Color.WHITE, Color.YELLOW,
             Color.RED, Color.BLUE, Color.CYAN, Color.MAGENTA, Color.WHITE, Color.LIGHT_GRAY,
             Color.GRAY, Color.DARK_GRAY, Color.ORANGE);
+    /**
+     * The Width.
+     */
     static int width = 700;
+    /**
+     * The Height.
+     */
     static int height = 500;
+    /**
+     * The Minimum.
+     */
     static int minimum = 1;
+    /**
+     * The Maximum.
+     */
     static int maximum = 8;
+    /**
+     * The Col index.
+     */
     static int colIndex = 0;
 
 
@@ -31,6 +55,9 @@ public class ShapeGraphics {
         colIndex = rnNum();
     }
 
+    /**
+     * Paint.
+     */
     public static void paint() {
         int x = 0;
         int y = 0;

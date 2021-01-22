@@ -22,6 +22,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * The type Read functions control.
+ */
 public class ReadFunctionsControl extends GridPane {
 
 
@@ -37,6 +40,9 @@ public class ReadFunctionsControl extends GridPane {
 
     private ChoiceBox<BibleTextUtils.DictionaryInstance> dictionaries = new ChoiceBox<>();
 
+    /**
+     * Instantiates a new Read functions control.
+     */
     public ReadFunctionsControl() {
         this.add(prevChapter, 0, 0);
         this.add(nextChapter, 2, 0);
@@ -71,22 +77,47 @@ public class ReadFunctionsControl extends GridPane {
         });
     }
 
+    /**
+     * Gets history choice.
+     *
+     * @return the history choice
+     */
     public ChoiceBox<HistoryEntry> getHistoryChoice() {
         return historyChoice;
     }
 
+    /**
+     * Gets dictionaries.
+     *
+     * @return the dictionaries
+     */
     public ChoiceBox<BibleTextUtils.DictionaryInstance> getDictionaries() {
         return dictionaries;
     }
 
+    /**
+     * Gets chapter info.
+     *
+     * @return the chapter info
+     */
     public TextField getChapterInfo() {
         return chapterInfo;
     }
 
+    /**
+     * Gets prev chapter.
+     *
+     * @return the prev chapter
+     */
     public Button getPrevChapter() {
         return prevChapter;
     }
 
+    /**
+     * Gets next chapter.
+     *
+     * @return the next chapter
+     */
     public Button getNextChapter() {
         return nextChapter;
     }

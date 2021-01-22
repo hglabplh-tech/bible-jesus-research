@@ -9,8 +9,17 @@ import javax.xml.bind.Unmarshaller;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * The type App settings persistence.
+ */
 public class AppSettingsPersistence {
 
+    /**
+     * Load app settings bible app config.
+     *
+     * @param stream the stream
+     * @return the bible app config
+     */
     public static BibleAppConfig loadAppSettings(InputStream stream) {
         JAXBContext jaxbContext;
 
@@ -35,6 +44,12 @@ public class AppSettingsPersistence {
         }
     }
 
+    /**
+     * Store app settings.
+     *
+     * @param root the root
+     * @param out  the out
+     */
     public static void storeAppSettings(BibleAppConfig root, OutputStream out) {
         JAXBContext jaxbContext;
         try {

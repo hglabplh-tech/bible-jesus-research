@@ -317,6 +317,8 @@
                         </execution>
                     </executions>
                     <configuration>
+                        <extension>true</extension>
+                        <createJavaDocAnnotations>true</createJavaDocAnnotations>
                         <sources>
                             <source>src/main/resources/xsd/zefania.xsd</source>
                             <source>src/main/resources/xsd/zefanjaDict.xsd</source>
@@ -380,6 +382,9 @@
                  <groupId>org.apache.maven.plugins</groupId>
                  <artifactId>maven-javadoc-plugin</artifactId>
                  <version>3.2.0</version>
+                <configuration>
+
+                </configuration>
                  <executions>
                      <execution>
                          <id>attach-javadocs</id>

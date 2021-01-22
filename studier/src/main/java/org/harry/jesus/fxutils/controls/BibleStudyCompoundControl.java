@@ -32,6 +32,9 @@ import org.tinylog.Logger;
 import javax.xml.bind.JAXBElement;
 import java.util.*;
 
+/**
+ * The type Bible study compound control.
+ */
 public class BibleStudyCompoundControl extends BorderPane {
 
     private FoldableStyledArea area;
@@ -70,10 +73,18 @@ public class BibleStudyCompoundControl extends BorderPane {
 
     private TextRendering rendering = null;
 
+    /**
+     * The Selected verses map.
+     */
     Map<Integer, IndexRange> selectedVersesMap = new LinkedHashMap<>();
 
 
-
+    /**
+     * Instantiates a new Bible study compound control.
+     *
+     * @param selected     the selected
+     * @param actBookLabel the act book label
+     */
     public BibleStudyCompoundControl(XMLBIBLE selected, String actBookLabel) {
         this.utils = BibleTextUtils.getInstance();
         this.utils.setSelected(selected);
@@ -139,6 +150,9 @@ public class BibleStudyCompoundControl extends BorderPane {
         this.setBottom(studyNotes);
     }
 
+    /**
+     * Init media view.
+     */
     public void initMediaView() {
         String mediaPath = BibleThreadPool.getContext().getAppSettings()
                 .getBaseConfig().getMediaPath();
@@ -390,6 +404,11 @@ public class BibleStudyCompoundControl extends BorderPane {
         jumpToVers(range);
     }
 
+    /**
+     * Show chapter boolean.
+     *
+     * @return the boolean
+     */
     public boolean showChapter() {
         rendering = new TextRendering(utils, this.area, actBookLabel, actChapter);
         HistoryEntry entry = createHistoryEntry();
@@ -465,6 +484,11 @@ public class BibleStudyCompoundControl extends BorderPane {
     }
 
 
+    /**
+     * Gets selected map sorted.
+     *
+     * @return the selected map sorted
+     */
     public Map<Integer, IndexRange> getSelectedMapSorted() {
         List<Integer> sortedList = new ArrayList<>();
         sortedList.addAll(selectedVersesMap.keySet());
@@ -483,50 +507,106 @@ public class BibleStudyCompoundControl extends BorderPane {
         return temp;
     }
 
+    /**
+     * Gets selected.
+     *
+     * @return the selected
+     */
     public XMLBIBLE getSelected() {
         return utils.getSelected();
     }
 
 
+    /**
+     * Gets act book.
+     *
+     * @return the act book
+     */
     public BibleTextUtils.BookLabel getActBook() {
         return actBook;
     }
 
+    /**
+     * Gets area.
+     *
+     * @return the area
+     */
     public FoldableStyledArea getArea() {
         return area;
     }
 
+    /**
+     * Gets act book label.
+     *
+     * @return the act book label
+     */
     public String getActBookLabel() {
         return actBookLabel;
     }
 
+    /**
+     * Gets act chapter.
+     *
+     * @return the act chapter
+     */
     public Integer getActChapter() {
         return actChapter;
     }
 
+    /**
+     * Sets act book label.
+     *
+     * @param actBookLabel the act book label
+     * @return the act book label
+     */
     public BibleStudyCompoundControl setActBookLabel(String actBookLabel) {
         this.actBookLabel = actBookLabel;
         return this;
     }
 
+    /**
+     * Sets act chapter.
+     *
+     * @param actChapter the act chapter
+     * @return the act chapter
+     */
     public BibleStudyCompoundControl setActChapter(Integer actChapter) {
         this.actChapter = actChapter;
         return this;
     }
 
+    /**
+     * Sets act book.
+     *
+     * @param actBook the act book
+     * @return the act book
+     */
     public BibleStudyCompoundControl setActBook(BibleTextUtils.BookLabel actBook) {
         this.actBook = actBook;
         return this;
     }
 
+    /**
+     * Gets the books.
+     *
+     * @return the the books
+     */
     public List<BIBLEBOOK> getTheBooks() {
         return theBooks;
     }
 
+    /**
+     * Clear selected.
+     */
     public void clearSelected() {
         this.selectedVersesMap.clear();
     }
 
+    /**
+     * Gets top controls.
+     *
+     * @return the top controls
+     */
     public ReadFunctionsControl getTopControls() {
         return topControls;
     }

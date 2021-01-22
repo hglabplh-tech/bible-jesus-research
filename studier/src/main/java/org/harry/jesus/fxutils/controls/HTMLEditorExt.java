@@ -19,8 +19,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Base64;
 
+/**
+ * The type Html editor ext.
+ */
 public class HTMLEditorExt  {
 
+    /**
+     * Instantiates a new Html editor ext.
+     *
+     * @param htmlEditor the html editor
+     */
     public HTMLEditorExt(HTMLEditor htmlEditor) {
         Node node = htmlEditor.lookup(".top-toolbar");
         if (node instanceof ToolBar) {

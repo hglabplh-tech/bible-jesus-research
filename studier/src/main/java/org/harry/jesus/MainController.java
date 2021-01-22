@@ -54,29 +54,56 @@ import java.io.*;
 import java.math.BigInteger;
 import java.util.*;
 
+/**
+ * The type Main controller.
+ */
 public class MainController {
 
+    /**
+     * The Main tab pane.
+     */
     @FXML
     TabPane mainTabPane;
 
+    /**
+     * The Read bible.
+     */
     @FXML Tab readBible;
 
 
+    /**
+     * The Bibles.
+     */
     @FXML
     ListView<String> bibles;
 
+    /**
+     * The History.
+     */
     @FXML
     ChoiceBox<HistoryEntry> history;
 
+    /**
+     * The Footer notes.
+     */
     @FXML
     ListView<String> footerNotes;
 
+    /**
+     * The Books tree.
+     */
     @FXML
     TreeView<String> booksTree;
 
+    /**
+     * The Query.
+     */
     @FXML
     TextField query;
 
+    /**
+     * The Resultlist.
+     */
     @FXML
     ListView<String> resultlist;
 
@@ -91,45 +118,86 @@ public class MainController {
 
     @FXML private WebView devView;
 
+    /**
+     * The Print dev.
+     */
     @FXML Button printDev;
 
 
     @FXML private WebView versesView;
 
+    /**
+     * The Search options.
+     */
     @FXML ChoiceBox<SearchOptions> searchOptions;
 
+    /**
+     * The Top grid pane.
+     */
     @FXML
     GridPane topGridPane;
 
 
-
-
+    /**
+     * The Dictionaries.
+     */
     @FXML ChoiceBox<BibleTextUtils.DictionaryInstance> dictionaries;
 
+    /**
+     * The Border pane.
+     */
     BorderPane borderPane = null;
 
+    /**
+     * The Utils.
+     */
     BibleTextUtils utils;
 
+    /**
+     * The Rendering.
+     */
     TextRendering rendering = null;
 
+    /**
+     * The Context.
+     */
     BibleThreadPool.ThreadBean context = null;
 
 
-
+    /**
+     * The Verse keys.
+     */
     List<BibleFulltextEngine.BibleTextKey> verseKeys;
 
+    /**
+     * The Note list.
+     */
     Versnotes noteList;
 
+    /**
+     * The Highlights.
+     */
     Highlights highlights;
 
+    /**
+     * The Plan days.
+     */
     Plan planDays = new Plan();
 
 
-
+    /**
+     * The Plan day number.
+     */
     int planDayNumber = 0;
 
+    /**
+     * The Edit plan day index.
+     */
     int editPlanDayIndex = 0;
 
+    /**
+     * The Selected index.
+     */
     int selectedIndex = 0;
 
     private PlayBible playBible;
@@ -139,8 +207,9 @@ public class MainController {
     private BibleStudyCompoundControl bibleStudy;
 
 
-
-
+    /**
+     * Initialize.
+     */
     @FXML
     public void initialize() {
         printDev.setDisable(true);
@@ -471,20 +540,42 @@ public class MainController {
     }
 
 
+    /**
+     * Show verse pics.
+     *
+     * @param event the event
+     */
     @FXML
     public void showVersePics(ActionEvent event) {
         ShowPicGallery.showTheVersePictures();
     }
+
+    /**
+     * Edit dict.
+     *
+     * @param event the event
+     */
     @FXML
     public void editDict(ActionEvent event) {
         Node nodeOfPrim = bibleStudy.getTopControls().getDictionaries();
         EditDictionary.showEditDictionary(nodeOfPrim);
     }
+
+    /**
+     * About.
+     *
+     * @param event the event
+     */
     @FXML
     public void about(ActionEvent event) {
 
     }
 
+    /**
+     * App help.
+     *
+     * @param event the event
+     */
     @FXML
     public void appHelp(ActionEvent event) {
 
@@ -492,6 +583,11 @@ public class MainController {
     }
 
 
+    /**
+     * Sets .
+     *
+     * @param event the event
+     */
     @FXML
     public void settings(ActionEvent event) {
         new SettingsDialog().showAppSettingsDialog();
@@ -504,12 +600,22 @@ public class MainController {
         bibleStudy.showChapter();
     }
 
+    /**
+     * Bible info.
+     *
+     * @param event the event
+     */
     @FXML
     public void bibleInfo(ActionEvent event) {
         int index = bibles.getSelectionModel().getSelectedIndex();
         BibleInfoDialog.callBibleInfoDialog(utils.getBibleInstances().get(index));
     }
 
+    /**
+     * Search.
+     *
+     * @param event the event
+     */
     @FXML
     public void search(ActionEvent event) {
         String pattern = query.getText();
@@ -532,11 +638,21 @@ public class MainController {
 
     }
 
+    /**
+     * Exit application.
+     *
+     * @param event the event
+     */
     @FXML
     public void exitApplication(ActionEvent event) {
         Platform.exit();
     }
 
+    /**
+     * Read full chapter.
+     *
+     * @param event the event
+     */
     @FXML
     public void readFullChapter(ActionEvent event) {
         int index = resultlist.getSelectionModel().getSelectedIndex();
@@ -550,6 +666,11 @@ public class MainController {
         mainTabPane.getSelectionModel().select(readBible);
     }
 
+    /**
+     * Read full chapter note.
+     *
+     * @param event the event
+     */
     @FXML
     public void readFullChapterNote(ActionEvent event) {
         int index = notesTable.getSelectionModel().getSelectedIndex();
@@ -559,6 +680,11 @@ public class MainController {
 
     }
 
+    /**
+     * Read full chapter highlight.
+     *
+     * @param event the event
+     */
     @FXML
     public void readFullChapterHighlight(ActionEvent event) {
         int index = highlightsTab.getSelectionModel().getSelectedIndex();
@@ -580,6 +706,11 @@ public class MainController {
         mainTabPane.getSelectionModel().select(readBible);
     }
 
+    /**
+     * Open plan.
+     *
+     * @param event the event
+     */
     @FXML
     public void openPlan(ActionEvent event) {
         InputStream input = JesusMisc.showOpenDialog(notesTable, JesusMisc.FileExtension.XML_EXT);
@@ -593,12 +724,22 @@ public class MainController {
         editPlanDayIndex = planDayNumber - 1;
     }
 
+    /**
+     * Save plan.
+     *
+     * @param event the event
+     */
     @FXML
     public void savePlan(ActionEvent event) {
         OutputStream os = JesusMisc.showSaveDialog(notesTable, JesusMisc.FileExtension.XML_EXT);
         PersistenceLayer.storePlan(planDays, os);
     }
 
+    /**
+     * New plan.
+     *
+     * @param event the event
+     */
     @FXML
     public void newPlan(ActionEvent event) {
         planDayNumber = 1;
@@ -608,6 +749,11 @@ public class MainController {
         devView.getEngine().loadContent("");
     }
 
+    /**
+     * Add day.
+     *
+     * @param event the event
+     */
     @FXML
     public void addDay(ActionEvent event) {
         Day newDay = nextPlanDay();
@@ -617,6 +763,11 @@ public class MainController {
         setPlanOutputSelected(newDay, versHtml);
     }
 
+    /**
+     * Copy to plan day.
+     *
+     * @param event the event
+     */
     @FXML
     public void copyToPlanDay(ActionEvent event) {
         int index = resultlist.getSelectionModel().getSelectedIndex();
@@ -636,6 +787,11 @@ public class MainController {
         setPlanOutputSelected(theDay, versHtml);
     }
 
+    /**
+     * Sets devotional text.
+     *
+     * @param event the event
+     */
     @FXML
     public void setDevotionalText(ActionEvent event) {
         List<Day> dayList = ensureFirstDay();
@@ -646,7 +802,11 @@ public class MainController {
     }
 
 
-
+    /**
+     * Gen dict html.
+     *
+     * @param event the event
+     */
     @FXML
     public void genDictHTML(ActionEvent event) {
         String dictDir = BibleThreadPool.getContext()
@@ -654,6 +814,11 @@ public class MainController {
         GenDictHTMLScene.generateDictHTML(utils, new File(dictDir));
     }
 
+    /**
+     * Load dev.
+     *
+     * @param event the event
+     */
     @FXML
     public void loadDev(ActionEvent event) {
         byte [] buffer = new byte[4096];
@@ -672,6 +837,11 @@ public class MainController {
         }
     }
 
+    /**
+     * Save dev.
+     *
+     * @param event the event
+     */
     @FXML
     public void saveDev(ActionEvent event) {
         OutputStream os = JesusMisc.showSaveDialog(notesTable, JesusMisc.FileExtension.HTML_EXT);
@@ -688,11 +858,21 @@ public class MainController {
         }
     }
 
+    /**
+     * New dev.
+     *
+     * @param event the event
+     */
     @FXML
     public void newDev(ActionEvent event) {
         devotionalEdit.setHtmlText("<html><header/><body/></html>");
     }
 
+    /**
+     * Copy vers.
+     *
+     * @param event the event
+     */
     @FXML
     public void copyVers(ActionEvent event) {
         StringBuffer htmlBuffer = new StringBuffer();
@@ -711,6 +891,11 @@ public class MainController {
 
     }
 
+    /**
+     * Copy highlight.
+     *
+     * @param event the event
+     */
     @FXML
     public void copyHighlight(ActionEvent event) {
         Integer row = highlightsTab.getSelectionModel().getSelectedIndex();
@@ -736,6 +921,11 @@ public class MainController {
 
     }
 
+    /**
+     * Copy highlight to plan.
+     *
+     * @param event the event
+     */
     @FXML
     public void copyHighlightToPlan(ActionEvent event) {
         Integer row = highlightsTab.getSelectionModel().getSelectedIndex();
@@ -757,8 +947,11 @@ public class MainController {
     }
 
 
-
-
+    /**
+     * Copy note.
+     *
+     * @param event the event
+     */
     @FXML
     public void copyNote(ActionEvent event) {
         Integer row = notesTable.getSelectionModel().getSelectedIndex();
@@ -773,6 +966,11 @@ public class MainController {
 
     }
 
+    /**
+     * Copy to plan from note.
+     *
+     * @param event the event
+     */
     @FXML
     public void copyToPlanFromNote(ActionEvent event) {
         Integer row = notesTable.getSelectionModel().getSelectedIndex();
@@ -785,6 +983,11 @@ public class MainController {
         setPlanOutputSelected(theDay, versHtml);
     }
 
+    /**
+     * Load search.
+     *
+     * @param event the event
+     */
     @FXML
     public void loadSearch(ActionEvent event) {
         InputStream is = JesusMisc.showOpenDialog(notesTable, JesusMisc.FileExtension.XML_EXT);
@@ -806,6 +1009,11 @@ public class MainController {
         }
     }
 
+    /**
+     * Save search.
+     *
+     * @param event the event
+     */
     @FXML
     public void saveSearch(ActionEvent event) {
         OutputStream os = JesusMisc.showSaveDialog(notesTable, JesusMisc.FileExtension.XML_EXT);
@@ -819,6 +1027,11 @@ public class MainController {
     }
 
 
+    /**
+     * To pdf.
+     *
+     * @param event the event
+     */
     @FXML
     public void toPDF(ActionEvent event) {
         String htmlText = devotionalEdit.getHtmlText();
@@ -826,6 +1039,11 @@ public class MainController {
         HTMLToPDF.convertTo(htmlText, pdfOut);
     }
 
+    /**
+     * Print dev.
+     *
+     * @param event the event
+     */
     @FXML
     public void printDev(ActionEvent event) {
         try {
@@ -835,6 +1053,11 @@ public class MainController {
         }
     }
 
+    /**
+     * Load notes.
+     *
+     * @param event the event
+     */
     @FXML
     public void loadNotes(ActionEvent event) {
         InputStream input = JesusMisc.showOpenDialog(notesTable, JesusMisc.FileExtension.XML_EXT);
@@ -918,6 +1141,11 @@ public class MainController {
         return entry;
     }
 
+    /**
+     * Save notes.
+     *
+     * @param event the event
+     */
     @FXML
     public void saveNotes(ActionEvent event) {
         OutputStream os = JesusMisc.showSaveDialog(notesTable, JesusMisc.FileExtension.XML_EXT);
@@ -925,10 +1153,21 @@ public class MainController {
     }
 
 
-
+    /**
+     * The enum Search options.
+     */
     public enum SearchOptions {
+        /**
+         * Simple search options.
+         */
         SIMPLE,
+        /**
+         * Exact search options.
+         */
         EXACT,
+        /**
+         * Fuzzy search options.
+         */
         FUZZY
     }
 

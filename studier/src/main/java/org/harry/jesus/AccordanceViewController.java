@@ -18,23 +18,37 @@ import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 
 import javax.swing.event.HyperlinkEvent;
 
+/**
+ * The type Accordance view controller.
+ */
 public class AccordanceViewController {
 
 
+    /**
+     * The Search input.
+     */
     @FXML
     TextField searchInput;
 
 
-
+    /**
+     * The Dictionary viewer.
+     */
     @FXML
     WebView dictionaryViewer;
 
+    /**
+     * The Chapter viewer.
+     */
     @FXML
     WebView chapterViewer;
 
     private XMLBIBLE selected = null;
 
 
+    /**
+     * Initialize.
+     */
     @FXML
     public void initialize() {
 
@@ -51,7 +65,12 @@ public class AccordanceViewController {
     }
 
 
-
+    /**
+     * Sets web view listener.
+     *
+     * @param area the area
+     * @param html the html
+     */
     public void setWebViewListener(FoldableStyledArea area, String html) {
         WebEngine engine = dictionaryViewer.getEngine();
         engine.setJavaScriptEnabled(true);
@@ -63,16 +82,29 @@ public class AccordanceViewController {
 
     }
 
+    /**
+     * Close win.
+     *
+     * @param event the event
+     */
     public void closeWin(ActionEvent event) {
 
     }
 
+    /**
+     * Search.
+     *
+     * @param event the event
+     */
     @FXML
     public void search(ActionEvent event) {
         String searchText = searchInput.getText();
         JScriptWebViewUtils.findString(dictionaryViewer.getEngine(), searchText);
     }
 
+    /**
+     * The type Controller.
+     */
     public static class Controller {
 
     }

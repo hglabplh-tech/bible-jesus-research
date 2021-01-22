@@ -7,7 +7,16 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+/**
+ * The interface Linked image.
+ */
 public interface LinkedImage {
+    /**
+     * Codec codec.
+     *
+     * @param <S> the type parameter
+     * @return the codec
+     */
     static <S> Codec<LinkedImage> codec() {
         return new Codec<LinkedImage>() {
             @Override
@@ -39,12 +48,24 @@ public interface LinkedImage {
         };
     }
 
+    /**
+     * Is real boolean.
+     *
+     * @return the boolean
+     */
     boolean isReal();
 
     /**
+     * Gets image path.
+     *
      * @return The path of the image to render.
      */
     String getImagePath();
 
+    /**
+     * Create node node.
+     *
+     * @return the node
+     */
     Node createNode();
 }

@@ -24,8 +24,17 @@ import static java.lang.String.*;
 import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
 
 
+/**
+ * The type Gen dict html scene.
+ */
 public class GenDictHTMLScene {
 
+    /**
+     * Generate dict html.
+     *
+     * @param utils            the utils
+     * @param accordenceAppDir the accordence app dir
+     */
     public static void generateDictHTML(BibleTextUtils utils, File accordenceAppDir) {
 
         Stage stage = new Stage();
@@ -54,6 +63,11 @@ public class GenDictHTMLScene {
         new Thread(worker).start();
     }
 
+    /**
+     * The type Worker.
+     *
+     * @param <T> the type parameter
+     */
     public static class Worker<T> extends Task<T> {
 
         private final BibleTextUtils utils;
@@ -67,12 +81,26 @@ public class GenDictHTMLScene {
         private String actDictionary = "";
 
 
-
+        /**
+         * Instantiates a new Worker.
+         *
+         * @param utils            the utils
+         * @param accordenceAppDir the accordence app dir
+         */
         public Worker(BibleTextUtils utils, File accordenceAppDir) {
             this.utils = utils;
             this.accordenceAppDir = accordenceAppDir;
         }
 
+        /**
+         * Build accordance tuple.
+         *
+         * @param utils      the utils
+         * @param accordance the accordance
+         * @param total      the total
+         * @param done       the done
+         * @return the tuple
+         */
         public Tuple<Long, StringBuffer> buildAccordance(BibleTextUtils utils, Dictionary accordance, long total, long done) {
             StringBuffer htmlBuffer = new StringBuffer();
             HTMLRendering.buildHead(htmlBuffer);
@@ -83,6 +111,12 @@ public class GenDictHTMLScene {
             return new Tuple<>(done, htmlBuffer);
         }
 
+        /**
+         * Buid accordance header.
+         *
+         * @param htmlBuffer the html buffer
+         * @param accordance the accordance
+         */
         public void buidAccordanceHeader(StringBuffer htmlBuffer, Dictionary accordance) {
             htmlBuffer.append("<H1 id=\"header\">Dictionary</H1><hr><p><span style=\"font-size: small; font-family: &quot;Times New Roman&quot;;\">");
             TINFORMATION dictionaryInfo = accordance.getINFORMATION();
@@ -121,6 +155,16 @@ public class GenDictHTMLScene {
             htmlBuffer.append("</span></p><hr>");
         }
 
+        /**
+         * Build acc item entries html long.
+         *
+         * @param utils      the utils
+         * @param htmlBuffer the html buffer
+         * @param items      the items
+         * @param total      the total
+         * @param done       the done
+         * @return the long
+         */
         public long buildAccItemEntriesHTML(BibleTextUtils utils,
                                             StringBuffer htmlBuffer,
                                             List<TItem> items, long total, long done) {
@@ -175,6 +219,13 @@ public class GenDictHTMLScene {
             return done;
         }
 
+        /**
+         * Build acc paragraph entry html.
+         *
+         * @param utils      the utils
+         * @param htmlBuffer the html buffer
+         * @param paragraph  the paragraph
+         */
         public void buildAccParagraphEntryHTML(BibleTextUtils utils,
                                                StringBuffer htmlBuffer,
                                                TParagraph paragraph) {
@@ -255,6 +306,12 @@ public class GenDictHTMLScene {
             }
         }
 
+        /**
+         * Build see.
+         *
+         * @param see        the see
+         * @param htmlBuffer the html buffer
+         */
         public void buildSee(SeeType see, StringBuffer htmlBuffer) {
             String target = see.getTarget();
             if (target.equals("x-self")) {
@@ -266,6 +323,13 @@ public class GenDictHTMLScene {
             }
         }
 
+        /**
+         * Create acc bible link.
+         *
+         * @param utils      the utils
+         * @param htmlBuffer the html buffer
+         * @param mScope     the m scope
+         */
         public void createAccBibleLink(BibleTextUtils utils, StringBuffer htmlBuffer,
                                        String mScope) {
             String[] parts = mScope.split(";");
@@ -310,6 +374,14 @@ public class GenDictHTMLScene {
         }
 
 
+        /**
+         * Gen dictionary long.
+         *
+         * @param dictInstance the dict instance
+         * @param total        the total
+         * @param done         the done
+         * @return the long
+         */
         public long genDictionary(BibleTextUtils.DictionaryInstance dictInstance, long total, long done) {
             String fileName = dictInstance.getDictionaryRef().getFilename() + ".html";
             int part = dictInstance.getDictionary().getItem().size();

@@ -20,6 +20,9 @@ import java.util.List;
 
 import static org.harry.jesus.fxutils.WebViewHyperListener.getRealBibleLink;
 
+/**
+ * The type Accordance view hyper listener.
+ */
 public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
 
 
@@ -33,6 +36,14 @@ public class AccordanceViewHyperListener implements WebViewHyperlinkListener {
     private final XMLBIBLE selected;
 
 
+    /**
+     * Instantiates a new Accordance view hyper listener.
+     *
+     * @param area        the area
+     * @param view        the view
+     * @param chapterView the chapter view
+     * @param selected    the selected
+     */
     public AccordanceViewHyperListener(FoldableStyledArea area,
                                        WebView view, WebView chapterView, XMLBIBLE selected) {
 

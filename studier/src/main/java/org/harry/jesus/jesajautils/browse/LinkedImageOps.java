@@ -5,8 +5,16 @@ import org.harry.jesus.jesajautils.browse.EmptyLinkedImage;
 import org.harry.jesus.jesajautils.browse.LinkedImage;
 
 
+/**
+ * The type Linked image ops.
+ *
+ * @param <S> the type parameter
+ */
 public class LinkedImageOps<S> extends NodeSegmentOpsBase<LinkedImage, S> {
 
+    /**
+     * Instantiates a new Linked image ops.
+     */
     public LinkedImageOps() {
         super(new EmptyLinkedImage());
     }

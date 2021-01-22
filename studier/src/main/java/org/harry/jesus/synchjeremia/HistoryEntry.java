@@ -6,6 +6,9 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Objects;
 
+/**
+ * The type History entry.
+ */
 public class HistoryEntry implements Serializable {
 
     private final String titel;
@@ -14,20 +17,42 @@ public class HistoryEntry implements Serializable {
 
     private final BibleTextUtils.BookLink bookLink;
 
+    /**
+     * Instantiates a new History entry.
+     *
+     * @param titel    the titel
+     * @param date     the date
+     * @param bookLink the book link
+     */
     public HistoryEntry(String titel, Calendar date, BibleTextUtils.BookLink bookLink) {
         this.titel = titel;
         this.date = date;
         this.bookLink = bookLink;
     }
 
+    /**
+     * Gets book link.
+     *
+     * @return the book link
+     */
     public BibleTextUtils.BookLink getBookLink() {
         return bookLink;
     }
 
+    /**
+     * Gets titel.
+     *
+     * @return the titel
+     */
     public String getTitel() {
         return titel;
     }
 
+    /**
+     * Gets date.
+     *
+     * @return the date
+     */
     public Calendar getDate() {
         return date;
     }
@@ -45,6 +70,12 @@ public class HistoryEntry implements Serializable {
         return getBookLink().equals(that.getBookLink());
     }
 
+    /**
+     * Equals exact boolean.
+     *
+     * @param o the o
+     * @return the boolean
+     */
     public boolean equalsExact(Object o) {
         if (this == o) return true;
         if (!(o instanceof HistoryEntry)) return false;

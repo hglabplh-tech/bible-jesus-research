@@ -24,12 +24,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type Show picture control.
+ */
 public class ShowPictureControl extends StackPane {
 
+    /**
+     * The Graphics list.
+     */
     ListView<VerseImageData> graphicsList  = null;
 
+    /**
+     * The Image list.
+     */
     List<Image> imageList = new ArrayList<>();
 
+    /**
+     * Instantiates a new Show picture control.
+     */
     public ShowPictureControl() {
         this.setMinHeight(700);
         this.setMinWidth(900);

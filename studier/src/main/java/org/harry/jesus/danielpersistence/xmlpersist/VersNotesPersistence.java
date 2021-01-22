@@ -8,8 +8,17 @@ import javax.xml.bind.*;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * The type Vers notes persistence.
+ */
 public class VersNotesPersistence {
 
+    /**
+     * Load notes versnotes.
+     *
+     * @param stream the stream
+     * @return the versnotes
+     */
     public static Versnotes loadNotes(InputStream stream) {
         JAXBContext jaxbContext;
 
@@ -34,6 +43,12 @@ public class VersNotesPersistence {
         }
     }
 
+    /**
+     * Store notes.
+     *
+     * @param root the root
+     * @param out  the out
+     */
     public static void storeNotes(Versnotes root, OutputStream out) {
         JAXBContext jaxbContext;
         try {

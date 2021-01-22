@@ -12,10 +12,19 @@ import org.pmw.tinylog.Logger;
 import java.io.*;
 import java.util.*;
 
+/**
+ * The type Synch thread.
+ */
 public class SynchThread extends TimerTask {
 
+    /**
+     * The constant APP_DIR.
+     */
     public static final String APP_DIR = System.getProperty("user.home") + "/.bibleStudy";
 
+    /**
+     * The constant APP_TEST_DIR.
+     */
     public static final String APP_TEST_DIR = System.getProperty("user.home") + "/.bibleStudyDevelop";
 
     private static final String VERSE_IMG_SUB = "verseimages";
@@ -33,8 +42,14 @@ public class SynchThread extends TimerTask {
 
     private static final String VERSE_IMAGES_XML = "verseImages.xml";
 
+    /**
+     * The constant appDir.
+     */
     public  static final File appDir;
 
+    /**
+     * The constant verseImageDir.
+     */
     public  static final File verseImageDir;
 
     private static final File renderObj;
@@ -45,10 +60,19 @@ public class SynchThread extends TimerTask {
 
     private static final File highlightsXML;
 
+    /**
+     * The constant appProps.
+     */
     public  static final File appProps;
 
+    /**
+     * The constant appSettings.
+     */
     public  static final File appSettings;
 
+    /**
+     * The constant verseImageXML.
+     */
     public static final File verseImageXML;
 
     private static Timer timer = new Timer();
@@ -104,6 +128,11 @@ public class SynchThread extends TimerTask {
         });
     }
 
+    /**
+     * Store notes.
+     *
+     * @param context the context
+     */
     public static void storeNotes(BibleThreadPool.ThreadBean context) {
         synchronized (SynchThread.class) {
             try {
@@ -116,6 +145,11 @@ public class SynchThread extends TimerTask {
         }
     }
 
+    /**
+     * Load notes.
+     *
+     * @param context the context
+     */
     public static void loadNotes(BibleThreadPool.ThreadBean context) {
         synchronized (SynchThread.class) {
             try {
@@ -127,6 +161,11 @@ public class SynchThread extends TimerTask {
         }
     }
 
+    /**
+     * Store highlights.
+     *
+     * @param context the context
+     */
     public static void storeHighlights(BibleThreadPool.ThreadBean context) {
         synchronized (SynchThread.class) {
             try {
@@ -138,6 +177,11 @@ public class SynchThread extends TimerTask {
         }
     }
 
+    /**
+     * Load highlights.
+     *
+     * @param context the context
+     */
     public static void loadHighlights(BibleThreadPool.ThreadBean context) {
         synchronized (SynchThread.class) {
             try {
@@ -150,6 +194,11 @@ public class SynchThread extends TimerTask {
     }
 
 
+    /**
+     * Store rendering.
+     *
+     * @param context the context
+     */
     public static void storeRendering(BibleThreadPool.ThreadBean context) {
         synchronized(SynchThread.class)  {
             try {
@@ -163,6 +212,11 @@ public class SynchThread extends TimerTask {
         }
     }
 
+    /**
+     * Load rendering.
+     *
+     * @param context the context
+     */
     public static void loadRendering(BibleThreadPool.ThreadBean context) {
         synchronized(SynchThread.class)  {
             try {
@@ -178,6 +232,11 @@ public class SynchThread extends TimerTask {
         }
     }
 
+    /**
+     * Store history.
+     *
+     * @param context the context
+     */
     public static void storeHistory(BibleThreadPool.ThreadBean context) {
         synchronized(SynchThread.class)  {
             try {
@@ -191,6 +250,11 @@ public class SynchThread extends TimerTask {
         }
     }
 
+    /**
+     * Load history.
+     *
+     * @param context the context
+     */
     public static void loadHistory(BibleThreadPool.ThreadBean context) {
         synchronized(SynchThread.class)  {
             try {
@@ -206,6 +270,11 @@ public class SynchThread extends TimerTask {
         }
     }
 
+    /**
+     * Store application settings.
+     *
+     * @param context the context
+     */
     public static void storeApplicationSettings(BibleThreadPool.ThreadBean context) {
         synchronized (SynchThread.class) {
             try {
@@ -249,6 +318,11 @@ public class SynchThread extends TimerTask {
 
     }
 
+    /**
+     * Load application settings.
+     *
+     * @param context the context
+     */
     public static void loadApplicationSettings(BibleThreadPool.ThreadBean context) {
         synchronized (SynchThread.class) {
             try {

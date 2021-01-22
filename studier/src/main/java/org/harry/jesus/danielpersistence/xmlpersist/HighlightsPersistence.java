@@ -19,13 +19,18 @@ import java.io.OutputStream;
 
 /**
  * Class for storing and loading the highlits of vedrses
- * @version $Revision$
- * @author $Author$
  *
- * $Id$
+ * @author $Author$  $Id$
+ * @version $Revision$
  */
 public class HighlightsPersistence {
 
+    /**
+     * Load highlights highlights.
+     *
+     * @param stream the stream
+     * @return the highlights
+     */
     public static Highlights loadHighlights(InputStream stream) {
         JAXBContext jaxbContext;
 
@@ -50,6 +55,12 @@ public class HighlightsPersistence {
         }
     }
 
+    /**
+     * Store highlights.
+     *
+     * @param root the root
+     * @param out  the out
+     */
     public static void storeHighlights(Highlights root, OutputStream out) {
         JAXBContext jaxbContext;
         try {

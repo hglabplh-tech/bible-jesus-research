@@ -19,8 +19,14 @@ import org.harry.jesus.jesajautils.browse.TextStyle;
  */
 public class ParStyle {
 
+    /**
+     * The constant EMPTY.
+     */
     public static final ParStyle EMPTY = new ParStyle();
 
+    /**
+     * The constant CODEC.
+     */
     public static final Codec<ParStyle> CODEC = new Codec<ParStyle>() {
 
         private final Codec<Optional<TextAlignment>> OPT_ALIGNMENT_CODEC =
@@ -52,17 +58,71 @@ public class ParStyle {
 
     };
 
+    /**
+     * Align left par style.
+     *
+     * @return the par style
+     */
     public static ParStyle alignLeft() { return EMPTY.updateAlignment(LEFT); }
+
+    /**
+     * Align center par style.
+     *
+     * @return the par style
+     */
     public static ParStyle alignCenter() { return EMPTY.updateAlignment(CENTER); }
+
+    /**
+     * Align right par style.
+     *
+     * @return the par style
+     */
     public static ParStyle alignRight() { return EMPTY.updateAlignment(RIGHT); }
+
+    /**
+     * Align justify par style.
+     *
+     * @return the par style
+     */
     public static ParStyle alignJustify() { return EMPTY.updateAlignment(JUSTIFY); }
+
+    /**
+     * Background color par style.
+     *
+     * @param color the color
+     * @return the par style
+     */
     public static ParStyle backgroundColor(Color color) { return EMPTY.updateBackgroundColor(color); }
+
+    /**
+     * Folded par style.
+     *
+     * @return the par style
+     */
     public static ParStyle folded() { return EMPTY.updateFold(Boolean.TRUE); }
+
+    /**
+     * Unfolded par style.
+     *
+     * @return the par style
+     */
     public static ParStyle unfolded() { return EMPTY.updateFold(Boolean.FALSE); }
 
+    /**
+     * The Alignment.
+     */
     final Optional<TextAlignment> alignment;
+    /**
+     * The Background color.
+     */
     final Optional<Color> backgroundColor;
+    /**
+     * The Indent.
+     */
     final Optional<Indent> indent;
+    /**
+     * The Fold count.
+     */
     final int foldCount;
 
     private ParStyle() {
@@ -99,6 +159,11 @@ public class ParStyle {
         return toCss();
     }
 
+    /**
+     * To css string.
+     *
+     * @return the string
+     */
     public String toCss() {
         StringBuilder sb = new StringBuilder();
 
@@ -123,6 +188,12 @@ public class ParStyle {
         return sb.toString();
     }
 
+    /**
+     * Update with par style.
+     *
+     * @param mixin the mixin
+     * @return the par style
+     */
     public ParStyle updateWith(ParStyle mixin) {
         return new ParStyle(
                 mixin.alignment.isPresent() ? mixin.alignment : alignment,
@@ -131,40 +202,89 @@ public class ParStyle {
                 mixin.foldCount + foldCount);
     }
 
+    /**
+     * Update alignment par style.
+     *
+     * @param alignment the alignment
+     * @return the par style
+     */
     public ParStyle updateAlignment(TextAlignment alignment) {
         return new ParStyle(Optional.of(alignment), backgroundColor, indent, foldCount);
     }
 
+    /**
+     * Update background color par style.
+     *
+     * @param backgroundColor the background color
+     * @return the par style
+     */
     public ParStyle updateBackgroundColor(Color backgroundColor) {
         return new ParStyle(alignment, Optional.of(backgroundColor), indent, foldCount);
     }
 
+    /**
+     * Update indent par style.
+     *
+     * @param indent the indent
+     * @return the par style
+     */
     public ParStyle updateIndent(Indent indent) {
         return new ParStyle(alignment, backgroundColor, Optional.ofNullable(indent), foldCount);
     }
 
+    /**
+     * Increase indent par style.
+     *
+     * @return the par style
+     */
     public ParStyle increaseIndent() {
         return updateIndent( indent.map( Indent::increase ).orElseGet( Indent::new ) );
     }
 
+    /**
+     * Decrease indent par style.
+     *
+     * @return the par style
+     */
     public ParStyle decreaseIndent() {
         return updateIndent( indent.filter( in -> in.level > 1 )
                 .map( Indent::decrease ).orElse( null ) );
     }
 
+    /**
+     * Gets indent.
+     *
+     * @return the indent
+     */
     public Indent getIndent() {
         return indent.get();
     }
 
+    /**
+     * Is indented boolean.
+     *
+     * @return the boolean
+     */
     public boolean isIndented() {
         return indent.map( in -> in.level > 0 ).orElse( false );
     }
 
+    /**
+     * Update fold par style.
+     *
+     * @param fold the fold
+     * @return the par style
+     */
     public ParStyle updateFold(boolean fold) {
         int foldLevels = fold ? foldCount+1 : Math.max( 0, foldCount-1 );
         return new ParStyle(alignment, backgroundColor, indent, foldLevels);
     }
 
+    /**
+     * Is folded boolean.
+     *
+     * @return the boolean
+     */
     public boolean isFolded() {
         return foldCount > 0;
     }

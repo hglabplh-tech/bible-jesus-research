@@ -7,8 +7,17 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/**
+ * The type Db creator.
+ */
 public class DBCreator {
 
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     * @throws SQLException the sql exception
+     */
     public static void main(String [] args) throws SQLException {
         Properties connProps = new Properties();
         connProps.setProperty("hibernate.connection.datasource", "");

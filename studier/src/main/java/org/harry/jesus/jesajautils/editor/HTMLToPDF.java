@@ -22,10 +22,19 @@ import java.io.*;
 import java.util.UUID;
 
 
+/**
+ * The type Html to pdf.
+ */
 public class HTMLToPDF {
 
 
-public static void convertTo(String html, OutputStream os) {
+    /**
+     * Convert to.
+     *
+     * @param html the html
+     * @param os   the os
+     */
+    public static void convertTo(String html, OutputStream os) {
         try {
             ConverterProperties
                     converterProperties = new ConverterProperties();
@@ -37,6 +46,11 @@ public static void convertTo(String html, OutputStream os) {
         }
     }
 
+    /**
+     * Print document.
+     *
+     * @param htmlEdit the html edit
+     */
     public static void printDocument(HTMLEditor htmlEdit) {
     try {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -56,9 +70,20 @@ public static void convertTo(String html, OutputStream os) {
     }
     }
 
+    /**
+     * The type Print job watcher.
+     */
     static class PrintJobWatcher {
+        /**
+         * The Done.
+         */
         boolean done = false;
 
+        /**
+         * Instantiates a new Print job watcher.
+         *
+         * @param job the job
+         */
         PrintJobWatcher(DocPrintJob job) {
             job.addPrintJobListener(new PrintJobAdapter() {
                 public void printJobCanceled(PrintJobEvent pje) {
@@ -82,6 +107,10 @@ public static void convertTo(String html, OutputStream os) {
                 }
             });
         }
+
+        /**
+         * Wait for done.
+         */
         public synchronized void waitForDone() {
             try {
                 while (!done) {

@@ -18,6 +18,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
+/**
+ * The type Foldable styled area.
+ */
 public class FoldableStyledArea extends GenericStyledArea<ParStyle, Either<String, LinkedImage>, TextStyle>
 {
     private final static TextOps<String, TextStyle> styledTextOps = SegmentOps.styledTextOps();
@@ -26,6 +29,9 @@ public class FoldableStyledArea extends GenericStyledArea<ParStyle, Either<Strin
     private List<TextField> searchInputFields = new ArrayList<>();
 
 
+    /**
+     * Instantiates a new Foldable styled area.
+     */
     public FoldableStyledArea()
     {
         super(
@@ -44,6 +50,9 @@ public class FoldableStyledArea extends GenericStyledArea<ParStyle, Either<Strin
         );
     }
 
+    /**
+     * Emit searxch to all.
+     */
     public void emitSearxchToAll() {
         String query = this.getSelectedText();
         SearchDictEvent event = new SearchDictEvent(query);
@@ -52,21 +61,47 @@ public class FoldableStyledArea extends GenericStyledArea<ParStyle, Either<Strin
         }
     }
 
+    /**
+     * Add linked search text field.
+     *
+     * @param searchField the search field
+     */
     public void addLinkedSearchTextField(TextField searchField) {
         searchInputFields.add(searchField);
     }
 
+    /**
+     * Gets linked search text fields.
+     *
+     * @return the linked search text fields
+     */
     public List<TextField> getLinkedSearchTextFields() {
         return searchInputFields;
     }
+
+    /**
+     * Gets add fold style.
+     *
+     * @return the add fold style
+     */
     public UnaryOperator<ParStyle> getAddFoldStyle() {
         return pstyle -> pstyle.updateFold( true );
     }
 
+    /**
+     * Gets remove fold style.
+     *
+     * @return the remove fold style
+     */
     public UnaryOperator<ParStyle> getRemoveFoldStyle() {
         return pstyle -> pstyle.updateFold( false );
     }
 
+    /**
+     * Gets fold style check.
+     *
+     * @return the fold style check
+     */
     public Predicate<ParStyle> getFoldStyleCheck() {
         return pstyle -> pstyle.isFolded();
     }
@@ -90,6 +125,9 @@ public class FoldableStyledArea extends GenericStyledArea<ParStyle, Either<Strin
         }
     }
 
+    /**
+     * Sets par visable selection.
+     */
     public void setParVisableSelection() {
         IndexRange selection = this.getSelection();
         int startPar = this.offsetToPosition(selection.getStart(), Bias.Forward).getMajor();

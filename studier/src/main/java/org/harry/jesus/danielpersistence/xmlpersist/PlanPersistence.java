@@ -10,8 +10,17 @@ import javax.xml.bind.Unmarshaller;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * The type Plan persistence.
+ */
 public class PlanPersistence {
 
+    /**
+     * Load plan plan.
+     *
+     * @param stream the stream
+     * @return the plan
+     */
     public static Plan loadPlan(InputStream stream) {
         JAXBContext jaxbContext;
 
@@ -36,6 +45,12 @@ public class PlanPersistence {
         }
     }
 
+    /**
+     * Store plan.
+     *
+     * @param root the root
+     * @param out  the out
+     */
     public static void storePlan(Plan root, OutputStream out) {
         JAXBContext jaxbContext;
         try {
