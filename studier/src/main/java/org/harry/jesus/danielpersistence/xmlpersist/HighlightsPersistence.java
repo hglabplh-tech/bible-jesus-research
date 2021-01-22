@@ -10,6 +10,12 @@ import javax.xml.bind.Unmarshaller;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * Class for storing and loading the highlits of vedrses
+ * @version$
+ * @author$
+ * @date$
+ */
 public class HighlightsPersistence {
 
     public static Highlights loadHighlights(InputStream stream) {
