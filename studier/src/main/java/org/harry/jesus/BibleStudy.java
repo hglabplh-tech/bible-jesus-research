@@ -2,6 +2,7 @@ package org.harry.jesus;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -17,7 +18,9 @@ import org.pmw.tinylog.writers.FileWriter;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 
 /**
@@ -25,6 +28,7 @@ import java.util.Locale;
  */
 public class BibleStudy extends Application {
 
+    public static final Map<String, Node> windowsMap = new HashMap<>();
     private static Scene scene;
 
     /**

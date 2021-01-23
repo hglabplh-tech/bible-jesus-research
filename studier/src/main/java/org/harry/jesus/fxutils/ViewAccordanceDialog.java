@@ -3,6 +3,7 @@ package org.harry.jesus.fxutils;
 
 import com.google.common.io.LineReader;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -42,6 +43,11 @@ public class ViewAccordanceDialog {
                                             String accFName) {
 
         Stage stage = new Stage();
+        Node node = BibleStudy.windowsMap.get(accFName);
+        if (node != null) {
+            node.getScene().getWindow().requestFocus();
+            return;
+        }
         stage.setTitle("Dictionary View");
         try {
             String accDir = BibleThreadPool.getContext()
@@ -69,9 +75,16 @@ public class ViewAccordanceDialog {
                 GenDictHTMLScene.generateDictHTML(BibleTextUtils.getInstance(), new File(accDir));
                 htmlBuffer.append("<p><h1>Accordance not available yet</h1></p>");
             }
-            Scene secondScene = new Scene(loadFXML("accordanceViewer",
-                    area, htmlBuffer.toString()));
+            Scene secondScene;
+            Parent parent = loadFXML("accordanceViewer",
+                    area, htmlBuffer.toString());
+            secondScene = new Scene(parent);
+            BibleStudy.windowsMap.put(accFName, parent);
             stage.setScene(secondScene);
+            stage.setOnCloseRequest(event -> {
+                System.out.println("Stage is closing");
+                BibleStudy.windowsMap.remove(accFName);
+            });
             stage.show();
         } catch (Exception ex) {
             ex.printStackTrace();

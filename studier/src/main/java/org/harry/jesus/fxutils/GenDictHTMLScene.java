@@ -3,6 +3,7 @@ package org.harry.jesus.fxutils;
 import generated.*;
 import javafx.concurrent.Task;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -10,6 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.text.StringEscapeUtils;
+import org.harry.jesus.BibleStudy;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.HTMLRendering;
 import org.harry.jesus.jesajautils.Tuple;
@@ -39,6 +41,11 @@ public class GenDictHTMLScene {
 
         Stage stage = new Stage();
         stage.setTitle("Dictionary HTML Generation");
+        Node node = BibleStudy.windowsMap.get("genDict");
+        if (node != null) {
+            node.getScene().getWindow().requestFocus();
+            return;
+        }
         VBox generationVBOX = new VBox();
         generationVBOX.setMinHeight(350);
         generationVBOX.setMinWidth(550);
@@ -59,6 +66,12 @@ public class GenDictHTMLScene {
 
         Scene secondScene = new Scene(generationVBOX);
         stage.setScene(secondScene);
+        BibleStudy.windowsMap.put("genDict", generationVBOX);
+        stage.setScene(secondScene);
+        stage.setOnCloseRequest(event -> {
+            System.out.println("Stage is closing");
+            BibleStudy.windowsMap.remove("genDict");
+        });
         stage.show();
         new Thread(worker).start();
     }

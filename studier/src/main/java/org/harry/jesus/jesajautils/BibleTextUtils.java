@@ -43,7 +43,9 @@ public class BibleTextUtils {
             "SF_2009-01-20_GER_ELB1905_(ELBERFELDER 1905).xml",
             "SF_2009-01-20_GER_LUTH1912_(LUTHER 1912).xml",
             "SF_2009-01-20_GER_SCH1951_(SCHLACHTER 1951).xml",
-            "SF_2014-09-30_GER_NEU_(NEUE EVANGELISTISCHE ÜBERSETZUNG (NEÜ)).xml"
+            "SF_2014-09-30_GER_NEU_(NEUE EVANGELISTISCHE ÜBERSETZUNG (NEÜ)).xml",
+            "SF_2009-01-22_GER_KNT_(KONKORDANTES NT).xml",
+            "SF_2009-01-20_GER_ILGRDE_(INTERLINEARÜBERSETZUNG).xml"
     );
     /**
      * bible instances list
