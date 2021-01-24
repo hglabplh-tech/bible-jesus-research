@@ -9,7 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.harry.jesus.BibleStudy;
-import org.harry.jesus.AccordanceViewController;
+import org.harry.jesus.DictionaryViewController;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
@@ -108,7 +108,7 @@ public class ViewAccordanceDialog {
         fxmlLoader = new FXMLLoader(resourceURL);
 
         Pane root = (Pane) fxmlLoader.load();
-        AccordanceViewController controller = (AccordanceViewController)fxmlLoader.getController();
+        DictionaryViewController controller = (DictionaryViewController)fxmlLoader.getController();
         controller.setWebViewListener(area, html);
 
 

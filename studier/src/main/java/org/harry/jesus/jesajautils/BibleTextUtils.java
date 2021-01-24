@@ -43,7 +43,6 @@ public class BibleTextUtils {
             "SF_2009-01-20_GER_ELB1905_(ELBERFELDER 1905).xml",
             "SF_2009-01-20_GER_LUTH1912_(LUTHER 1912).xml",
             "SF_2009-01-20_GER_SCH1951_(SCHLACHTER 1951).xml",
-            "SF_2014-09-30_GER_NEU_(NEUE EVANGELISTISCHE ÜBERSETZUNG (NEÜ)).xml",
             "SF_2009-01-22_GER_KNT_(KONKORDANTES NT).xml",
             "SF_2009-01-20_GER_ILGRDE_(INTERLINEARÜBERSETZUNG).xml"
     );
@@ -301,7 +300,7 @@ public class BibleTextUtils {
                     .setHashValue(actAccordance.getSecond())
                     .setFilename(fileName)
                     .setPathToBook(accordanceFile.getAbsolutePath());
-            AccordanceUtil util = new AccordanceUtil(
+            BibleDictUtil util = new BibleDictUtil(
                     Arrays.asList(new Tuple<String, Dictionary>(fileName, actAccordance.getFirst())));
             Optional<BibleBookInstance> instance = bibleInstances.stream().filter(e -> {
                 Optional<Tuple<String, Dictionary>> opt = util.findAccordance(actAccordance.getFirst(),
@@ -311,8 +310,8 @@ public class BibleTextUtils {
             if (instance.isPresent()) {
                 instance.get().setOptDictAccRefTuple(actAccordance.getFirst(), accRef);
             }
-            String id = AccordanceUtil.getIdFromInfo(actAccordance.getFirst().getINFORMATION());
-            String name = AccordanceUtil.getNameFromInfo(actAccordance.getFirst().getINFORMATION());
+            String id = BibleDictUtil.getIdFromInfo(actAccordance.getFirst().getINFORMATION());
+            String name = BibleDictUtil.getNameFromInfo(actAccordance.getFirst().getINFORMATION());
             accRef.setDictionaryID(id);
             accRef.setDictionaryName(name);
             dictInstances.add(new DictionaryInstance(accRef, actAccordance.getFirst()));
@@ -329,7 +328,7 @@ public class BibleTextUtils {
 
         for (BibleRef ref : references) {
             Tuple<XMLBIBLE, String> actBible = BibleReader.loadBible(new File(ref.getPathToBook()));
-            ref.setBibleID(AccordanceUtil
+            ref.setBibleID(BibleDictUtil
                     .getIdFromBibleInfo(actBible
                             .getFirst()
                             .getINFORMATION()
@@ -438,10 +437,10 @@ public class BibleTextUtils {
                                       FoldableStyledArea area, Map<Integer, IndexRange> selectedVersesMap) {
         Vers vers = new Vers();
         vers.setChapter(BigInteger.valueOf(actChapter));
-        String links = LinkHandler.buildVersLinkEnhanced(utils, actBook.getBookNumber(),
+        String links = LinkDetector.buildVersLinkEnhanced(utils, actBook.getBookNumber(),
                 actChapter,
                 new ArrayList(selectedVersesMap.keySet()));
-        List<BookLink> bookLinks = LinkHandler.parseLinks(utils, links);
+        List<BookLink> bookLinks = LinkDetector.parseLinks(utils, links);
         vers.setBook(BigInteger.valueOf(actBook.getBookNumber()));
         StringBuffer versBuffer = new StringBuffer();
         int index = 0;
@@ -742,6 +741,13 @@ public class BibleTextUtils {
             this.verses = verses;
         }
 
+        public BookLink(Integer bookNo, Integer chapter, List<Integer> verses) {
+            this.bookLabel = BibleTextUtils.getInstance()
+                    .getBookLabels().get(bookNo -1);
+            this.chapter = chapter;
+            this.verses = verses;
+        }
+
         /**
          * Gets book label.
          *
@@ -821,12 +827,15 @@ public class BibleTextUtils {
 
         private String longName = "";
 
+        private String label = "";
+
         /**
          * Instantiates a new Book label.
          *
          * @param label the label
          */
         public BookLabel(String label) {
+            this.label = label;
             String [] temp = label.split(",");
             bookNumber = Integer.parseInt(temp[0]);
             longName = temp[1];
@@ -858,6 +867,11 @@ public class BibleTextUtils {
          */
         public String getLongName() {
             return longName;
+        }
+
+        @Override
+        public String toString() {
+            return label;
         }
     }
 

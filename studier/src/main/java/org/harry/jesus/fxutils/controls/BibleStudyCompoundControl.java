@@ -230,9 +230,9 @@ public class BibleStudyCompoundControl extends BorderPane {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
                 String note = studyNotes.getItems().get(t1.intValue());
-                List<BibleTextUtils.BookLink> links = LinkHandler.parseLinks(utils, note);
+                List<BibleTextUtils.BookLink> links = LinkDetector.parseLinks(utils, note);
                 if (links.size() > 0) {
-                    showLink(links);
+                    showLink(links, false);
                 }
             }
 
@@ -452,8 +452,13 @@ public class BibleStudyCompoundControl extends BorderPane {
     }
 
 
-    private void showLink(List<BibleTextUtils.BookLink> links) {
-        String htmlText = HTMLRendering.renderLink(utils, utils.getSelected(), links);
+    public void showLink(List<BibleTextUtils.BookLink> links, boolean compare) {
+        String htmlText;
+        if (compare) {
+            htmlText = HTMLRendering.renderLinkForCompare(links);
+        } else {
+            htmlText = HTMLRendering.renderLink(utils, utils.getSelected(), links);
+        }
         ReadLinksDialog.showReadLinkDialog(utils, area, htmlText);
     }
 
@@ -466,7 +471,7 @@ public class BibleStudyCompoundControl extends BorderPane {
             for (String note : rendering.getNotes()) {
                 String links = "";
                 try {
-                    links = LinkHandler.generateLinksFuzzy(utils, note);
+                    links = LinkDetector.generateLinksFuzzy(utils, note);
                 } catch (Exception ex) {
                     Logger.trace("Something went wrong with fuzzy!!! This feature has to be enhanced");
                 }

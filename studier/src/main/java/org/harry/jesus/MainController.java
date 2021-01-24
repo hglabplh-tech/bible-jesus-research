@@ -480,21 +480,35 @@ public class MainController {
         mItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                List<Day> dayList = ensureFirstDay();
-                Day theDay = dayList.get(dayList.size() - 1);
-                Vers vers = BibleTextUtils.generateVerses(utils,
-                        bibleStudy.getActBook(),
-                        bibleStudy.getActChapter(),
-                        bibleStudy.getArea(),
-                        bibleStudy.getSelectedMapSorted());
-                theDay.getVerses().add(vers);
+                List<Integer> temp = new ArrayList<>();
+                temp.addAll(bibleStudy.getSelectedMapSorted().keySet());
+                BibleTextUtils.BookLink link =
+                        new BibleTextUtils.BookLink(bibleStudy.getActBook().toString(),
+                                bibleStudy.getActChapter(),
+                                temp);
                 StringBuffer buffer = new StringBuffer();
-                buffer.append(vers.getBook())
+                buffer.append(link.getBookLabelClass().getBookNumber())
                         .append(';')
-                        .append(vers.getChapter())
+                        .append(link.getChapter())
                         .append( ';')
-                        .append(vers.getVers().get(0));
+                        .append(link.getVerses().get(0));
                 copyHtmlToClip(buffer, DataFormat.PLAIN_TEXT);
+            }
+
+        });
+        contMenu.getItems().add(mItem);
+        mItem = new MenuItem();
+        mItem.setText("compare Versions");
+        mItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                List<Integer> temp = new ArrayList<>();
+                temp.addAll(bibleStudy.getSelectedMapSorted().keySet());
+                BibleTextUtils.BookLink link =
+                        new BibleTextUtils.BookLink(bibleStudy.getActBook().toString(),
+                                bibleStudy.getActChapter(),
+                                temp);
+                bibleStudy.showLink(Arrays.asList(link), true);
             }
 
         });

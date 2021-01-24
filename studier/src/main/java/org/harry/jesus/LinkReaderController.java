@@ -1,10 +1,11 @@
 package org.harry.jesus;
 
+import generated.XMLBIBLE;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.web.WebView;
 import org.codefx.libfx.control.webview.WebViews;
-import org.harry.jesus.fxutils.WebViewHyperListener;
+import org.harry.jesus.fxutils.WebViewerHyperListener;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 
@@ -37,8 +38,10 @@ public class LinkReaderController {
      * @param htmlText the html text
      */
     public void setWebViewListener(BibleTextUtils utils, FoldableStyledArea area, String htmlText) {
+        XMLBIBLE selected = BibleTextUtils.getInstance().getSelected();
         WebViews.addHyperlinkListener(linkReader,
-                new WebViewHyperListener(utils, area), HyperlinkEvent.EventType.ACTIVATED);
+                new WebViewerHyperListener(area, linkReader,
+                        null, selected), HyperlinkEvent.EventType.ACTIVATED);
         linkReader.getEngine().loadContent(htmlText);
     }
 

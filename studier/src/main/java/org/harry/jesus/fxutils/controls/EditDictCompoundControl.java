@@ -7,7 +7,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.event.EventTarget;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -16,12 +15,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import org.harry.jesus.fxutils.JesusMisc;
 import org.harry.jesus.fxutils.event.DeployDictionary;
-import org.harry.jesus.jesajautils.AccordanceUtil;
+import org.harry.jesus.jesajautils.BibleDictUtil;
 import org.harry.jesus.jesajautils.BibleReader;
 import org.harry.jesus.jesajautils.configjaxbser.DictionaryRef;
 import org.tinylog.Logger;
 
-import javax.swing.text.html.Option;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -208,9 +206,9 @@ public class EditDictCompoundControl extends BorderPane {
             @Override
             public void handle(ActionEvent event) {
                 if (outFile.isPresent()) {
-                    String dictID = AccordanceUtil
+                    String dictID = BibleDictUtil
                             .getIdFromInfo(dictionary.getINFORMATION());
-                    String dictName = AccordanceUtil
+                    String dictName = BibleDictUtil
                             .getNameFromInfo(dictionary.getINFORMATION());
                     String fileName = outFile.get().getName();
                     fileName = fileName.substring(0, fileName.indexOf(".xml"));

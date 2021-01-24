@@ -11,9 +11,9 @@ public class LinkHandlerTest {
     public void simpleTest() {
         String text2 = "verboten (vergleiche 3. Mose 18,9; 20,17; 5. Mose 27,22)";
         BibleTextUtils utils = BibleTextUtils.getInstance();
-        LinkHandler.parseLinksFuzzy(utils, "vergleiche Hesekiel 28,11-15; Daniel 10,13");
-        LinkHandler.parseLinksFuzzy(utils, text2);
-        System.out.println(LinkHandler.generateLinksFuzzy(utils, text2));
+        LinkDetector.parseLinksFuzzy(utils, "vergleiche Hesekiel 28,11-15; Daniel 10,13");
+        LinkDetector.parseLinksFuzzy(utils, text2);
+        System.out.println(LinkDetector.generateLinksFuzzy(utils, text2));
     }
 
     @Test
@@ -31,7 +31,7 @@ public class LinkHandlerTest {
                 "Moses (1. Könige 2,3; Nehemia 8,1; Markus 7,10; 12,26). " +
                 "Siehe Fußnote zu 1. Mose 46,27. Jakobs Ankunft in " +
                 "Ägypten könnte um das Jahr 1867 v.Chr. stattgefunden haben.";
-        Map<String, List<Integer>> bookCol = LinkHandler.collectLabelsWithBeginIndex(utils, text);
+        Map<String, List<Integer>> bookCol = LinkDetector.collectLabelsWithBeginIndex(utils, text);
         bookCol.entrySet().stream().forEach(e -> {
                     System.out.println(e.getKey());
                     for (Integer num : e.getValue()) {
@@ -39,6 +39,6 @@ public class LinkHandlerTest {
                     }
                     System.out.println("");
                 });
-        LinkHandler.parseLinksFuzzy(utils, text);
+        LinkDetector.parseLinksFuzzy(utils, text);
     }
 }

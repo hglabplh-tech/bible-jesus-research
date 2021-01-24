@@ -5,12 +5,8 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import org.apache.commons.io.IOUtils;
-import org.harry.jesus.fxutils.ReadLinksDialog;
 import org.harry.jesus.fxutils.event.DeployDictionary;
-import org.harry.jesus.fxutils.event.SetLinkEvent;
 import org.harry.jesus.jesajautils.BibleTextUtils;
-import org.harry.jesus.jesajautils.HTMLRendering;
-import org.harry.jesus.jesajautils.LinkHandler;
 import org.harry.jesus.jesajautils.configjaxbser.DictionaryRef;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
 import org.harry.jesus.synchjeremia.HistoryEntry;
@@ -20,7 +16,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * The type Read functions control.

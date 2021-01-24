@@ -10,17 +10,22 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.text.StringEscapeUtils;
 import org.harry.jesus.BibleStudy;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.HTMLRendering;
 import org.harry.jesus.jesajautils.Tuple;
+import org.harry.jesus.jesajautils.configjaxbser.AppSettingsPersistence;
+import org.harry.jesus.jesajautils.configjaxbser.BibleAppConfig;
+import org.harry.jesus.jesajautils.configjaxbser.BibleRef;
+import org.harry.jesus.synchjeremia.BibleThreadPool;
+import org.harry.jesus.synchjeremia.SynchThread;
 import org.pmw.tinylog.Logger;
 
 import javax.xml.bind.JAXBElement;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Optional;
 
 import static java.lang.String.*;
 import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
@@ -93,6 +98,8 @@ public class GenDictHTMLScene {
 
         private String actDictionary = "";
 
+        private BibleAppConfig config = null;
+
 
         /**
          * Instantiates a new Worker.
@@ -103,6 +110,13 @@ public class GenDictHTMLScene {
         public Worker(BibleTextUtils utils, File accordenceAppDir) {
             this.utils = utils;
             this.accordenceAppDir = accordenceAppDir;
+            try {
+                this.config = AppSettingsPersistence.loadAppSettings(
+                        new FileInputStream(SynchThread.appSettings));
+            } catch(IOException ex) {
+                Logger.trace(ex);
+                Logger.trace("Unable to read settings: " + ex.getMessage());
+            }
         }
 
         /**
@@ -353,15 +367,12 @@ public class GenDictHTMLScene {
                 if (parts.length == 3) {
                     verse = parts[2];
                 }
-                BibleTextUtils.BookLabel link = utils.getBookLabMap().get(book);
-                String longName = link.getLongName();
-                String theFinal = "["
-                        + longName
-                        + " "
-                        + chapter.toString()
-                        + "," + verse
-                        + "]";
-                HTMLRendering.generateHyperLink(htmlBuffer, theFinal);
+                if (chapter.matches("[0-9]+") &&
+                        verse.matches("[0-9]+")) {
+                    LinkHandler.generateHyperLink(htmlBuffer, book,
+                            Integer.parseInt(chapter),
+                            Integer.parseInt(verse));
+                }
             } else {
                 htmlBuffer.append("#target#");
             }
@@ -378,6 +389,17 @@ public class GenDictHTMLScene {
                 total = total + dictInstance.getDictionary().getItem().size();
             }
             for (BibleTextUtils.DictionaryInstance dictInstance: utils.getDictInstances()) {
+                BibleRef bibleRef = this.config.getDictConfig().getDictBibleMapping()
+                        .get(dictInstance.getDictionaryRef());
+                Optional<BibleTextUtils.BibleBookInstance> optBible = Optional.empty();
+                if (bibleRef != null ) {
+                    optBible =
+                            LinkHandler.findBibleById(bibleRef.getBibleID());
+                } else {
+                    optBible = LinkHandler.findBibleById("ELB1905");
+
+                }
+                BibleTextUtils.getInstance().setSelected(optBible.get().getBible());
                 actDictionary = dictInstance.getDictionaryRef().getDictionaryName();
                 done = genDictionary(dictInstance, total, done);
             }
@@ -416,6 +438,8 @@ public class GenDictHTMLScene {
                 Logger.trace("Ready build accordance file: " + outFile.getAbsolutePath());
                 setLabelWriteSuccessText(done, total);
             } catch (IOException ex) {
+                System.err.println(ex.getMessage());
+                ex.printStackTrace();
                 setLabelWriteFailedText(done, total);
                 Logger.trace(ex);
                 Logger.trace("Write: \""

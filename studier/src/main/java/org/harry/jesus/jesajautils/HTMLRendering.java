@@ -3,14 +3,12 @@ package org.harry.jesus.jesajautils;
 import generated.*;
 import javafx.scene.paint.Color;
 import jesus.harry.org.versnotes._1.Vers;
+import org.harry.jesus.fxutils.LinkHandler;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 
 import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
 
@@ -86,6 +84,18 @@ public class HTMLRendering {
         }
     }
 
+    private static void putTitle(StringBuffer buffer, BibleTextUtils.BibleBookInstance bible) {
+        String title = BibleDictUtil
+                .getTitleFromBibleInfo(
+                        bible.getBible().getINFORMATION()
+                                .getValue());
+        String id = BibleDictUtil
+                .getIdFromBibleInfo(
+                        bible.getBible().getINFORMATION()
+                                .getValue());
+        buffer.append("<p>" + title + "("+ id + ")</p>");
+    }
+
     /**
      * Render link string.
      *
@@ -117,10 +127,11 @@ public class HTMLRendering {
                     vers.setVtext(versText);
                     BibleTextUtils.BookLabel labelClass = new BibleTextUtils.BookLabel(link.getBookLabel());
                     htmlContent.append("<p>");
-                    generateHyperLink(htmlContent, "[" + labelClass.getLongName()
-                            + " " + link.getChapter()
-                            + "," + versNo
-                            + "]");
+                    LinkHandler.generateHyperLink(htmlContent,
+                            link.getBookLabelClass().getBookNumber(),
+                            link.getChapter(),
+                            versNo);
+
                     htmlContent.append("</p>");
                     renderVers(htmlContent, versText, null);
 
@@ -198,36 +209,6 @@ public class HTMLRendering {
                 + ")</H5>\n");
     }
 
-    /**
-     * Build link internal.
-     *
-     * @param link       the link
-     * @param htmlBuffer the html buffer
-     */
-    public static void buildLinkInternal(String link, StringBuffer htmlBuffer) {
-            htmlBuffer.append("http://_self/#"
-                    + link);
-    }
-
-
-    /**
-     * Generate hyper link string.
-     *
-     * @param buffer the buffer
-     * @param link   the link
-     * @return the string
-     */
-    public static String generateHyperLink(StringBuffer buffer, String link) {
-        String href = "http://bible/"+ link;
-        href = href.replace(",", "/vers/");
-        href = href.replace(" ", "\\");
-        href = href.replace("[", "opstart");
-        href = href.replace("]", "opend");
-
-        buffer.append("<a href=\"" + href + "\">" + link + "</a>");
-        return buffer.toString();
-    }
-
 
     /**
      * Note to html.
@@ -299,7 +280,7 @@ public class HTMLRendering {
             BIBLEBOOK book = utils.getBooks(selected).get(vers.getBook().intValue() - 1);
             Optional<CHAPTER> chapter = utils.getChapter(book, vers.getChapter().intValue());
             if (chapter.isPresent()) {
-                String linkText = LinkHandler.buildVersLinkEnhanced(utils, book.getBnumber().intValue(),
+                String linkText = LinkDetector.buildVersLinkEnhanced(utils, book.getBnumber().intValue(),
                         chapter.get().getCnumber().intValue(), vers.getVers());
                 renderVers(buffer, linkText, null);
                 renderVers(buffer, vers.getVtext(), null);
@@ -309,4 +290,19 @@ public class HTMLRendering {
     }
 
 
+    public static String renderLinkForCompare(List<BibleTextUtils.BookLink> links) {
+        StringBuffer buffer = new StringBuffer();
+        for (BibleTextUtils.BookLink link:links) {
+            for (BibleTextUtils.BibleBookInstance bible :
+                    BibleTextUtils.getInstance().getBibleInstances()) {
+                BibleTextUtils.getInstance().setSelected(bible.getBible());
+                putTitle(buffer, bible);
+                buffer.append(renderLink(
+                        BibleTextUtils.getInstance(),
+                        bible.getBible(),
+                        Arrays.asList(link)));
+            }
+        }
+        return buffer.toString();
+    }
 }

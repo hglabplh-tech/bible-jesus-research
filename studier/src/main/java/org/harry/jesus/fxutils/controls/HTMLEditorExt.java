@@ -12,12 +12,14 @@ import javafx.scene.web.HTMLEditor;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSException;
+import org.harry.jesus.fxutils.LinkHandler;
 import org.harry.jesus.fxutils.graphics.ImageMaker;
-import org.harry.jesus.jesajautils.HTMLRendering;
+import org.harry.jesus.jesajautils.BibleTextUtils;
+import org.harry.jesus.jesajautils.LinkDetector;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.Base64;
+import java.util.List;
 
 /**
  * The type Html editor ext.
@@ -41,7 +43,11 @@ public class HTMLEditorExt  {
                     WebView view = (WebView) htmlEditor.lookup("WebView");
                     String selected = (String) view.getEngine().executeScript("window.getSelection().toString();");
                     StringBuffer buffer = new StringBuffer();
-                    String hyperlinkHtml = HTMLRendering.generateHyperLink(buffer, selected.trim());
+                    List<BibleTextUtils.BookLink> links = LinkDetector
+                            .parseLinks(BibleTextUtils.getInstance(), selected.trim());
+                    String hyperlinkHtml = LinkHandler.generateHyperLink(buffer, links.get(0).getBookLabelClass().getBookNumber(),
+                            links.get(0).getChapter(),
+                            links.get(0).getVerses().get(0));
                     view.getEngine().executeScript(getInsertHtmlAtCursorJS(hyperlinkHtml));
                 }
             });
