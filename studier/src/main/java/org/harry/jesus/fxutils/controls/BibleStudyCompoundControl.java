@@ -207,6 +207,8 @@ public class BibleStudyCompoundControl extends BorderPane {
                     Integer bookNo = utils.getSelected().getBIBLEBOOK().get(0)
                             .getValue().getBnumber().intValue();
                     actBookLabel = utils.getBookLabels().get(bookNo - 1);
+                    actBook = new BibleTextUtils.BookLabel(actBookLabel);
+                    actChapter = 1;
                 }
                 Optional<BibleTextUtils.DictionaryInstance> dictInstance =
                         BibleTextUtils.searchSelectedForBible(instance.getBibleRef());
