@@ -64,6 +64,7 @@ public class FoldableStyledArea extends GenericStyledArea<ParStyle, Either<Strin
 
     /**
      * Emit search to all.
+     * @param query the query string
      */
     public void emitSearchStrongNumberToAll(String query) {
         SearchDictEvent event = new SearchDictEvent(query);

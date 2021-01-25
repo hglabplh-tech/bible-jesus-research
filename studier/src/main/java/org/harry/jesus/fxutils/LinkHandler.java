@@ -16,11 +16,26 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * The type Link handler.
+ */
 public class LinkHandler {
 
-     public static final String BIBLE_PARAM = "bible";
-     public static final String BOOKNO_PARAM = "bookNo";
-     public static final String CHAPTERNO_PARAM = "chapterNo";
+    /**
+     * The constant BIBLE_PARAM.
+     */
+    public static final String BIBLE_PARAM = "bible";
+    /**
+     * The constant BOOKNO_PARAM.
+     */
+    public static final String BOOKNO_PARAM = "bookNo";
+    /**
+     * The constant CHAPTERNO_PARAM.
+     */
+    public static final String CHAPTERNO_PARAM = "chapterNo";
+    /**
+     * The constant VERSENO_PARAM.
+     */
     public static final String VERSENO_PARAM = "versNo";
 
     /**
@@ -62,6 +77,12 @@ public class LinkHandler {
         }
     }
 
+    /**
+     * Find bible by id optional.
+     *
+     * @param bibleId the bible id
+     * @return the optional
+     */
     public static Optional<BibleTextUtils.BibleBookInstance> findBibleById(final String bibleId) {
        return BibleTextUtils.getInstance().getBibleInstances().stream()
                 .filter(e -> e.getBibleRef().getBibleID().equals(bibleId))
@@ -82,9 +103,10 @@ public class LinkHandler {
     /**
      * Generate hyper link string.
      *
-     * @param buffer the buffer
-     * @param link   the link
-     *
+     * @param buffer  the buffer
+     * @param bookNo  the book no
+     * @param chapter the chapter
+     * @param vers    the vers
      * @return the string
      */
     public static String generateHyperLink(StringBuffer buffer, Integer bookNo
@@ -115,6 +137,12 @@ public class LinkHandler {
         return buffer.toString();
     }
 
+    /**
+     * Split uri query map.
+     *
+     * @param theURI the the uri
+     * @return the map
+     */
     public static Map<String, String> splitURIQuery(URI theURI)  {
         Map<String, String> query_pairs = new LinkedHashMap<>();
         try {
