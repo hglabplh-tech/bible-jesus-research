@@ -49,9 +49,11 @@ import org.tinylog.Logger;
 //import org.reactfx.util.Either;
 
 
+import javax.swing.event.HyperlinkEvent;
 import javax.xml.bind.JAXBElement;
 import java.io.*;
 import java.math.BigInteger;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -305,12 +307,27 @@ public class MainController {
     private void initAreaContextMenu() {
         ContextMenu contMenu = new ContextMenu();
         MenuItem mItem = new MenuItem();
-        mItem.setText("Search accordance Selected word");
+        mItem.setText("Search dictionary Selected word");
         contMenu.getItems().add(mItem);
         mItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                bibleStudy.getArea().emitSearxchToAll();
+                bibleStudy.getArea().emitSearchToAll();
+            }
+
+        });
+        mItem = new MenuItem();
+        mItem.setText("Lookup selected Strong Number");
+        contMenu.getItems().add(mItem);
+        mItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                bibleStudy.getActStrongNumber().ifPresent(
+                       e ->
+                            bibleStudy.getArea()
+                                .emitSearchStrongNumberToAll(e.substring(1, e.length()-1))
+                );
+
             }
 
         });

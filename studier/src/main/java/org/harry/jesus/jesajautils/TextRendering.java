@@ -40,6 +40,11 @@ public class TextRendering {
     private Map<Integer, IndexRange> chapterMap = new LinkedHashMap<>();
 
     /**
+     * The map holding the index ranges/strong numbers for the text
+     */
+    private Map<IndexRange, String> strongsMap = new LinkedHashMap<>();
+
+    /**
      * The map holds the style of the different verses
      */
     private Map<IndexRange, TextStyle> renderMap = new LinkedHashMap<>();
@@ -265,6 +270,18 @@ public class TextRendering {
         return null;
     }
 
+    public Optional<String> selectStrongNumberByRange(IndexRange range) {
+        int start = range.getStart();
+
+        for (Map.Entry<IndexRange, String> entry: this.strongsMap.entrySet()) {
+            IndexRange compRange = entry.getKey();
+            if (start >= compRange.getStart() && start <= compRange.getEnd()) {
+                return Optional.of(entry.getValue());
+            }
+        }
+        return Optional.empty();
+    }
+
     /**
      * This method selects a verse by the given ÄIndexRange in the text
      *
@@ -454,6 +471,7 @@ public class TextRendering {
         return start;
     }
 
+
     private void renderVers(StringBuffer strContent, VERS vers) {
         strContent.append(vers.getVnumber().toString(10))
                 .append(". ");
@@ -474,12 +492,29 @@ public class TextRendering {
                     for (Object styledContent : styled.getContent()) {
                         if (styledContent instanceof String) {
                             String text = (String) styledContent;
-                            start = strContent.toString().length() - 1;
-                            IndexRange range = new IndexRange(start, start + text.length() + 1);
-                            TextStyle style = new TextStyle().fromCss(cssString);
-                            renderMap.put(range, style);
+                            storeForRender(strContent, cssString, text, false);
+                        }
+                    }
+
+                } else if (jaxbClazz.getName().equals(GRAM.class.getName())) {
+                    String prefix;
+                    if (actBookNo < 40) {
+                        prefix = "H";
+                    } else {
+                        prefix = "G";
+                    }
+                    GRAM gram = (GRAM) ((JAXBElement<?>) content).getValue();
+                    for (Object styledContent : gram.getContent()) {
+                        if (styledContent instanceof String) {
+                            String text = (String) styledContent;
                             renderBlock(strContent, text);
                         }
+                        String [] strNos = gram.getStr().split(" ");
+                        for (String no: strNos) {
+                            String gramStrong = "[" + prefix + no + "]";
+                            storeForRender(strContent, TextStyle.CSS_BOLD, gramStrong, true);
+                        }
+
 
                     }
                 } else if (jaxbClazz.getName().equals(DIV.class.getName()) ) {
@@ -503,7 +538,7 @@ public class TextRendering {
                     BR br = (BR)((JAXBElement<?>) content).getValue();
                     BreakType type = br.getArt();
                     type.value();
-                    strContent.append("\n");
+                    //strContent.append("\n");
                 }
             }
 
@@ -511,6 +546,16 @@ public class TextRendering {
         }
 
         strContent.append("\n");
+    }
+
+    private void storeForRender(StringBuffer strContent, String cssString, String text, boolean strongNumberFlag) {
+        int start;
+        start = strContent.toString().length() - 1;
+        IndexRange range = new IndexRange(start, start + text.length() + 1);
+        this.strongsMap.put(range, text);
+        TextStyle style = new TextStyle().fromCss(cssString);
+        renderMap.put(range, style);
+        renderBlock(strContent, text);
     }
 
     private void renderFootNote(StringBuffer strContent) {

@@ -9,6 +9,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.media.MediaPlayer;
@@ -77,6 +78,8 @@ public class BibleStudyCompoundControl extends BorderPane {
      * The Selected verses map.
      */
     Map<Integer, IndexRange> selectedVersesMap = new LinkedHashMap<>();
+
+    private Optional<String> actStrongNumber = Optional.empty();
 
 
     /**
@@ -331,17 +334,31 @@ public class BibleStudyCompoundControl extends BorderPane {
 
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if (mouseEvent.getClickCount() == 2) {
-                    IndexRange range = area.getSelection();
-                    Map.Entry<Integer, IndexRange> versPointer =
-                            rendering.selectVerseByGivenRange(range, true);
-                    if (selectedVersesMap.get(versPointer.getKey()) != null) {
-                        selectedVersesMap.remove(versPointer.getKey(), versPointer.getValue());
-                        rendering.selectVerseByGivenRange(range, false);
+                if (mouseEvent.getButton() == MouseButton.PRIMARY) {
 
-                    } else {
-                        selectedVersesMap.put(versPointer.getKey(), versPointer.getValue());
+                    if (mouseEvent.getClickCount() == 2) {
+
+                        IndexRange range = area.getSelection();
+                        Map.Entry<Integer, IndexRange> versPointer =
+                                rendering.selectVerseByGivenRange(range, true);
+
+                        if (selectedVersesMap.get(versPointer.getKey()) != null) {
+                            selectedVersesMap.remove(versPointer.getKey(), versPointer.getValue());
+                            rendering.selectVerseByGivenRange(range, false);
+                        } else {
+                            selectedVersesMap.put(versPointer.getKey(), versPointer.getValue());
+                        }
+                    } else if (mouseEvent.getClickCount() == 1) {
+                        IndexRange range = area.getSelection();
+                        actStrongNumber =
+                                rendering.selectStrongNumberByRange(range);
+                        actStrongNumber.ifPresent(s -> System.out.println("Actual strong number is: ("
+                                + s
+                                + ")"));
+
                     }
+                } else if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+
                 }
             }
         });
@@ -616,5 +633,9 @@ public class BibleStudyCompoundControl extends BorderPane {
      */
     public ReadFunctionsControl getTopControls() {
         return topControls;
+    }
+
+    public Optional<String> getActStrongNumber() {
+        return actStrongNumber;
     }
 }

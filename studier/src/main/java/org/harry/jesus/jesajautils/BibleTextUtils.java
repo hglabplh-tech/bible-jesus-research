@@ -44,7 +44,9 @@ public class BibleTextUtils {
             "SF_2009-01-20_GER_LUTH1912_(LUTHER 1912).xml",
             "SF_2009-01-20_GER_SCH1951_(SCHLACHTER 1951).xml",
             "SF_2009-01-22_GER_KNT_(KONKORDANTES NT).xml",
-            "SF_2009-01-20_GER_ILGRDE_(INTERLINEARÜBERSETZUNG).xml"
+            "SF_2009-01-20_GER_ILGRDE_(INTERLINEARÜBERSETZUNG).xml",
+            "SF_2009-01-22_GER_ELB1905STR_(ELBERFELDER 1905).xml",
+            "SF_2009-01-20_GER_LUTH1545STR_(LUTHER 1545 MIT STRONGS).xml"
     );
     /**
      * bible instances list
@@ -473,7 +475,9 @@ public class BibleTextUtils {
     public List<String> getBibleInfos() {
         List<String> result = new ArrayList<>();
         for (BibleBookInstance inst : bibleInstances) {
-            result.add(inst.getBible().getBiblename());
+            result.add(inst.getBibleRef().getBibleID()
+                    + "||"
+                    + inst.getBible().getBiblename());
         }
         return result;
     }
@@ -638,6 +642,28 @@ public class BibleTextUtils {
                                     if (styledContent instanceof String) {
                                         String text = (String) styledContent;
                                         buffer.append(text);
+                                    }
+
+                                }
+
+                            }
+                            else if (jaxbClazz.getName().equals(GRAM.class.getName())) {
+                                String prefix;
+                                if (key.getBook() < 40) {
+                                    prefix = "H";
+                                } else {
+                                    prefix = "G";
+                                }
+                                GRAM gram = (GRAM) ((JAXBElement<?>) content).getValue();
+                                for (Object styledContent : gram.getContent()) {
+                                    if (styledContent instanceof String) {
+                                        String text = (String) styledContent;
+                                        buffer.append(text);
+                                    }
+                                    String [] strNos = gram.getStr().split(" ");
+                                    for (String no: strNos) {
+                                        String gramStrong = "[" + prefix + no + "]";
+                                        buffer.append(gramStrong);
                                     }
 
                                 }

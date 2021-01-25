@@ -51,13 +51,25 @@ public class FoldableStyledArea extends GenericStyledArea<ParStyle, Either<Strin
     }
 
     /**
-     * Emit searxch to all.
+     * Emit search to all.
      */
-    public void emitSearxchToAll() {
+    public void emitSearchToAll() {
         String query = this.getSelectedText();
         SearchDictEvent event = new SearchDictEvent(query);
         for(TextField field : getLinkedSearchTextFields()) {
             field.fireEvent(event);
+            field.getParent().getScene().getWindow().requestFocus();
+        }
+    }
+
+    /**
+     * Emit search to all.
+     */
+    public void emitSearchStrongNumberToAll(String query) {
+        SearchDictEvent event = new SearchDictEvent(query);
+        for(TextField field : getLinkedSearchTextFields()) {
+            field.fireEvent(event);
+            field.getParent().getScene().getWindow().requestFocus();
         }
     }
 
