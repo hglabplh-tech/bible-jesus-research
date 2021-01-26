@@ -386,6 +386,11 @@ public class TextRendering {
        }
     }
 
+    /**
+     * merge the render style map with underline
+     * @param range the range
+     * @param toggle toggle underline
+     */
     public void setToggledUnderLined( IndexRange range, Boolean toggle) {
         for (Map.Entry<IndexRange, TextStyle> entry : renderMap.entrySet()) {
             IndexRange renderRange = entry.getKey();
