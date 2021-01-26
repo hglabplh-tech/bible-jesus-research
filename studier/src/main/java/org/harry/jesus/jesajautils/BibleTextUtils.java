@@ -767,6 +767,13 @@ public class BibleTextUtils {
             this.verses = verses;
         }
 
+        /**
+         * Instantiates a new Book link.
+         *
+         * @param bookNo  the book no
+         * @param chapter the chapter
+         * @param verses  the verses
+         */
         public BookLink(Integer bookNo, Integer chapter, List<Integer> verses) {
             this.bookLabel = BibleTextUtils.getInstance()
                     .getBookLabels().get(bookNo -1);

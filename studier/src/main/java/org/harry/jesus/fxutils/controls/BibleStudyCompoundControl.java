@@ -471,6 +471,12 @@ public class BibleStudyCompoundControl extends BorderPane {
     }
 
 
+    /**
+     * Show link.
+     *
+     * @param links   the links
+     * @param compare the compare
+     */
     public void showLink(List<BibleTextUtils.BookLink> links, boolean compare) {
         String htmlText;
         if (compare) {
@@ -635,6 +641,11 @@ public class BibleStudyCompoundControl extends BorderPane {
         return topControls;
     }
 
+    /**
+     * Gets act strong number.
+     *
+     * @return the act strong number
+     */
     public Optional<String> getActStrongNumber() {
         return actStrongNumber;
     }

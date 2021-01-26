@@ -52,7 +52,7 @@ public class GenDictHTMLScene {
     /**
      * Generate dict html.
      *
-     * @param utils            the utils
+     * @param utils      the utils
      * @param dictAppDir the accordence app dir
      */
     public static void generateDictHTML(BibleTextUtils utils, File dictAppDir) {
@@ -308,6 +308,7 @@ public class GenDictHTMLScene {
 
         /**
          * Build a table of contents. Has to be enhanced ....
+         *
          * @param tocBuffer the buffer containing HTML code
          */
         public void buildToc(StringBuffer tocBuffer) {
@@ -431,7 +432,7 @@ public class GenDictHTMLScene {
         /**
          * Build see.
          *
-         * @param see        the see
+         * @param seeContent the see content
          * @param htmlBuffer the html buffer
          */
         public void buildSeeLink(String seeContent, StringBuffer htmlBuffer) {

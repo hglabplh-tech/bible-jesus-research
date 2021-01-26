@@ -290,6 +290,12 @@ public class HTMLRendering {
     }
 
 
+    /**
+     * Render link for compare string.
+     *
+     * @param links the links
+     * @return the string
+     */
     public static String renderLinkForCompare(List<BibleTextUtils.BookLink> links) {
         StringBuffer buffer = new StringBuffer();
         for (BibleTextUtils.BookLink link:links) {

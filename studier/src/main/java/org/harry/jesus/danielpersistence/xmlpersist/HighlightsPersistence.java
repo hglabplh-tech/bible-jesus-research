@@ -20,7 +20,7 @@ import java.io.OutputStream;
 /**
  * Class for storing and loading the highlits of vedrses
  *
- * @author $Author$  $Id$
+ * @author $Author$ $Id$
  * @version $Revision$
  */
 public class HighlightsPersistence {

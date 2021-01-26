@@ -271,6 +271,12 @@ public class TextRendering {
         return null;
     }
 
+    /**
+     * Select strong number by range optional.
+     *
+     * @param range the range
+     * @return the optional
+     */
     public Optional<String> selectStrongNumberByRange(IndexRange range) {
         int start = range.getStart();
 
@@ -370,8 +376,8 @@ public class TextRendering {
     /**
      * Refresh area style.
      *
-     * @param range    the range
-     * @param toggle   the toggle
+     * @param range  the range
+     * @param toggle the toggle
      */
     public void refreshAreaStyle(IndexRange range, Boolean toggle) {
         BaseConfig base = BibleThreadPool.getContext().getAppSettings().getBaseConfig();
@@ -388,7 +394,8 @@ public class TextRendering {
 
     /**
      * merge the render style map with underline
-     * @param range the range
+     *
+     * @param range  the range
      * @param toggle toggle underline
      */
     public void setToggledUnderLined( IndexRange range, Boolean toggle) {

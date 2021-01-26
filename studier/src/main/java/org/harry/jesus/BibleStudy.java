@@ -28,6 +28,9 @@ import java.util.Map;
  */
 public class BibleStudy extends Application {
 
+    /**
+     * The constant windowsMap.
+     */
     public static final Map<String, Node> windowsMap = new HashMap<>();
     private static Scene scene;
 
