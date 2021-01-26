@@ -263,7 +263,8 @@ public class TextRendering {
         for (Map.Entry<Integer, IndexRange> entry: this.chapterMap.entrySet()) {
             IndexRange compRange = entry.getValue();
             if (start >= compRange.getStart() && start <= compRange.getEnd()) {
-                refreshAreaStyle(area, compRange, toggler);
+                refreshAreaStyle(compRange, toggler);
+                setToggledUnderLined(compRange, toggler);
                 return entry;
             }
         }
@@ -311,7 +312,7 @@ public class TextRendering {
      */
     public void setAreaText(StringBuffer strContent) {
         area.replaceText(strContent.toString());
-        refreshAreaStyle(area, null, false);
+        refreshAreaStyle( null, false);
         for (Map.Entry<IndexRange, TextStyle> entry : renderMap.entrySet()) {
             IndexRange range = entry.getKey();
             TextStyle style = entry.getValue();
@@ -369,22 +370,32 @@ public class TextRendering {
     /**
      * Refresh area style.
      *
-     * @param textArea the text area
      * @param range    the range
      * @param toggle   the toggle
      */
-    public static void refreshAreaStyle(FoldableStyledArea textArea, IndexRange range, Boolean toggle) {
+    public void refreshAreaStyle(IndexRange range, Boolean toggle) {
         BaseConfig base = BibleThreadPool.getContext().getAppSettings().getBaseConfig();
         Integer fontSize = base.getFontSize();
         String fontFamily = base.getFontFamily();
         TextStyle theStyle = base.getShape();
        if (range == null) {
-           SettingsDialog.setPreview(textArea, theStyle, fontFamily, fontSize);
+           SettingsDialog.setPreview(this.area, theStyle, fontFamily, fontSize);
        } else {
            TextStyle underLined = theStyle.updateUnderline(toggle);
-           SettingsDialog.setPreview(textArea, underLined, fontFamily, fontSize, range);
-
+           SettingsDialog.setPreview(this.area, underLined, fontFamily, fontSize, range);
        }
+    }
+
+    public void setToggledUnderLined( IndexRange range, Boolean toggle) {
+        for (Map.Entry<IndexRange, TextStyle> entry : renderMap.entrySet()) {
+            IndexRange renderRange = entry.getKey();
+            if ((range.getStart() < renderRange.getEnd()) &&
+                    (range.getEnd() > renderRange.getEnd())) {
+                TextStyle style = entry.getValue();
+                TextStyle underLined = style.updateUnderline(toggle);
+                mergeRangeStyle(this.area, underLined, renderRange);
+            }
+        }
     }
 
 

@@ -482,6 +482,7 @@ public class BibleStudyCompoundControl extends BorderPane {
     }
 
     private boolean fillChapterText() {
+        rendering.clearRendering();
         boolean found = rendering.render(utils.getSelected(), actBookLabel, actChapter);
         if (found) {
             studyNotes.getItems().clear();
@@ -500,7 +501,6 @@ public class BibleStudyCompoundControl extends BorderPane {
             }
             String[] splitted = actBookLabel.split(",");
             selectedVersesMap.clear();
-            rendering.clearRendering();
             topControls.getChapterInfo().setText("Book: " + splitted[1] + " Chapter: " + actChapter);
 
         }

@@ -1,7 +1,13 @@
 package org.harry.jesus.fxutils;
 
 import generated.*;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -21,9 +27,16 @@ import org.harry.jesus.synchjeremia.BibleThreadPool;
 import org.harry.jesus.synchjeremia.SynchThread;
 import org.pmw.tinylog.Logger;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.xml.bind.JAXBElement;
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,9 +53,9 @@ public class GenDictHTMLScene {
      * Generate dict html.
      *
      * @param utils            the utils
-     * @param accordenceAppDir the accordence app dir
+     * @param dictAppDir the accordence app dir
      */
-    public static void generateDictHTML(BibleTextUtils utils, File accordenceAppDir) {
+    public static void generateDictHTML(BibleTextUtils utils, File dictAppDir) {
 
         Stage stage = new Stage();
         stage.setTitle("Dictionary HTML Generation");
@@ -61,8 +74,7 @@ public class GenDictHTMLScene {
         grid.add(title, 0, 0);
         grid.add(bar, 0, 1);
         grid.add(progressText, 0, 2);
-
-        Worker<Void> worker = new Worker<>(utils, accordenceAppDir);
+        Worker<Void> worker = createWorker(utils, dictAppDir);
         bar.progressProperty().bind(worker.progressProperty());
         progressText.textProperty().bind(worker.messageProperty());
 
@@ -78,7 +90,27 @@ public class GenDictHTMLScene {
             BibleStudy.windowsMap.remove("genDict");
         });
         stage.show();
-        new Thread(worker).start();
+        Thread workerThread = new Thread(worker);
+        workerThread.start();
+    }
+
+    private static Worker<Void> createWorker(BibleTextUtils utils, File dictAppDir) {
+        Worker<Void> worker = new Worker<>(utils, dictAppDir);
+        worker.exceptionProperty().addListener(new ChangeListener<Throwable>() {
+            @Override
+            public void changed(ObservableValue<? extends Throwable> observableValue, Throwable throwable, Throwable t1) {
+                if (throwable != null) {
+                    System.err.println(throwable.getMessage());
+                    throwable.printStackTrace();
+                }
+                if (t1 != null) {
+                    System.err.println(t1.getMessage());
+                    t1.printStackTrace();
+                }
+            }
+        });
+
+        return worker;
     }
 
     /**
@@ -100,6 +132,10 @@ public class GenDictHTMLScene {
 
         private BibleAppConfig config = null;
 
+        private List<String> tocHeads = new ArrayList<>();
+
+        private List<Tuple<String, String>> tocData = new ArrayList<>();
+
 
         /**
          * Instantiates a new Worker.
@@ -119,6 +155,21 @@ public class GenDictHTMLScene {
             }
         }
 
+        @Override protected void succeeded() {
+            super.succeeded();
+            updateMessage("Done!");
+        }
+
+        @Override protected void cancelled() {
+            super.cancelled();
+            updateMessage("Cancelled!");
+        }
+
+        @Override protected void failed() {
+            super.failed();
+            updateMessage("Failed!");
+        }
+
         /**
          * Build accordance tuple.
          *
@@ -130,11 +181,17 @@ public class GenDictHTMLScene {
          */
         public Tuple<Long, StringBuffer> buildAccordance(BibleTextUtils utils, Dictionary accordance, long total, long done) {
             StringBuffer htmlBuffer = new StringBuffer();
+            StringBuffer tempBuffer = new StringBuffer();
             HTMLRendering.buildHead(htmlBuffer);
             buidAccordanceHeader(htmlBuffer, accordance);
-            done = buildAccItemEntriesHTML(utils, htmlBuffer, accordance.getItem(), total, done);
+            done = buildAccItemEntriesHTML(utils, tempBuffer, accordance.getItem(), total, done);
+            StringBuffer tocBuffer = new StringBuffer();
+            buildToc(tocBuffer);
+            htmlBuffer.append(tocBuffer);
+            htmlBuffer.append(tempBuffer);
             HTMLRendering.buildFoot(htmlBuffer);
             Logger.trace(htmlBuffer.toString());
+            tocHeads = new ArrayList<>();
             return new Tuple<>(done, htmlBuffer);
         }
 
@@ -203,6 +260,7 @@ public class GenDictHTMLScene {
                             + "\">"
                             + escapeHtml4(item.getId())
                             + "</H5>\n");
+                    tocHeads.add(item.getId());
                 }
                 if (item.getStrongId() != null) {
                     htmlBuffer.append("<H5 id=\"" +
@@ -210,7 +268,9 @@ public class GenDictHTMLScene {
                             + "\">"
                             + escapeHtml4(item.getStrongId())
                             + "</H5>\n");
+                    tocHeads.add(item.getStrongId());
                 }
+
                 List<Serializable> objects = item.getContent();
                 for (Serializable object : objects) {
                     if (object instanceof JAXBElement) {
@@ -244,6 +304,26 @@ public class GenDictHTMLScene {
                 updateGenDictProgress(done, total);
             }
             return done;
+        }
+
+        /**
+         * Build a table of contents. Has to be enhanced ....
+         * @param tocBuffer the buffer containing HTML code
+         */
+        public void buildToc(StringBuffer tocBuffer) {
+            tocBuffer.append("<p class=\"toc_title\">Table of contents</p>\n");
+            tocBuffer.append("<ul class=\"toc_list\">\n<ul>\n");
+            for (String linkSrc: tocHeads) {
+                tocBuffer.append("<li>\n");
+                buildSeeLink(linkSrc, tocBuffer);
+                tocBuffer.append("</li>\n");
+            }
+            tocBuffer.append("</ul>\n");
+ /* <ul>
+    <li><a href="#First_Sub_Point_1">1.1 First Sub Point 1</a></li>
+    <li><a href="#First_Sub_Point_2">1.2 First Sub Point 2</a></li>
+  </ul> */
+
         }
 
         /**
@@ -342,12 +422,24 @@ public class GenDictHTMLScene {
         public void buildSee(SeeType see, StringBuffer htmlBuffer) {
             String target = see.getTarget();
             if (target.equals("x-self")) {
-                htmlBuffer.append("<p>See: <A href=\"http://_self/#"
-                        + see.getContent()
-                        + "\">"
-                        + see.getContent()
-                        + "</A></p>\n");
+                htmlBuffer.append("<p>See: ");
+                buildSeeLink(see.getContent(), htmlBuffer);
+                htmlBuffer.append("</p>\n");
             }
+        }
+
+        /**
+         * Build see.
+         *
+         * @param see        the see
+         * @param htmlBuffer the html buffer
+         */
+        public void buildSeeLink(String seeContent, StringBuffer htmlBuffer) {
+                htmlBuffer.append("<A href=\"http://_self/#"
+                        + seeContent
+                        + "\">"
+                        + seeContent
+                        + "</A>");
         }
 
         /**
@@ -395,11 +487,16 @@ public class GenDictHTMLScene {
                 if (bibleRef != null ) {
                     optBible =
                             LinkHandler.findBibleById(bibleRef.getBibleID());
+                    if (!optBible.isPresent()) {
+                        optBible = LinkHandler.findBibleById("ELB1905");
+                    }
                 } else {
                     optBible = LinkHandler.findBibleById("ELB1905");
 
                 }
-                BibleTextUtils.getInstance().setSelected(optBible.get().getBible());
+                if (optBible.isPresent()) {
+                    BibleTextUtils.getInstance().setSelected(optBible.get().getBible());
+                }
                 actDictionary = dictInstance.getDictionaryRef().getDictionaryName();
                 done = genDictionary(dictInstance, total, done);
             }
