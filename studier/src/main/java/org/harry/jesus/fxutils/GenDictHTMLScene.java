@@ -89,6 +89,7 @@ public class GenDictHTMLScene {
             System.out.println("Stage is closing");
             BibleStudy.windowsMap.remove("genDict");
         });
+        generationVBOX.getStylesheets().add(BibleStudy.CSS.BIBLE.getUrl());
         stage.show();
         Thread workerThread = new Thread(worker);
         workerThread.start();

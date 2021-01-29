@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import org.harry.jesus.BibleStudy;
 import org.harry.jesus.fxutils.JesusMisc;
 import org.harry.jesus.fxutils.event.DeployDictionary;
 import org.harry.jesus.jesajautils.BibleDictUtil;
@@ -66,7 +67,7 @@ public class EditDictCompoundControl extends BorderPane {
 
     private ContextMenu itemsListMenu;
 
-    private Button addToList;
+    private Button updateContent;
 
     private Button newDict;
 
@@ -80,7 +81,7 @@ public class EditDictCompoundControl extends BorderPane {
 
     private Button editInfo;
 
-    private Button addToDescrList;
+    private CheckBox storeAsTarget;
 
     private Integer actItemsIndex = 0;
 
@@ -89,12 +90,18 @@ public class EditDictCompoundControl extends BorderPane {
     private Optional<File> outFile = Optional.empty();
 
     /**
+     * The change indicator
+     */
+    private Boolean changeIndicator = false;
+
+    /**
      * Instantiates a new Edit dict compound control.
      *
      * @param nodeFromPrimary the node from primary
      */
     public EditDictCompoundControl(Node nodeFromPrimary) {
         super();
+        this.getStylesheets().add(BibleStudy.CSS.BIBLE.getUrl());
         this.nodeFromPrimary = nodeFromPrimary;
         GridPane centerPane = new GridPane();
         centerPane.setHgap(10);
@@ -125,6 +132,7 @@ public class EditDictCompoundControl extends BorderPane {
         descriptionText = new TextArea();
         centerPane.add(descriptionLab, 0, 4);
         centerPane.add(descriptionText, 1, 4, 2, 2);
+
         refLinkBox = new ComboBox();
         refLinkMenu = new ContextMenu();
         MenuItem item = new MenuItem("Paste");
@@ -139,10 +147,12 @@ public class EditDictCompoundControl extends BorderPane {
         });
         Label refLinkLab = new Label("Reference Links:");
         refLinkMenu.getItems().add(item);
+        storeAsTarget = new CheckBox("store reflink as target");
         refLinkBox.setContextMenu(refLinkMenu);
         refLinkBox.setEditable(true);
         centerPane.add(refLinkLab, 0, 6);
         centerPane.add(refLinkBox, 1, 6);
+        centerPane.add(storeAsTarget, 2, 6);
         seeBox = new ComboBox();
         seeMenu = new ContextMenu();
         MenuItem seeItem = new MenuItem("Paste");
@@ -169,23 +179,21 @@ public class EditDictCompoundControl extends BorderPane {
         bottomPane.setHgap(10);
         bottomPane.setVgap(10);
         bottomPane.setPadding(new Insets(20, 150, 10, 10));
-        addToList = new Button("<-- move item to list");
+        updateContent = new Button("Update Content");
         newDict = new Button("New Dictionary");
         newItem = new Button(" New Item");
         newDescription = new Button(" New Description");
         loadDict = new Button("Load Dictionary");
         saveDict = new Button("Save Dictionary");
         editInfo = new Button("Edit dictionary Information");
-        addToDescrList = new Button("Add description to list -->");
         this.setBottom(bottomPane);
-        bottomPane.add(addToList, 0, 0);
+        bottomPane.add(updateContent, 0, 0);
         bottomPane.add(newDict, 1, 0);
         bottomPane.add(newItem, 2, 0);
         bottomPane.add(loadDict, 3, 0);
         bottomPane.add(saveDict, 4, 0);
         bottomPane.add(newDescription, 5, 0);
         bottomPane.add(editInfo, 6, 0);
-        bottomPane.add(addToDescrList, 7, 0);
 
         itemsListView = new ListView<>();
         itemsListMenu = new ContextMenu();
@@ -260,25 +268,16 @@ public class EditDictCompoundControl extends BorderPane {
         newDescription.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                addDescription();
                 clearDescrControls();
             }
         });
 
-        addToList.setOnAction(new EventHandler<ActionEvent>() {
+        updateContent.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                String idString = idField.getText();
-
-                if (itemsListView.getItems().contains(idString)) {
-                    int index = itemsListView.getItems().indexOf(idString);
-                    TItem item = dictionary.getItem().get(index);
-                    fillItem(item);
-                } else {
-                    TItem item = new TItem();
-                    itemsListView.getItems().add(idString);
-                    dictionary.getItem().add(item);
-                    fillItem(item);
-                }
+                addDescription();
+                addItemToDict();
             }
         });
 
@@ -348,6 +347,8 @@ public class EditDictCompoundControl extends BorderPane {
         newItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                addDescription();
+                addItemToDict();
                 clearControls();
             }
         });
@@ -368,28 +369,48 @@ public class EditDictCompoundControl extends BorderPane {
             }
         });
 
-        addToDescrList.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                String idString = descrIdField.getText();
-
-                if (descrListView.getItems().contains(idString)) {
-                    int index = descrListView.getItems().indexOf(idString);
-                    TParagraph paragraph = descriptions.get(index);
-                    fillParagraph(paragraph);
-                } else {
-                    TParagraph paragraph = new TParagraph();
-                    descrListView.getItems().add(idString);
-                    descriptions.add(paragraph);
-                    fillParagraph(paragraph);
-                }
-                descrToItem.put(actItemsIndex, descriptions);
-            }
-        });
 
     }
 
+    private void addItemToDict() {
+        String idString = idField.getText();
+        changeIndicator = true;
+        if (itemsListView.getItems().contains(idString)) {
+            int index = itemsListView.getItems().indexOf(idString);
+            TItem item = dictionary.getItem().get(index);
+            fillItem(item);
+        } else {
+            TItem item = new TItem();
+            itemsListView.getItems().add(idString);
+            dictionary.getItem().add(item);
+            fillItem(item);
+        }
+    }
+
+    private void addDescription() {
+        String idString = descrIdField.getText();
+        changeIndicator = true;
+        if (descrListView.getItems().contains(idString)) {
+            int index = descrListView.getItems().indexOf(idString);
+            TParagraph paragraph = descriptions.get(index);
+            fillParagraph(paragraph);
+        } else {
+            TParagraph paragraph = new TParagraph();
+            descrListView.getItems().add(idString);
+            descriptions.add(paragraph);
+            fillParagraph(paragraph);
+        }
+        descrToItem.put(actItemsIndex, descriptions);
+    }
+
     private void saveDictionary() {
+        if (!changeIndicator) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Changes");
+            alert.setContentText("No changes tracked please press first update button");
+            alert.showAndWait();
+            return;
+        }
         if (!outFile.isPresent()) {
             outFile = JesusMisc
                     .showSaveDialogFile(saveDict, JesusMisc.FileExtension.XML_EXT);
@@ -400,6 +421,7 @@ public class EditDictCompoundControl extends BorderPane {
                 Integer index = 0;
                 if (stream != null) {
                     BibleReader.storeDictionary(dictionary, stream);
+                    changeIndicator = false;
                 }
             } catch (IOException ex) {
                 Logger.trace(ex);
@@ -451,10 +473,15 @@ public class EditDictCompoundControl extends BorderPane {
         pElement = new JAXBElement(new QName("title"),
                 String.class, descriptionTitle.getText());
         paragraph.getContent().add(pElement);
+        String refLinkTagName = "reflink";
         for (String link: refLinkBox.getItems()) {
             RefLinkType refLink = new RefLinkType();
-            refLink.setMscope(link);
-            pElement = new JAXBElement(new QName("reflink"), RefLinkType.class, refLink);
+            if (storeAsTarget.isSelected()) {
+                refLink.setTarget(link);
+            } else {
+                refLink.setMscope(link);
+            }
+            pElement = new JAXBElement(new QName(refLinkTagName), RefLinkType.class, refLink);
             paragraph.getContent().add(pElement);
         }
         for (String link: seeBox.getItems()) {

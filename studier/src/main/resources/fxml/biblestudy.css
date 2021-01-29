@@ -41,16 +41,16 @@
 
 }
 
-.root{
+.root {
     -fx-font-size: 10pt;
-    -fx-base: orange;
-    -fx-background: pink
+    -fx-base: palegoldenrod;
+    -fx-background: lightgray;
 }
 
 #content-header {
     -fx-font-size: 12px;
     -fx-padding: 0 0 5 0;
-    -fx-font-weight: 300;
+    -fx-font-weight: 300px;
 }
 
 #content {
@@ -66,28 +66,56 @@
 }
 
 .custom-red {
-  -fx-control-inner-background: red;
+    -fx-control-inner-background: red;
 }
 
 .custom-green {
-  -fx-control-inner-background: green;
+    -fx-control-inner-background: green;
 }
 
 .custom-yellow {
-  -fx-control-inner-background: yellow;
+    -fx-control-inner-background: yellow;
 }
 
 .custom-white {
-  -fx-control-inner-background: white;
+    -fx-control-inner-background: white;
 }
 
 .custom {
-  -fx-control-inner-background: transparent;
+    -fx-control-inner-background: transparent;
 }
 
 .label {
     -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-text-fill: #333333;
-    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+    -fx-text-fill: white;
+    -fx-border-color: green;
+    -fx-background-color: rosybrown;
+    -fx-effect: innershadow(gaussian, sandybrown, 5, 0.7, 3, 3);
+}
+
+.button {
+    -fx-background-color: darkorange;
+    -fx-border-color: black;
+    -fx-text-fill: white;
+}
+
+.button:pressed {
+    -fx-background-color: red;
+    -fx-border-color: black;
+    -fx-text-fill: white;
+}
+
+.button:hover {
+    -fx-background-color: darkgreen;
+    -fx-border-color: black;
+    -fx-text-fill: white;
+}
+
+.progress-indicator {
+    -fx-background-position: center, center;
+    -fx-background-color: lightgreen;
+    -fx-text-fill: white;
+    -fx-border-color: white;
+    -fx-effect: innershadow(gaussian, darkgreen, 4, 0.7, 3, 3);
 }

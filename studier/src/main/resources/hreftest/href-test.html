@@ -1,5 +1,33 @@
 <html>
  <head>
+     <style>
+         @media screen
+         {
+             p {font-size: 1.0em;
+                 font-family: "Times New Roman";
+                 fill:azure
+             }
+             a {
+                 font-size: 0.9em;
+                 font-feature-settings: revert;
+                 font-family: "Courier New";
+                 fill:green;
+             }
+             h5 {
+                 font: revert;
+                 font-family: "Arial Rounded MT Bold";
+                 fill:blueviolet;
+             }
+         }
+
+         @media print
+         {
+             p {font-size: 13pt;
+                 font-family: "Times New Roman";
+                 fill: azure;
+             }
+         }
+     </style>
      <script>
          function scrollTo(elementId) {
              document.getElementById(elementId).scrollIntoView();

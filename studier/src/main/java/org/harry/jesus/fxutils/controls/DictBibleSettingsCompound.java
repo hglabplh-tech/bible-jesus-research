@@ -52,6 +52,8 @@ public class DictBibleSettingsCompound extends BorderPane  {
      */
     CheckBox selectDictionary = new CheckBox("auto-load dictionary when selecting assoc bible");
 
+
+
     /**
      * Instantiates a new Dict bible settings compound.
      */

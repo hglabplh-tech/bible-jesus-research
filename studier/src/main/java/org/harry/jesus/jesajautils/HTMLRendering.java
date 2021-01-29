@@ -27,6 +27,39 @@ public class HTMLRendering {
         htmlBuffer.append("<!DOCTYPE html>\n" +
                 "<html>\n" +
                 " <head>\n" +
+                " <style>\n" +
+                        "         @media screen\n" +
+                        "         {\n" +
+                        "             p {font-size: 1.0em;\n" +
+                        "                 font-family: \"Times New Roman\";\n" +
+                        "                 fill:azure\n" +
+                        "             }\n" +
+                        "             a {\n" +
+                        "                 font-size: 0.9em;\n" +
+                        "                 font-feature-settings: revert;\n" +
+                        "                 font-family: \"Courier New\";\n" +
+                        "                 fill:green;\n" +
+                        "             }\n" +
+                        "             h5 {\n" +
+                        "                 font-size: 1.2em;\n" +
+                        "                 font-family: \"Arial Rounded MT Bold\";\n" +
+                        "                 fill:blueviolet;\n" +
+                        "             }\n" +
+                        "             h6 {\n" +
+                        "                 font-size: 1.0em;\n" +
+                        "                 font-family: \"Britannic Bold\";\n" +
+                        "                 fill:blueviolet;\n" +
+                        "             }\n" +
+                        "         }\n" +
+                        "\n" +
+                        "         @media print\n" +
+                        "         {\n" +
+                        "             p {font-size: 13pt;\n" +
+                        "                 font-family: \"Times New Roman\";\n" +
+                        "                 fill: azure;\n" +
+                        "             }\n" +
+                        "         }\n" +
+                        "     </style>" +
                 "<meta charset=\"utf-8\"/>\n" +
                 "     <script>\n" +
                 "         function scrollTo(elementId) {\n" +

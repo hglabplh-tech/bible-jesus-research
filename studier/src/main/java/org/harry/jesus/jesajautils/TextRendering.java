@@ -607,35 +607,27 @@ public class TextRendering {
         notes.add(buffer.toString());
     }
 
-    private int renderBlock(StringBuffer strContent, String block) {
-        StringBuffer lineBuffer = new StringBuffer();
-        if (block.length() >= TEXT_WIDTH) {
-            int pos = 0;
-            int actLength = 0;
-            int blockL = block.length();
-            while (actLength < blockL) {
-                int temp = (actLength + pos + 1);
-                actLength = Math.min(temp, block.length());
-                int lastPos = actLength -1;
-                pos = block.indexOf(" ", lastPos + TEXT_WIDTH);
-                if (pos != -1) {
-                    strContent.append(block.substring(lastPos, pos) + "\n");
-                    this.lastPosINBuffer = block.substring(lastPos, pos).length() + (pos - lastPos);
-                } else {
-                    actLength = block.length();
-                    pos = actLength;
-
-                    strContent.append(block.substring(lastPos));
-                    this.lastPosINBuffer = block.substring(lastPos).length() + (pos + 1);
-                }
-
+    private void renderBlock(StringBuffer strContent, String block) {
+        int lastLength = getLastLength(strContent);
+        String[] wordsOfBlock  =  block.split(" ");
+        for (String word: wordsOfBlock) {
+            if ((lastLength  + word.length())
+                    >= TEXT_WIDTH) {
+                strContent.append("\n");
             }
-        }else {
-            strContent.append(block);
-            this.lastPosINBuffer = lineBuffer.toString().length() + block.length();
+            strContent.append(word + " ");
+            lastLength = getLastLength(strContent);
         }
-        strContent.append(lineBuffer.toString());
-        return lineBuffer.toString().length();
+        return;
+    }
+
+    private int getLastLength(StringBuffer strContent) {
+        int lastWord = strContent.toString().lastIndexOf("\n");
+        if (lastWord == -1) {
+            lastWord = 0;
+        }
+        int lastLength = strContent.toString().length() - lastWord;
+        return lastLength;
     }
 
 }

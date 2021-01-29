@@ -108,6 +108,7 @@ public class ViewAccordanceDialog {
         fxmlLoader = new FXMLLoader(resourceURL);
 
         Pane root = (Pane) fxmlLoader.load();
+        root.getStylesheets().add(BibleStudy.CSS.BIBLE.getUrl());
         DictionaryViewController controller = (DictionaryViewController)fxmlLoader.getController();
         controller.setWebViewListener(area, html);
 
