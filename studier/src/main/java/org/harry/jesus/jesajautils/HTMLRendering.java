@@ -269,12 +269,12 @@ public class HTMLRendering {
     public static void renderVers(StringBuffer htmlBuffer, String buffer, Color color) {
         if (color == null) {
             htmlBuffer.append("<hr><p><span style=\"font-size: small; font-family: &quot;Times New Roman&quot;;\">")
-                    .append(buffer.toString())
+                    .append(escapeHtml4(buffer.toString()))
                     .append("</span></p><hr>");
         } else {
             htmlBuffer.append("<hr><p><span style=\"background-color:#ddd;\" style=\"background-color:"
                     + color.toString().replace("0x", "#") + ";font-size: small; font-family: &quot;Times New Roman&quot;;\">")
-                    .append(buffer.toString())
+                    .append(escapeHtml4(buffer.toString()))
                     .append("</span></p><hr>");
         }
     }

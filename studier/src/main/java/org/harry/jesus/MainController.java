@@ -2,6 +2,7 @@ package org.harry.jesus;
 
 import generated.BIBLEBOOK;
 import generated.CHAPTER;
+import generated.XMLBIBLE;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -208,6 +209,7 @@ public class MainController {
 
     private BibleStudyCompoundControl bibleStudy;
 
+    public static BibleHTTPSrv theService = null;
 
     /**
      * Initialize.
@@ -239,6 +241,16 @@ public class MainController {
             org.pmw.tinylog.Logger.trace("Verse Images definition not loaded: " + ex.getMessage());
         }
         utils = BibleTextUtils.getInstance();
+        String bibleId = context.getAppSettings().getDictConfig().getVerseOfDayBibleId();
+        if (bibleId == null) {
+            bibleId = "ELB1905";
+        }
+        String finalBibleId = bibleId;
+        Optional<BibleTextUtils.BibleBookInstance> verseOfDaySel =
+                utils.getBibleInstances().stream()
+                        .filter(e -> e.getBibleRef().getBibleID().equals(finalBibleId))
+                        .findFirst();
+        verseOfDaySel.ifPresent(e -> theService = new BibleHTTPSrv(e.getBible()));
 
         if (utils.getBibleInstances().size() > 0) {
             utils.setSelected(utils.getBibleInstances().get(0).getBible());
@@ -612,6 +624,18 @@ public class MainController {
 
         HelpDialog.showHelp("/AppHelp.html");
     }
+
+    /**
+     * verse of day.
+     *
+     * @param event the event
+     */
+    @FXML
+    public void verseOfDay(ActionEvent event) {
+
+        VerseOfDayDialog.showVerse();
+    }
+
 
 
     /**

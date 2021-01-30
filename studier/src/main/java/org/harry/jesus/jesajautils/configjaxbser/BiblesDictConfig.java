@@ -16,7 +16,8 @@ import java.util.Map;
         "dictionaryRefs",
         "dictBibleMap",
         "selectBible",
-        "selectDictionary"
+        "selectDictionary",
+        "verseOfDayBibleId"
 })
 public class BiblesDictConfig {
 
@@ -26,6 +27,12 @@ public class BiblesDictConfig {
      */
     @XmlElement( required = true)
     protected List<BibleRef> bibleRefs;
+
+    /**
+     * The Bible refs.
+     */
+    @XmlElement( required = false)
+    protected String verseOfDayBibleId;
 
     /**
      * The Dictionary refs.
@@ -59,6 +66,15 @@ public class BiblesDictConfig {
      */
     public Map<DictionaryRef, BibleRef> getDictBibleMapping() {
         return dictBibleMap;
+    }
+
+    public String getVerseOfDayBibleId() {
+        return verseOfDayBibleId;
+    }
+
+    public BiblesDictConfig setVerseOfDayBibleId(String verseOfDayBibleId) {
+        this.verseOfDayBibleId = verseOfDayBibleId;
+        return this;
     }
 
     /**

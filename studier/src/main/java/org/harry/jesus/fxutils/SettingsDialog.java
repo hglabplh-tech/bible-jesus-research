@@ -1,5 +1,6 @@
 package org.harry.jesus.fxutils;
 
+import generated.XMLBIBLE;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -14,12 +15,11 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import org.harry.jesus.fxutils.controls.DictBibleSettingsCompound;
+import org.harry.jesus.fxutils.controls.MiscBibleSettingsCompound;
+import org.harry.jesus.jesajautils.BibleDictUtil;
 import org.harry.jesus.jesajautils.browse.FoldableStyledArea;
 import org.harry.jesus.jesajautils.browse.TextStyle;
-import org.harry.jesus.jesajautils.configjaxbser.BaseConfig;
-import org.harry.jesus.jesajautils.configjaxbser.BibleAppConfig;
-import org.harry.jesus.jesajautils.configjaxbser.BibleRef;
-import org.harry.jesus.jesajautils.configjaxbser.DictionaryRef;
+import org.harry.jesus.jesajautils.configjaxbser.*;
 import org.harry.jesus.synchjeremia.ApplicationProperties;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
 import org.harry.jesus.synchjeremia.SynchThread;
@@ -131,11 +131,14 @@ public class SettingsDialog {
          * set the font box
          */
         DictBibleSettingsCompound dictCompound = new DictBibleSettingsCompound();
+        MiscBibleSettingsCompound miscCompound = new MiscBibleSettingsCompound();
         TabPane settingsTab = new TabPane();
         Tab baseSettings = new Tab("Base Settings");
         settingsTab.getTabs().add(baseSettings);
         Tab advSettings = new Tab("Advanced Settings");
         settingsTab.getTabs().add(advSettings);
+        Tab miscSettings = new Tab("Miscellaneous Settings");
+        settingsTab.getTabs().add(miscSettings);
         Label fontLabel = new Label("Select default Font");
         ChoiceBox<String> fontBox = makeFontBox();
         ChoiceBox<Integer> fontSizeBox = getFontSizeChoiceBox();
@@ -166,6 +169,7 @@ public class SettingsDialog {
 
         baseSettings.setContent(grid);
         advSettings.setContent(dictCompound);
+        miscSettings.setContent(miscCompound);
         dialog.getDialogPane().setContent(settingsTab);
 
 // Request focus on the passwordKey field by default.
@@ -181,17 +185,22 @@ public class SettingsDialog {
                 config.getBaseConfig().setFontSize(fontSize);
                 Boolean selectBible = dictCompound.getSelectBible().isSelected();
                 Boolean selectDictionary = dictCompound.getSelectDictionary().isSelected();
-                config.getDictConfig()
+                BiblesDictConfig biblesDictConf = config.getDictConfig();
+                biblesDictConf
                         .setSelectBible(selectBible)
                         .setSelectDictionary(selectDictionary);
-                config.getDictConfig().getBibleRefs().clear();
-                config.getDictConfig().getBibleRefs().addAll(
+                biblesDictConf.getBibleRefs().clear();
+                biblesDictConf.getBibleRefs().addAll(
                         dictCompound.getBibleRefs().getItems());
-                config.getDictConfig().getDictionaryRefs().clear();
-                config.getDictConfig().getDictionaryRefs().addAll(
+                biblesDictConf.getDictionaryRefs().clear();
+                biblesDictConf.getDictionaryRefs().addAll(
                         dictCompound.getDictRefs().getItems());
                 Map<DictionaryRef, BibleRef> map = config.getDictConfig().getDictBibleMapping();
                 fillAssocMap(map, config, dictCompound.getAssocData());
+                Optional<XMLBIBLE> selected = miscCompound.getSelectedBible();
+                selected.ifPresent(e ->
+                        biblesDictConf.setVerseOfDayBibleId(BibleDictUtil.getIdFromBibleInfo(
+                                e.getINFORMATION().getValue())));
                 context.setAppSettings(config);
                 SynchThread.storeApplicationSettings(context);
             }
