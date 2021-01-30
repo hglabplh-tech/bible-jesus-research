@@ -195,12 +195,13 @@ public class SettingsDialog {
                 biblesDictConf.getDictionaryRefs().clear();
                 biblesDictConf.getDictionaryRefs().addAll(
                         dictCompound.getDictRefs().getItems());
-                Map<DictionaryRef, BibleRef> map = config.getDictConfig().getDictBibleMapping();
+                Map<DictionaryRef, BibleRef> map = biblesDictConf.getDictBibleMapping();
                 fillAssocMap(map, config, dictCompound.getAssocData());
                 Optional<XMLBIBLE> selected = miscCompound.getSelectedBible();
                 selected.ifPresent(e ->
                         biblesDictConf.setVerseOfDayBibleId(BibleDictUtil.getIdFromBibleInfo(
                                 e.getINFORMATION().getValue())));
+                biblesDictConf.setVerseOfDayRandom(miscCompound.getVerseRandom());
                 context.setAppSettings(config);
                 SynchThread.storeApplicationSettings(context);
             }

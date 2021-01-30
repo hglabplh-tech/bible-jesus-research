@@ -1,4 +1,6 @@
-package org.harry.jesus.jesajautils;
+package org.harry.jesus.jesajautils.httpSrv;
+
+import org.harry.jesus.jesajautils.BibleTextUtils;
 
 import java.util.Arrays;
 import java.util.List;

@@ -284,6 +284,9 @@ public class EditDictCompoundControl extends BorderPane {
         loadDict.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                dictionary = new Dictionary();
+                itemsListView.getItems().clear();
+                clearControls();
                 descrToItem.clear();
                 outFile = JesusMisc.showOpenDialogFile(loadDict,
                         JesusMisc.FileExtension.XML_EXT);

@@ -1,27 +1,22 @@
-package org.harry.jesus.jesajautils;
+package org.harry.jesus.jesajautils.httpSrv;
 
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import generated.XMLBIBLE;
-import org.w3c.dom.stylesheets.LinkStyle;
+import org.harry.jesus.jesajautils.BibleTextUtils;
+import org.harry.jesus.jesajautils.HTMLRendering;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class BibleHTTPSrv {
 
@@ -30,7 +25,7 @@ public class BibleHTTPSrv {
     public static final Integer PORT = 8980;
     private HttpServer server;
 
-    public BibleHTTPSrv(XMLBIBLE bible) {
+    public BibleHTTPSrv(XMLBIBLE bible, Boolean verseRandom) {
         try {
 
             ResponseCache responseCache = new ResponseCache() {
@@ -50,7 +45,7 @@ public class BibleHTTPSrv {
             server.bind(new InetSocketAddress(
                     InetAddress.getByName(HOST),
                     PORT), 0);
-            server.createContext("/dayVerse", new VersPerDayHandler(bible));
+            server.createContext("/dayVerse", new VersPerDayHandler(bible, verseRandom));
             server.setExecutor(null);
             server.start();
         } catch (Exception e) {
@@ -68,13 +63,18 @@ public class BibleHTTPSrv {
 
     private static class VersPerDayHandler  implements HttpHandler {
 
-        private int rand;
+        private int sequence = 0;
 
         private final XMLBIBLE bible;
 
-        public VersPerDayHandler(XMLBIBLE bible) {
-            rand = 0;
+        private  ThreadLocalRandom randomizer;
+
+        private final Boolean verseRandom;
+
+        public VersPerDayHandler(XMLBIBLE bible, Boolean verseRandom) {
             this.bible = bible;
+             randomizer = ThreadLocalRandom.current();
+             this.verseRandom = verseRandom;
         }
 
         @Override
@@ -84,26 +84,43 @@ public class BibleHTTPSrv {
             String htmlText = HTMLRendering.renderLink(
                     utils, this.bible, Arrays.asList(link));
             System.out.println(htmlText);
-            getLengthAndSend(exchange, htmlText);
+            getLengthAndSendText(exchange, htmlText);
         }
 
+        /**
+         * Get a verse either by random or sequential
+         * @return the verse link
+         */
         public BibleTextUtils.BookLink getRandomVerse() {
-            BibleTextUtils.BookLink link = DayVerses.verses.get(rand);
-            System.out.println(link);
-            if (rand == (DayVerses.verses.size() - 1)) {
-                rand = 0;
+            BibleTextUtils.BookLink link;
+            if (verseRandom) {
+                Integer index = randomizer.nextInt(DayVerses.verses.size());
+                link = DayVerses.verses.get(index);
             } else {
-                rand++;
+                link = DayVerses.verses.get(sequence);
+            }
+            System.out.println(link);
+            if (sequence == (DayVerses.verses.size() - 1)) {
+                sequence = 0;
+            } else {
+                sequence++;
             }
             return link;
         }
     }
 
-    private static void getLengthAndSend(HttpExchange exchange, String htmlText) throws IOException {
-        int length = htmlText.getBytes(StandardCharsets.UTF_8).length;
+    /**
+     * Be careful with changes here.. This method calculates the length in bytes
+     * of a UTF-8 encoded String and sends the String as request answer
+     * @param exchange the exchange context
+     * @param textToSend the text
+     * @throws IOException exception if the data cannot be transmitted
+     */
+    private static void getLengthAndSendText(HttpExchange exchange, String textToSend) throws IOException {
+        int length = textToSend.getBytes(StandardCharsets.UTF_8).length;
         exchange.sendResponseHeaders(200, length);
         OutputStream os = exchange.getResponseBody();
-        os.write(htmlText.getBytes(StandardCharsets.UTF_8));
+        os.write(textToSend.getBytes(StandardCharsets.UTF_8));
         os.flush();
         os.close();
         exchange.close();

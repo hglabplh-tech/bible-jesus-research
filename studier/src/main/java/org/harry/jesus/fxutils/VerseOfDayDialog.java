@@ -16,7 +16,7 @@ public class VerseOfDayDialog {
         WebView view = new WebView();
         stack.getChildren().add(view);
         verseDialog.getDialogPane().setContent(stack);
-        view.getEngine().load("http://localhost:8980/dayVerse?verseInt=" + UUID.randomUUID().toString());
+        view.getEngine().load("http://localhost:8980/dayVerse");
         verseDialog.showAndWait();
     }
 }

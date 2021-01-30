@@ -17,7 +17,8 @@ import java.util.Map;
         "dictBibleMap",
         "selectBible",
         "selectDictionary",
-        "verseOfDayBibleId"
+        "verseOfDayBibleId",
+        "verseOfDayRandom"
 })
 public class BiblesDictConfig {
 
@@ -57,6 +58,9 @@ public class BiblesDictConfig {
      */
     @XmlElement( required = false)
     protected Boolean selectBible = Boolean.FALSE;
+
+    @XmlElement( required = false)
+    protected Boolean verseOfDayRandom = Boolean.TRUE;
 
 
     /**
@@ -117,6 +121,24 @@ public class BiblesDictConfig {
      */
     public Boolean getSelectBible() {
         return selectBible;
+    }
+
+    /**
+     * If verse of day is random
+     * @return get the true/false
+     */
+    public Boolean getVerseOfDayRandom() {
+        return verseOfDayRandom;
+    }
+
+    /**
+     * Set if the verse of the day is selected random
+     * @param verseOfDayRandom set true /false
+     * @return the instance of this class
+     */
+    public BiblesDictConfig setVerseOfDayRandom(Boolean verseOfDayRandom) {
+        this.verseOfDayRandom = verseOfDayRandom;
+        return this;
     }
 
     /**

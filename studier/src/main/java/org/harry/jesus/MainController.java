@@ -2,7 +2,6 @@ package org.harry.jesus;
 
 import generated.BIBLEBOOK;
 import generated.CHAPTER;
-import generated.XMLBIBLE;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -44,17 +43,16 @@ import org.harry.jesus.jesajautils.fulltext.StatisticsCollector;
 
 import org.harry.jesus.jesajautils.graphicsjaxb.VerseImageData;
 import org.harry.jesus.jesajautils.graphicsjaxb.VerseImagePersistence;
+import org.harry.jesus.jesajautils.httpSrv.BibleHTTPSrv;
 import org.harry.jesus.synchjeremia.*;
 import org.tinylog.Logger;
 
 //import org.reactfx.util.Either;
 
 
-import javax.swing.event.HyperlinkEvent;
 import javax.xml.bind.JAXBElement;
 import java.io.*;
 import java.math.BigInteger;
-import java.net.URL;
 import java.util.*;
 
 /**
@@ -242,6 +240,7 @@ public class MainController {
         }
         utils = BibleTextUtils.getInstance();
         String bibleId = context.getAppSettings().getDictConfig().getVerseOfDayBibleId();
+        Boolean verseRandom = context.getAppSettings().getDictConfig().getVerseOfDayRandom();
         if (bibleId == null) {
             bibleId = "ELB1905";
         }
@@ -250,7 +249,7 @@ public class MainController {
                 utils.getBibleInstances().stream()
                         .filter(e -> e.getBibleRef().getBibleID().equals(finalBibleId))
                         .findFirst();
-        verseOfDaySel.ifPresent(e -> theService = new BibleHTTPSrv(e.getBible()));
+        verseOfDaySel.ifPresent(e -> theService = new BibleHTTPSrv(e.getBible(), verseRandom));
 
         if (utils.getBibleInstances().size() > 0) {
             utils.setSelected(utils.getBibleInstances().get(0).getBible());
@@ -626,7 +625,7 @@ public class MainController {
     }
 
     /**
-     * verse of day.
+     * verse of day. Called directly via menu
      *
      * @param event the event
      */

@@ -20,7 +20,8 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * The type Dict bible settings compound.
+ * The settings for miscellaneous parameters for the application
+ * e.g. for the verse of the day
  */
 public class MiscBibleSettingsCompound extends BorderPane  {
 
@@ -29,12 +30,17 @@ public class MiscBibleSettingsCompound extends BorderPane  {
      */
     private ListView<BibleRef> bibleRefs = new ListView<>();
 
+    /**
+     * The checkbox if verse of day is random
+     */
+    private CheckBox verseRandom = null;
+
 
     private Optional<XMLBIBLE> optBible = Optional.empty();
 
 
     /**
-     * Instantiates a new Dict bible settings compound.
+     * Instantiates a new Miscellaneous Settings Compound control
      */
     public MiscBibleSettingsCompound() {
 
@@ -60,6 +66,12 @@ public class MiscBibleSettingsCompound extends BorderPane  {
         if (selected != null) {
             selectBibleField.setText(selected);
         }
+        verseRandom = new CheckBox("Get Verse of day random / sequential (not checked)");
+        Boolean verseRand = context.getAppSettings()
+                .getDictConfig()
+                .getVerseOfDayRandom();
+        verseRandom.setSelected(verseRand);
+        grid.add(verseRandom, 2, 0);
         selectBible.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -75,18 +87,20 @@ public class MiscBibleSettingsCompound extends BorderPane  {
         });
 
         this.setBottom(grid);
-
-
     }
 
 
     /**
-     * Gets bible refs.
+     * returns the probably selected XML Bible for the verse of the day
      *
      * @return the bible refs
      */
     public Optional<XMLBIBLE> getSelectedBible() {
         return this.optBible;
+    }
+
+    public Boolean getVerseRandom() {
+        return verseRandom.isSelected();
     }
 
 
