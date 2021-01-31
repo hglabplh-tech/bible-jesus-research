@@ -7,19 +7,26 @@
     <import namespace="http://org.harry.jesus/versnotes/1.0" schemaLocation="versnotes.xsd"/>
     <element name="versesOfDay">
         <complexType>
-            <sequence minOccurs="1" maxOccurs="unbounded">
+            <sequence minOccurs="0" maxOccurs="unbounded">
                 <element name="verses" type="vod:linkType"/>
             </sequence>
         </complexType>
     </element>
 
     <complexType name="linkType">
-        <sequence minOccurs="1" maxOccurs="unbounded">
-            <element name="bookNo" type="xs:int" minOccurs="1" maxOccurs="1"/>
-            <element name="chapterNo" type = "xs:int" minOccurs="1" maxOccurs="1"/>
-            <element name="versNo" type = "xs:int" minOccurs="1" maxOccurs="unbounded"/>
+        <sequence>
+            <element name="verseContent" type="vod:linkContent"/>
         </sequence>
     </complexType>
+
+    <complexType name="linkContent">
+        <sequence>
+            <element name="verseNo" type ="xs:int" minOccurs="1" maxOccurs="unbounded"/>
+        </sequence>
+        <attribute name="bookNo" type="xs:int" use="required"/>
+        <attribute name="chapterNo" type="xs:int" use="required"/>
+    </complexType>
+
 
 
 </schema>

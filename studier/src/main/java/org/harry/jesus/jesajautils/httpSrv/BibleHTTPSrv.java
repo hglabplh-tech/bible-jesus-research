@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import generated.XMLBIBLE;
+import jesus.harry.org.plan._1.Day;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.HTMLRendering;
 
@@ -92,15 +93,17 @@ public class BibleHTTPSrv {
          * @return the verse link
          */
         public BibleTextUtils.BookLink getRandomVerse() {
+            DayVerses versesObj = DayVerses.getInstance();
+            List<BibleTextUtils.BookLink> linkList = versesObj.loadVerses();
             BibleTextUtils.BookLink link;
             if (verseRandom) {
-                Integer index = randomizer.nextInt(DayVerses.verses.size());
-                link = DayVerses.verses.get(index);
+                Integer index = randomizer.nextInt(linkList.size());
+                link = linkList.get(index);
             } else {
-                link = DayVerses.verses.get(sequence);
+                link = linkList.get(sequence);
             }
             System.out.println(link);
-            if (sequence == (DayVerses.verses.size() - 1)) {
+            if (sequence == (linkList.size() - 1)) {
                 sequence = 0;
             } else {
                 sequence++;

@@ -35,6 +35,7 @@
                   <MenuItem fx:id="showVersePics" mnemonicParsing="false" onAction="#showVersePics" text="Show Verses Gallery" />
                   <MenuItem fx:id="verseOfDay" mnemonicParsing="false" onAction="#verseOfDay" text="Verse of Day" />
                    <MenuItem fx:id="editDict" mnemonicParsing="false" onAction="#editDict" text="Edit a own Dictionary" />
+                  <MenuItem fx:id="editVOfDays" mnemonicParsing="false" onAction="#editVOfDays" text="Edit verses of days" />
                </items></Menu>
           <Menu mnemonicParsing="false" text="Help">
             <items>

@@ -541,6 +541,23 @@ public class MainController {
 
         });
         contMenu.getItems().add(mItem);
+
+        mItem = new MenuItem();
+        mItem.setText("add to verse of days");
+        mItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                List<Integer> temp = new ArrayList<>();
+                temp.addAll(bibleStudy.getSelectedMapSorted().keySet());
+                BibleTextUtils.BookLink link =
+                        new BibleTextUtils.BookLink(bibleStudy.getActBook().toString(),
+                                bibleStudy.getActChapter(),
+                                temp);
+                EditVersesOfDayDialog.quickStoreTheVersesOfDay(link);
+            }
+
+        });
+        contMenu.getItems().add(mItem);
         bibleStudy.getArea().contextMenuObjectProperty().setValue(contMenu);
     }
 
@@ -866,6 +883,11 @@ public class MainController {
         String dictDir = BibleThreadPool.getContext()
                 .getAppSettings().getBaseConfig().getDictionariesDir();
         GenDictHTMLScene.generateDictHTML(utils, new File(dictDir));
+    }
+
+    @FXML
+    public void editVOfDays(ActionEvent event) {
+        EditVersesOfDayDialog.showDialog();
     }
 
     /**

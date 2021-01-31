@@ -14,6 +14,7 @@ import org.harry.jesus.jesajautils.configjaxbser.DictionaryRef;
 import org.harry.jesus.jesajautils.configjaxbser.BibleRef;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
 
+import org.jetbrains.annotations.NotNull;
 import org.pmw.tinylog.Logger;
 
 import javax.xml.bind.JAXBElement;
@@ -734,6 +735,65 @@ public class BibleTextUtils {
     }
 
     /**
+     * Get all books from the given bible
+     * @param selected the bible
+     * @return the list of books and display Strings
+     */
+    public List<Tuple<BIBLEBOOK, String>> getBibleBooksCooked(XMLBIBLE selected) {
+        List<BIBLEBOOK> books = getInstance().getBooks(selected);
+        List<BookLabel> labels = getBookLabelsAsClasses();
+        List<Tuple<BIBLEBOOK, String>> result = new ArrayList<>();
+        for (BIBLEBOOK book: books) {
+            Optional<BookLabel> theLabel = labels.stream()
+                    .filter(e -> e.getBookNumber().equals(book.getBnumber().intValue()))
+                    .findFirst();
+            theLabel.ifPresent(e -> {
+                String displayString = e.bookNumber + ". " + e.getLongName();
+                result.add(new Tuple<>(book, displayString));});
+        }
+        return result;
+    }
+
+    /**
+     * get the list of chapters from the specified book
+     * @param book the book tuple
+     * @return the list of chapters of the book
+     */
+    public List<Tuple<Integer, CHAPTER>> getChaptersForBookCooked(Tuple<BIBLEBOOK, String> book) {
+        List<CHAPTER> chapterList  = getInstance().getChapters(book.getFirst());
+        List<Tuple<Integer, CHAPTER>> result = new ArrayList<>();
+        for (CHAPTER chapter:chapterList) {
+            result.add(new Tuple<>(chapter.getCnumber().intValue(), chapter));
+        }
+        return  result;
+    }
+
+    /**
+     * get the verses for a specific chapter
+     * @param chapter the chapter tuple
+     * @return the verses for the chapter
+     */
+    public List<Integer> getVersesForChapterCooked(Tuple<Integer, CHAPTER> chapter) {
+        List<Integer> result = new ArrayList<>();
+        for (JAXBElement<?> element:chapter.getSecond().getPROLOGOrCAPTIONOrVERS()) {
+            if (element.getValue() instanceof VERS) {
+                VERS verse = (VERS)element.getValue();
+                result.add(verse.getVnumber().intValue());
+            }
+        }
+        return result;
+    }
+
+    private List<BookLabel> getBookLabelsAsClasses() {
+        List<BookLabel> labels = new ArrayList<>();
+        List<String> temp = getInstance().getBookLabels();
+        for (String label: temp) {
+            labels.add(getInstance().getBookLabelAsClass(label));
+        }
+        return labels;
+    }
+
+    /**
      * The type Book link.
      */
     public static class BookLink implements Serializable {
@@ -743,6 +803,8 @@ public class BibleTextUtils {
         private final Integer chapter;
 
         private final List<Integer> verses;
+
+        private final Integer book;
 
         /**
          * Instantiates a new Book link.
@@ -763,6 +825,7 @@ public class BibleTextUtils {
          */
         public BookLink(String bookLabel, Integer chapter, List<Integer> verses) {
             this.bookLabel = bookLabel;
+            this.book = this.getBookLabelClass().getBookNumber();
             this.chapter = chapter;
             this.verses = verses;
         }
@@ -777,6 +840,7 @@ public class BibleTextUtils {
         public BookLink(Integer bookNo, Integer chapter, List<Integer> verses) {
             this.bookLabel = BibleTextUtils.getInstance()
                     .getBookLabels().get(bookNo -1);
+            this.book = bookNo;
             this.chapter = chapter;
             this.verses = verses;
         }
@@ -817,22 +881,55 @@ public class BibleTextUtils {
             return verses;
         }
 
+        public Integer getBook() {
+            return book;
+        }
+
         @Override
         public String toString() {
             StringBuffer buffer = new StringBuffer();
             List<Integer> versList = this.getVerses();
             String vers = new Integer(1).toString();
             if (versList.size() != 0) {
-                vers = versList.get(0).toString();
+                getVerseFormatted(buffer, versList);
             } else {
+                buffer.append("[")
+                        .append(this.getBookLabelClass().longName)
+                        .append(" " + this.getChapter())
+                        .append("," + vers)
+                        .append("]");
 
+            }
+            return buffer.toString();
+        }
+
+        private void getVerseFormatted(StringBuffer buffer, List<Integer> versList) {
+            String vers;
+            Integer versNoStart = versList.get(0);
+            Integer verseInt = versNoStart;
+            Boolean sequential = false;
+            for (Integer verseNum: versList) {
+                if (verseNum == verseInt) {
+                    sequential = true;
+                } else {
+                    sequential = false;
+                    break;
+                }
+                verseInt++;
+            }
+            if (sequential) {
+                vers = "" + versNoStart + "-" + versList.get(versList.size() - 1);
+            } else {
+                vers = "";
+                for (Integer versNum: versList) {
+                    vers = vers + versNum + ".";
+                }
             }
             buffer.append("[")
                     .append(this.getBookLabelClass().longName)
                     .append(" " + this.getChapter())
                     .append("," + vers)
                     .append("]");
-            return buffer.toString();
         }
 
         @Override
@@ -840,7 +937,9 @@ public class BibleTextUtils {
             if (this == o) return true;
             if (!(o instanceof BookLink)) return false;
             BookLink bookLink = (BookLink) o;
-            return getBookLabel().equals(bookLink.getBookLabel()) && getChapter().equals(bookLink.getChapter()) && getVerses().equals(bookLink.getVerses());
+            return getBookLabel().equals(bookLink.getBookLabel())
+                    && getChapter().equals(bookLink.getChapter())
+                    && getVerses().equals(bookLink.getVerses());
         }
 
         @Override

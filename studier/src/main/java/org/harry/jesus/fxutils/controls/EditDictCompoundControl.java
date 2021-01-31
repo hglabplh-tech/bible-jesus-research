@@ -238,7 +238,7 @@ public class EditDictCompoundControl extends BorderPane {
 
         MenuItem descrItem = new MenuItem("delete description");
 
-        // TODO: have to fix this here that it is working
+        // TODO: have to fix this here that it is working Top: ListBoxNotUpdated
         descrItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -250,9 +250,10 @@ public class EditDictCompoundControl extends BorderPane {
                 }
             }
         });
-        descrContextMenu.getItems().add(descrItem);
+        // TODO activate after fixing (Top -> ListBoxNotUpdated) see above
+        /*descrContextMenu.getItems().add(descrItem);
+        descrListView.setContextMenu(descrContextMenu); */
         itemsListView.setContextMenu(itemsListMenu);
-        //descrListView.setContextMenu(descrContextMenu);
         this.setRight(descrListView);
         initLiseners();
     }

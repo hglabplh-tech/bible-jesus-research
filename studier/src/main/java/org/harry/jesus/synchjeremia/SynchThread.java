@@ -42,6 +42,8 @@ public class SynchThread extends TimerTask {
 
     private static final String VERSE_IMAGES_XML = "verseImages.xml";
 
+    private static final String VERSE_OFDAYS_XML = "verseOfDays.xml";
+
     /**
      * The constant appDir.
      */
@@ -75,6 +77,11 @@ public class SynchThread extends TimerTask {
      */
     public static final File verseImageXML;
 
+    /**
+     * Verse of Days XML storage
+     */
+    public static final File verseOfDaysXML;
+
     private static Timer timer = new Timer();
 
 
@@ -100,6 +107,7 @@ public class SynchThread extends TimerTask {
         appProps = new File(appDir, SETTINGS_PROP);
         appSettings = new File(appDir, APP_SETTINGS_XML);
         verseImageXML = new File(appDir, VERSE_IMAGES_XML);
+        verseOfDaysXML = new File(appDir, VERSE_OFDAYS_XML);
         timer.schedule (new SynchThread()
            , (long)(1000L * 120L), (long)(1000L * 60L));
     }
