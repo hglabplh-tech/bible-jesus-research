@@ -232,9 +232,27 @@ public class EditDictCompoundControl extends BorderPane {
             }
         });
         itemsListMenu.getItems().add(deleteItem);
-        itemsListView.setContextMenu(itemsListMenu);
         this.setLeft(itemsListView);
         descrListView = new ListView<>();
+        ContextMenu descrContextMenu = new ContextMenu();
+
+        MenuItem descrItem = new MenuItem("delete description");
+
+        // TODO: have to fix this here that it is working
+        descrItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Integer index = descrListView.getSelectionModel().getSelectedIndex();
+                if (index >= 0) {
+                    descrListView.getItems().remove(index);
+                    descriptions.remove(index);
+                    descrListView.refresh();
+                }
+            }
+        });
+        descrContextMenu.getItems().add(descrItem);
+        itemsListView.setContextMenu(itemsListMenu);
+        //descrListView.setContextMenu(descrContextMenu);
         this.setRight(descrListView);
         initLiseners();
     }

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:vod="http://org.harry.jesus/verseofday/1.0"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://org.harry.jesus/verseofday/1.0"
+        elementFormDefault="qualified">
+    <import namespace="http://org.harry.jesus/versnotes/1.0" schemaLocation="versnotes.xsd"/>
+    <element name="versesOfDay">
+        <complexType>
+            <sequence minOccurs="1" maxOccurs="unbounded">
+                <element name="verses" type="vod:linkType"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <complexType name="linkType">
+        <sequence minOccurs="1" maxOccurs="unbounded">
+            <element name="bookNo" type="xs:int" minOccurs="1" maxOccurs="1"/>
+            <element name="chapterNo" type = "xs:int" minOccurs="1" maxOccurs="1"/>
+            <element name="versNo" type = "xs:int" minOccurs="1" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+
+
+</schema>

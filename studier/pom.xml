@@ -331,6 +331,7 @@
                             <source>src/main/resources/xsd/devotional.xsd</source>
                             <source>src/main/resources/xsd/plan.xsd</source>
                             <source>src/main/resources/xsd/highlights.xsd</source>
+                            <source>src/main/resources/xsd/verseofday.xsd</source>
                         </sources>
                     </configuration>
                 </plugin>
