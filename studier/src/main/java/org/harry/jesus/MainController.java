@@ -145,6 +145,11 @@ public class MainController {
     @FXML ChoiceBox<BibleTextUtils.DictionaryInstance> dictionaries;
 
     /**
+     * search retrieved by relevance
+     */
+    @FXML CheckBox byRelevance;
+
+    /**
      * The Border pane.
      */
     BorderPane borderPane = null;
@@ -690,21 +695,23 @@ public class MainController {
     @FXML
     public void search(ActionEvent event) {
         String pattern = query.getText();
-        BibleFulltextEngine engine = new BibleFulltextEngine(bibleStudy.getSelected());
         StatisticsCollector collector = new StatisticsCollector();
-        Map<BibleFulltextEngine.BibleTextKey, String> hits;
+        BibleFulltextEngine engine = new BibleFulltextEngine(bibleStudy.getSelected(), collector);
         if (searchOptions.getValue().equals(SearchOptions.SIMPLE)) {
-            hits = engine.searchPlain(pattern, collector);
+            engine.searchPlain(pattern);
         } else if (searchOptions.getValue().equals(SearchOptions.EXACT)) {
-            hits = engine.searchPattern(pattern, BibleFulltextEngine.INSENSITIVE, collector);
+            engine.searchPattern(pattern, BibleFulltextEngine.INSENSITIVE);
         } else  {
-            hits = engine.searchPatternFuzzy(pattern, BibleFulltextEngine.INSENSITIVE, collector);
+            engine.searchPatternFuzzy(pattern, BibleFulltextEngine.INSENSITIVE);
         }
-        verseKeys.clear();
+        if (byRelevance.isSelected()) {
+            verseKeys = engine.retrieveResultsByRelevanz();
+        } else {
+            verseKeys = engine.retrieveResultsByBookOrder();
+        }
         resultlist.getItems().clear();
-        for (Map.Entry<BibleFulltextEngine.BibleTextKey, String> entry: hits.entrySet()) {
-            verseKeys.add(entry.getKey());
-            resultlist.getItems().add(utils.generateVersEntry(entry.getKey(), entry.getValue()));
+        for (BibleFulltextEngine.BibleTextKey entry: verseKeys) {
+            resultlist.getItems().add(utils.generateVersEntry(entry));
         }
 
     }
@@ -988,7 +995,7 @@ public class MainController {
             BibleFulltextEngine.BibleTextKey link =
                     new BibleFulltextEngine
                             .BibleTextKey(vers.getBook().intValue(),
-                            vers.getChapter().intValue(), versNo.intValue());
+                            vers.getChapter().intValue(), versNo.intValue(), null);
             StringBuffer buffer = HTMLRendering.buildVersHTML(link, listText.substring(startIndex, endIndex + 1), chapter);
             startIndex = endIndex + 1;
             HTMLRendering.renderVers(htmlBuffer, buffer.toString(), null);
@@ -1075,9 +1082,9 @@ public class MainController {
             for (BibleFulltextEngine.BibleTextKey versKey: verseKeys) {
                 BIBLEBOOK book = bibleStudy.getTheBooks().get(versKey.getBook() - 1);
                 CHAPTER chapter = book.getCHAPTER().get(versKey.getChapter() -1).getValue();
-                Map.Entry<BibleFulltextEngine.BibleTextKey, String> entry  =
+                BibleFulltextEngine.BibleTextKey entry  =
                         utils.getVersEntry(chapter, versKey);
-                resultlist.getItems().add(utils.generateVersEntry(entry.getKey(), entry.getValue()));
+                resultlist.getItems().add(utils.generateVersEntry(entry));
 
             }
         } catch (IOException | ClassNotFoundException ex) {

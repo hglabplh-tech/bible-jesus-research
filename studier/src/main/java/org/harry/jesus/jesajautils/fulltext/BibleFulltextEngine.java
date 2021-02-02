@@ -4,13 +4,14 @@ import generated.BIBLEBOOK;
 import generated.CHAPTER;
 import generated.XMLBIBLE;
 import org.harry.jesus.jesajautils.BibleTextUtils;
+import org.harry.jesus.jesajautils.Tuple;
 
 import java.io.Serializable;
-import java.lang.reflect.MalformedParameterizedTypeException;
 import java.util.*;
-import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * The type Bible fulltext engine.
@@ -47,26 +48,31 @@ public class BibleFulltextEngine {
         operatorMap.put(WILDCARD,"(.*)");
     }
 
-    private Map<BibleTextKey, String> wholeBook = new LinkedHashMap<>();
+    private List<BibleTextKey> wholeBook = new ArrayList<>();
 
     private static BibleTextUtils util = BibleTextUtils.getInstance();
 
     private final XMLBIBLE bible;
+
+    private final List<BibleTextKey> hits = new ArrayList<>();
+
+    private final StatisticsCollector collector;
 
     /**
      * Instantiates a new Bible fulltext engine.
      *
      * @param bible the bible
      */
-    public BibleFulltextEngine(XMLBIBLE bible) {
+    public BibleFulltextEngine(XMLBIBLE bible, StatisticsCollector collector) {
         this.bible = bible;
         List<BIBLEBOOK> books = util.getBooks(bible);
         for (BIBLEBOOK book: books) {
             List<CHAPTER> chapters = util.getChapters(book);
             for (CHAPTER chapter: chapters) {
-                wholeBook.putAll(util.getVerses(chapter, book.getBnumber().intValue()));
+                wholeBook.addAll(util.getVerses(chapter, book.getBnumber().intValue()));
             }
         }
+        this.collector = collector;
         System.err.println("End of engine construct");
     }
 
@@ -83,25 +89,19 @@ public class BibleFulltextEngine {
      * Search plain map.
      *
      * @param plainQuery the plain query
-     * @param collector  the collector
      * @return the map
      */
 // (.*)
-    public Map<BibleTextKey, String> searchPlain(String plainQuery, StatisticsCollector collector) {
-        Map<BibleTextKey, String> hits = new LinkedHashMap<>();
-        Map.Entry<BibleTextKey, String> lastentry = null;
-        for (Map.Entry<BibleTextKey, String> entry: this.wholeBook.entrySet()) {
-            String upper = entry.getValue().toUpperCase();
+    public void searchPlain(String plainQuery) {
+        for (BibleTextKey entry: this.wholeBook) {
+            String upper = entry.getVerseText().toUpperCase();
             if (upper.contains(plainQuery.toUpperCase())) {
-                lastentry = entry;
-                collector.callBack(entry.getKey().getBook(), entry.getKey().getChapter());
-                hits.put(entry.getKey(), entry.getValue());
+                collector.callBack(entry.getBook(),
+                        entry.getChapter(),
+                        entry.getVers(),  entry.getVerseText());
+                hits.add(entry);
             }
         }
-        if (lastentry != null) {
-            collector.callBackEnd(lastentry.getKey().getBook(), lastentry.getKey().getChapter());
-        }
-        return hits;
     }
 
     /**
@@ -109,24 +109,61 @@ public class BibleFulltextEngine {
      *
      * @param patternQuery the pattern query
      * @param flags        the flags
-     * @param collector    the collector
      * @return the map
      */
-    public Map<BibleTextKey, String> searchPattern(String patternQuery, int flags, StatisticsCollector collector) {
-        Map<BibleTextKey, String> hits = new LinkedHashMap<>();
-        Map.Entry<BibleTextKey, String> lastentry = null;
+    public void searchPattern(String patternQuery, int flags) {
         List<String> patternList = patternFromMiniGoogle(patternQuery);
-        for (Map.Entry<BibleTextKey, String> entry: this.wholeBook.entrySet()) {
-            if (patternMatch(entry.getValue(), patternList, flags)) {
-                lastentry = entry;
-                collector.callBack(entry.getKey().getBook(), entry.getKey().getChapter());
-                hits.put(entry.getKey(), entry.getValue());
+        for (BibleTextKey entry: this.wholeBook) {
+            if (patternMatch(entry.getVerseText(), patternList, flags)) {
+                collector.callBack(entry.getBook(),
+                        entry.getChapter(),
+                        entry.getVers(),  entry.getVerseText());
+                hits.add(entry);
             }
         }
-        if (lastentry != null) {
-            collector.callBackEnd(lastentry.getKey().getBook(), lastentry.getKey().getChapter());
-        }
+
+
+    }
+
+    /**
+     * Returns the query result in books order
+     * @return the book order result
+     */
+    public List<BibleTextKey> retrieveResultsByBookOrder() {
         return hits;
+    }
+
+    /**
+     * returns the relkevance ordered result of the query
+     * @return the relevance result of the query
+     */
+    public List<BibleTextKey> retrieveResultsByRelevanz() {
+        List<BibleTextKey> hits = new ArrayList<>();
+        List<BibleTextKey> hitsResult = new ArrayList<>();
+        Stream<StatisticsCollector.BooksStats> sortedStream = collector.getBookStatsList().stream().sorted(
+                new Comparator<StatisticsCollector.BooksStats>() {
+            @Override
+            public int compare(StatisticsCollector.BooksStats o1, StatisticsCollector.BooksStats o2) {
+                int result = o2.getHitCount().compareTo(o1.getHitCount());
+                return result;
+            }
+        });
+        sortedStream.forEachOrdered(e ->
+        {
+            Integer book = e.getBook();
+            List<StatisticsCollector.ChapterStats> chapterStats =
+                    collector.getChapterStatsList().stream().filter(e1 -> (e1.getBook() == book))
+                    .collect(Collectors.toList());
+            for (StatisticsCollector.ChapterStats stat: chapterStats) {
+                for (Tuple<Integer, String> verse: stat.getVerseList()) {
+                    BibleTextKey textKey = new BibleTextKey(stat.getBook(),
+                            stat.getChapter(),
+                            verse.getFirst(), verse.getSecond());
+                    hitsResult.add(textKey);
+                }
+            }
+        });
+        return hitsResult;
     }
 
     /**
@@ -134,24 +171,19 @@ public class BibleFulltextEngine {
      *
      * @param patternQuery the pattern query
      * @param flags        the flags
-     * @param collector    the collector
      * @return the map
      */
-    public Map<BibleTextKey, String> searchPatternFuzzy(String patternQuery, int flags, StatisticsCollector collector) {
-        Map<BibleTextKey, String> hits = new LinkedHashMap<>();
-        Map.Entry<BibleTextKey, String> lastentry = null;
+    public void searchPatternFuzzy(String patternQuery, int flags) {
         List<String> patternList = patternFromMiniGoogle(patternQuery);
-        for (Map.Entry<BibleTextKey, String> entry: this.wholeBook.entrySet()) {
-            if (patternMatchFuzzy(entry.getValue(), patternList, flags)) {
-                lastentry = entry;
-                collector.callBack(entry.getKey().getBook(), entry.getKey().getChapter());
-                hits.put(entry.getKey(), entry.getValue());
+        for (BibleTextKey entry: this.wholeBook) {
+            if (patternMatchFuzzy(entry.getVerseText(), patternList, flags)) {
+                collector.callBack(entry.getBook(),
+                        entry.getChapter(),
+                        entry.getVers(),  entry.getVerseText());
+                hits.add(entry);
             }
         }
-        if (lastentry != null) {
-            collector.callBackEnd(lastentry.getKey().getBook(), lastentry.getKey().getChapter());
-        }
-        return hits;
+
     }
 
     /**
@@ -222,7 +254,7 @@ public class BibleFulltextEngine {
     /**
      * The type Bible text key.
      */
-    public static class BibleTextKey implements Serializable {
+    public static class     BibleTextKey implements Serializable {
 
         private final Integer book;
         
@@ -230,17 +262,20 @@ public class BibleFulltextEngine {
         
         private final Integer vers;
 
+        private final String verseText;
+
         /**
          * Instantiates a new Bible text key.
-         *
-         * @param book    the book
+         *  @param book    the book
          * @param chapter the chapter
          * @param vers    the vers
+         * @param verseText
          */
-        public BibleTextKey(Integer book, Integer chapter, Integer vers) {
+        public BibleTextKey(Integer book, Integer chapter, Integer vers, String verseText) {
             this.book = book;
             this.chapter = chapter;
             this.vers = vers;
+            this.verseText = verseText;
         }
 
         /**
@@ -270,6 +305,14 @@ public class BibleFulltextEngine {
             return vers;
         }
 
+        /**
+         * Get the verse text
+         * @return the verse text
+         */
+        public String getVerseText() {
+            return verseText;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -283,6 +326,16 @@ public class BibleFulltextEngine {
         @Override
         public int hashCode() {
             return Objects.hash(book, chapter, vers);
+        }
+
+        @Override
+        public String toString() {
+            return "BibleTextKey{" +
+                    "book=" + book +
+                    ", chapter=" + chapter +
+                    ", vers=" + vers +
+                    ", verseText=\"" + verseText + "\"" +
+                    '}';
         }
     }
 }

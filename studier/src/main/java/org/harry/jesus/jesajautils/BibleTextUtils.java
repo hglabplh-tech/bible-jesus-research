@@ -14,7 +14,7 @@ import org.harry.jesus.jesajautils.configjaxbser.DictionaryRef;
 import org.harry.jesus.jesajautils.configjaxbser.BibleRef;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
 
-import org.jetbrains.annotations.NotNull;
+import org.harry.jesus.synchjeremia.SynchThread;
 import org.pmw.tinylog.Logger;
 
 import javax.xml.bind.JAXBElement;
@@ -101,6 +101,7 @@ public class BibleTextUtils {
             }
             reader.close();
             buidBookLabMap();
+            SynchThread.loadApplicationSettings(BibleThreadPool.getContext());
             BaseConfig base = BibleThreadPool.getContext().getAppSettings().getBaseConfig();
             File biblePath = new File(base.getBiblesDir());
             File dictionariesPath = new File(base.getDictionariesDir());
@@ -349,11 +350,10 @@ public class BibleTextUtils {
      * @param versText the text of the verse
      * @return The entry as string
      */
-    public String generateVersEntry(BibleFulltextEngine.BibleTextKey key,
-                                           String versText) {
+    public String generateVersEntry(BibleFulltextEngine.BibleTextKey key) {
         String versLink =  "";
         versLink = buildVersLink(key);
-        String result = versLink + versText;
+        String result = versLink + key.getVerseText();
         return result;
     }
 
@@ -594,22 +594,17 @@ public class BibleTextUtils {
      * @param bookNumber the book number
      * @return the verses
      */
-    public Map<BibleFulltextEngine.BibleTextKey, String> getVerses(CHAPTER chapter, Integer bookNumber) {
-        Map<BibleFulltextEngine.BibleTextKey, String> result = new LinkedHashMap<>();
+    public List<BibleFulltextEngine.BibleTextKey> getVerses(CHAPTER chapter, Integer bookNumber) {
+        List<BibleFulltextEngine.BibleTextKey> result = new ArrayList<>();
         for (JAXBElement xmlVers: chapter.getPROLOGOrCAPTIONOrVERS()) {
             if (xmlVers.getValue() instanceof VERS) {
               VERS vers = (VERS)xmlVers.getValue();
-              StringBuffer buffer = new StringBuffer();
               Integer versNo = vers.getVnumber().intValue();
-              for (Object content: vers.getContent()) {
-                  if (content instanceof String) {
-                      buffer.append((String)content);
-                  }
-              }
-
               BibleFulltextEngine.BibleTextKey keyObj =
-                      new BibleFulltextEngine.BibleTextKey(bookNumber, chapter.getCnumber().intValue(), versNo);
-              result.put(keyObj, buffer.toString());
+                      new BibleFulltextEngine.BibleTextKey(bookNumber, chapter.getCnumber().intValue(),
+                              versNo, null);
+              keyObj = getVersEntry(chapter,keyObj);
+              result.add(keyObj);
             }
         }
         return result;
@@ -622,13 +617,13 @@ public class BibleTextUtils {
      * @param key     the key
      * @return the vers entry
      */
-    public Map.Entry<BibleFulltextEngine.BibleTextKey, String> getVersEntry(CHAPTER chapter,
+    public BibleFulltextEngine.BibleTextKey getVersEntry(CHAPTER chapter,
                                                                       BibleFulltextEngine.BibleTextKey key) {
         StringBuffer buffer = new StringBuffer();
-        Map.Entry<BibleFulltextEngine.BibleTextKey, String> result = null;
-        for (JAXBElement xmlVers: chapter.getPROLOGOrCAPTIONOrVERS()) {
+        BibleFulltextEngine.BibleTextKey result = null;
+        for (JAXBElement xmlVers : chapter.getPROLOGOrCAPTIONOrVERS()) {
             if (xmlVers.getValue() instanceof VERS) {
-                VERS vers = (VERS)xmlVers.getValue();
+                VERS vers = (VERS) xmlVers.getValue();
                 Integer versNo = vers.getVnumber().intValue();
                 if (versNo.equals(key.getVers())) {
                     for (Object content : vers.getContent()) {
@@ -647,8 +642,7 @@ public class BibleTextUtils {
 
                                 }
 
-                            }
-                            else if (jaxbClazz.getName().equals(GRAM.class.getName())) {
+                            } else if (jaxbClazz.getName().equals(GRAM.class.getName())) {
                                 String prefix;
                                 if (key.getBook() < 40) {
                                     prefix = "H";
@@ -661,8 +655,8 @@ public class BibleTextUtils {
                                         String text = (String) styledContent;
                                         buffer.append(text);
                                     }
-                                    String [] strNos = gram.getStr().split(" ");
-                                    for (String no: strNos) {
+                                    String[] strNos = gram.getStr().split(" ");
+                                    for (String no : strNos) {
                                         String gramStrong = "[" + prefix + no + "]";
                                         buffer.append(gramStrong);
                                     }
@@ -675,22 +669,10 @@ public class BibleTextUtils {
                 }
             }
         }
-        result = new Map.Entry<BibleFulltextEngine.BibleTextKey, String>() {
-            @Override
-            public BibleFulltextEngine.BibleTextKey getKey() {
-                return key;
-            }
-
-            @Override
-            public String getValue() {
-                return buffer.toString();
-            }
-
-            @Override
-            public String setValue(String value) {
-                return buffer.toString();
-            }
-        };
+        result = new BibleFulltextEngine.BibleTextKey(key.getBook(),
+                key.getChapter(),
+                key.getVers(),
+                buffer.toString());
         return result;
     }
 

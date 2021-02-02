@@ -103,13 +103,13 @@
                                 <items>
                                   <AnchorPane minHeight="150.0" minWidth="900.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <Label layoutX="124.0" layoutY="11.0" text="Keyword" />
-                                          <TextField fx:id="query" layoutX="206.0" layoutY="6.0">
+                                          <Label layoutX="124.0" layoutY="24.0" text="Keyword" />
+                                          <TextField fx:id="query" layoutX="208.0" layoutY="17.0">
                                              <tooltip>
                                                 <Tooltip text="Enter search term" />
                                              </tooltip>
                                           </TextField>
-                                          <Button fx:id="search" layoutX="527.0" layoutY="6.0" mnemonicParsing="false" onAction="#search" text="Search">
+                                          <Button fx:id="search" layoutX="589.0" layoutY="19.0" mnemonicParsing="false" onAction="#search" text="Search">
                                              <tooltip>
                                                 <Tooltip text="Start the search" />
                                              </tooltip>
@@ -119,7 +119,8 @@
                                                 <Tooltip text="Here you have to make your choice" />
                                              </tooltip>
                                           </ChoiceBox>
-                                          <Label layoutX="617.0" layoutY="22.0" prefHeight="21.0" prefWidth="92.0" text="Options:" />
+                                          <Label layoutX="667.0" layoutY="24.0" prefHeight="21.0" prefWidth="59.0" text="Options:" />
+                                          <CheckBox fx:id="byRelevance" layoutX="429.0" layoutY="24.0" mnemonicParsing="false" text="By Relevance" />
                                        </children>
                                     </AnchorPane>
                                   <AnchorPane minHeight="400.0" minWidth="900.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

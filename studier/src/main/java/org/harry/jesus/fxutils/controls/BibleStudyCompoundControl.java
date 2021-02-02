@@ -458,12 +458,12 @@ public class BibleStudyCompoundControl extends BorderPane {
                             actChapter);
         }
         if (chapter.isPresent()) {
-            Map<BibleFulltextEngine.BibleTextKey, String> verses =
+            List<BibleFulltextEngine.BibleTextKey> verses =
                     utils.getVerses(chapter.get(), actBook.getBookNumber());
-            Optional<Map.Entry<BibleFulltextEngine.BibleTextKey, String>> vers =
-                    verses.entrySet().stream().filter(e -> e.getKey().getVers() == 1).findFirst();
+            Optional<BibleFulltextEngine.BibleTextKey> vers =
+                    verses.stream().filter(e -> e.getVers() == 1).findFirst();
             if (vers.isPresent()) {
-                HistoryEntry entry = new HistoryEntry(vers.get().getValue(), date, link);
+                HistoryEntry entry = new HistoryEntry(vers.get().getVerseText(), date, link);
                 return entry;
             }
         }

@@ -153,10 +153,10 @@ public class HTMLRendering {
                     JAXBElement<CHAPTER> jaxbChapter = book.get().getCHAPTER().get(link.getChapter() - 1);
                     BibleFulltextEngine.BibleTextKey key =
                             new BibleFulltextEngine.BibleTextKey(book.get().getBnumber().intValue(),
-                                    link.getChapter(), versNo);
-                    Map.Entry<BibleFulltextEngine.BibleTextKey, String> mapEntry =
+                                    link.getChapter(), versNo, null);
+                    BibleFulltextEngine.BibleTextKey mapEntry =
                             utils.getVersEntry(jaxbChapter.getValue(), key);
-                    String versText = mapEntry.getValue();
+                    String versText = mapEntry.getVerseText();
                     vers.setVtext(versText);
                     BibleTextUtils.BookLabel labelClass = new BibleTextUtils.BookLabel(link.getBookLabel());
                     htmlContent.append("<p>");
@@ -207,10 +207,10 @@ public class HTMLRendering {
                 Integer bookNo = links.get(0).getBookLabelClass().getBookNumber();
                 Integer chapterNo  = links.get(0).getChapter();
                 BibleFulltextEngine.BibleTextKey key =
-                        new BibleFulltextEngine.BibleTextKey(bookNo, chapterNo, versNo);
-                Map.Entry<BibleFulltextEngine.BibleTextKey, String> mapEntry =
+                        new BibleFulltextEngine.BibleTextKey(bookNo, chapterNo, versNo, null);
+                BibleFulltextEngine.BibleTextKey mapEntry =
                         utils.getVersEntry(jaxbChapter.getValue(), key);
-                String versText = mapEntry.getValue();
+                String versText = mapEntry.getVerseText();
                 htmlContent.append("<p/>");
                 htmlContent.append("(" + Integer.toString(versNo) + ")<br>");
                 if (links.get(0).getVerses().contains(versNo)) {

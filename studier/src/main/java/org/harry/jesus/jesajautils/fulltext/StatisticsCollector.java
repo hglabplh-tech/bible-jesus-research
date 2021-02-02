@@ -1,49 +1,96 @@
 package org.harry.jesus.jesajautils.fulltext;
 
-import java.util.LinkedHashMap;
+import org.harry.jesus.jesajautils.Tuple;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * The type Statistics collector.
  */
 public class StatisticsCollector {
 
-    private Map<Integer, Integer> bookStatsMap = new LinkedHashMap<>();
+    private List<BooksStats> bookStatsList = new ArrayList<>();
 
-    private Map<Integer, ChapterStats> chapterStatsMap = new LinkedHashMap<>();
+    private List<ChapterStats> chapterStatsList = new ArrayList<>();
 
     private Integer lastBook = 0;
 
+    private Integer lastChapter = 0;
+
     private int counter = 0;
 
+    ChapterStats actChapterStats = null;
+
+    BooksStats actBookStats = null;
+
     /**
-     * Call back.
+     * update the book statistics and update the chapters counters
      *
      * @param book    the book
      * @param chapter the chapter
      */
-    public void callBack(Integer book, Integer chapter) {
-        if (lastBook.equals(0)) {
-            lastBook = book;
-            counter++;
-        } else if (book.equals(lastBook)) {
-            counter++;
-        } else if (!lastBook.equals(book)) {
-            counter++;
-            bookStatsMap.put(lastBook, counter);
-            counter = 0;
-            lastBook = book;
+    public void callBack(Integer book, Integer chapter, Integer verse, String vContent) {
+
+        if (!lastBook.equals(book)) {
+            switchBookStats(book);
         }
+        actBookStats.incrementHitCount();
+
+        countChapter(book, chapter, verse, vContent);
     }
 
     /**
-     * Call back end.
-     *
-     * @param book    the book
-     * @param chapter the chapter
+     * update the chapter counters and set the verses information
+     * @param thisBook the book
+     * @param thisChapter the chapter
+     * @param verse the verse number
+     * @param vContent the verse content
      */
-    public void callBackEnd(Integer book, Integer chapter) {
-        bookStatsMap.put(lastBook, counter);
+    private void countChapter(Integer thisBook, Integer thisChapter,
+                              Integer verse, String vContent) {
+
+        if (!thisChapter.equals(lastChapter) || !thisBook.equals(lastBook)) {
+            switchChapterStat(thisBook, thisChapter);
+            debugPrintChapterSwitch(thisBook, thisChapter, verse);
+        }
+        actChapterStats.incrementCounter();
+        actChapterStats.addVerseToList(verse, vContent);
+
+    }
+
+    private void debugPrintChapterSwitch(Integer thisBook, Integer thisChapter, Integer verse) {
+        System.out.println("Book: "
+                + thisBook
+                + " Chapter: "
+                + thisChapter
+                +  " Verse: "
+                + verse);
+    }
+
+    /**
+     * switch to the next book
+     * @param book the book
+     */
+    private void switchBookStats(Integer book) {
+        lastBook = book;
+        actBookStats = new BooksStats(book);
+        bookStatsList.add(actBookStats);
+    }
+
+    /**
+     * switch to the next chapter
+     * @param thisBook the book number
+     * @param thisChapter the chapter number
+     */
+    private void switchChapterStat(Integer thisBook, Integer thisChapter) {
+        lastChapter = thisChapter;
+        actBookStats.incrementChapterCount();
+        actChapterStats =
+                new ChapterStats(thisBook, thisChapter);
+        chapterStatsList.add(actChapterStats);
     }
 
     /**
@@ -51,8 +98,8 @@ public class StatisticsCollector {
      *
      * @return the book stats map
      */
-    public Map<Integer, Integer> getBookStatsMap() {
-        return bookStatsMap;
+    public List<BooksStats> getBookStatsList() {
+        return bookStatsList;
     }
 
     /**
@@ -60,27 +107,41 @@ public class StatisticsCollector {
      *
      * @return the chapter stats map
      */
-    public Map<Integer, ChapterStats> getChapterStatsMap() {
-        return chapterStatsMap;
+    public List<ChapterStats> getChapterStatsList() {
+        return chapterStatsList;
     }
 
     /**
      * The type Chapter stats.
      */
     public static class ChapterStats {
+
+        private final int book;
+
         private final int chapter;
 
-        private final int hitCount;
+        private int hitCount;
+
+        private List<Tuple<Integer, String>> verseList;
 
         /**
          * Instantiates a new Chapter stats.
+         *  @param chapter  the chapter
          *
-         * @param chapter  the chapter
-         * @param hitCount the hit count
          */
-        public ChapterStats(int chapter, int hitCount) {
+        public ChapterStats(int book, int chapter) {
+            this.book = book;
             this.chapter = chapter;
-            this.hitCount = hitCount;
+            this.hitCount = 0;
+            this.verseList = new ArrayList<>();
+        }
+
+        /**
+         * Gets the book of the chapter
+         * @return the book
+         */
+        public int getBook() {
+            return book;
         }
 
         /**
@@ -93,12 +154,129 @@ public class StatisticsCollector {
         }
 
         /**
+         * gets the verse list of the chapter
+         * @return the list
+         */
+        public List<Tuple<Integer, String>> getVerseList() {
+            return verseList;
+        }
+
+        /**
          * Gets hit count.
          *
          * @return the hit count
          */
         public int getHitCount() {
             return hitCount;
+        }
+
+        public void incrementCounter() {
+            this.hitCount++;
+        }
+
+        public void addVerseToList(Integer verseNo, String verseText) {
+            Tuple<Integer, String> verseTuple = new Tuple<>(verseNo, verseText);
+            this.getVerseList().add(verseTuple);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof ChapterStats)) return false;
+            ChapterStats that = (ChapterStats) o;
+            return getBook() == that.getBook() && getChapter() == that.getChapter() && getHitCount() == that.getHitCount();
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(getBook(), getChapter(), getHitCount());
+        }
+
+        @Override
+        public String toString() {
+            return "ChapterStats{" +
+                    "book=" + book +
+                    ", chapter=" + chapter +
+                    ", hitCount=" + hitCount +
+                    ", verseList=" + verseList +
+                    '}';
+        }
+    }
+
+    public static class BooksStats {
+
+        private final Integer book;
+
+        private Integer chapterCount = 0;
+
+        private Integer hitCount = 0;
+
+        /**
+         * constructor initializing the final member book
+         * @param book the book number
+         */
+        public BooksStats(Integer book) {
+            this.book = book;
+        }
+
+        /**
+         * get the book number
+         * @return the book number
+         */
+        public Integer getBook() {
+            return book;
+        }
+
+        /**
+         * get the chabter count
+         * @return the chapter count
+         */
+        public Integer getChapterCount() {
+            return chapterCount;
+        }
+
+        /**
+         * get the hit count
+         * @return the hit count
+         */
+        public Integer getHitCount() {
+            return hitCount;
+        }
+
+        /**
+         * Increment the chapter count
+         */
+        public void incrementChapterCount() {
+            chapterCount++;
+        }
+
+        /**
+         * Increment the hit count
+         */
+        public void incrementHitCount() {
+            hitCount++;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof BooksStats)) return false;
+            BooksStats that = (BooksStats) o;
+            return getBook().equals(that.getBook()) && getChapterCount().equals(that.getChapterCount()) && getHitCount().equals(that.getHitCount());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(getBook(), getChapterCount(), getHitCount());
+        }
+
+        @Override
+        public String toString() {
+            return "BooksStats{" +
+                    "book=" + book +
+                    ", chapterCount=" + chapterCount +
+                    ", hitCount=" + hitCount +
+                    '}';
         }
     }
 
