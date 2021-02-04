@@ -1,23 +1,27 @@
 package org.harry.jesus.jesajautils.httpSrv;
 
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
+import com.github.markusbernhardt.proxy.selector.pac.PacProxySelector;
+import com.github.markusbernhardt.proxy.selector.pac.PacScriptSource;
+import com.github.markusbernhardt.proxy.selector.pac.UrlPacScriptSource;
+import com.sun.deploy.net.proxy.BrowserProxyInfo;
+import com.sun.deploy.net.proxy.ProxyInfo;
+import com.sun.deploy.net.proxy.ProxyType;
+import com.sun.deploy.net.proxy.SunAutoProxyHandler;
 import com.sun.net.httpserver.HttpServer;
 import generated.XMLBIBLE;
-import jesus.harry.org.plan._1.Day;
-import org.harry.jesus.jesajautils.BibleTextUtils;
-import org.harry.jesus.jesajautils.HTMLRendering;
+import org.harry.jesus.jesajautils.httpSrv.context.RetrieveChapterHandler;
+import org.harry.jesus.jesajautils.httpSrv.context.VersPerDayHandler;
 
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.security.AccessControlContext;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class BibleHTTPSrv {
 
@@ -46,7 +50,7 @@ public class BibleHTTPSrv {
             server.bind(new InetSocketAddress(
                     InetAddress.getByName(HOST),
                     PORT), 0);
-            server.createContext("/dayVerse", new VersPerDayHandler(bible, verseRandom));
+            createContextPoints(bible, verseRandom);
             server.setExecutor(null);
             server.start();
         } catch (Exception e) {
@@ -55,78 +59,26 @@ public class BibleHTTPSrv {
 
     }
 
-    public void stopServer() {
+    private void createContextPoints(XMLBIBLE bible, Boolean verseRandom) {
+        server.createContext("/dayVerse", new VersPerDayHandler(bible, verseRandom));
+        server.createContext("/retrieveChapter", new RetrieveChapterHandler(bible));
+    }
+
+    private void removeContextPoints() {
         server.removeContext("/dayVerse");
+        server.removeContext("/retrieveChapter");
+    }
+
+    public void stopServer() {
+        removeContextPoints();
         server.stop(0);
     }
 
+    public static void proxySelect(String url) throws  Exception {
+        PacProxySelector selector = new PacProxySelector(new UrlPacScriptSource("file:///C:/Users/haral/proxy/proxy.pac"));
+        List<Proxy> pList = selector.select(new URI(url));
+        System.out.println(pList.get(0).toString());
 
-
-    private static class VersPerDayHandler  implements HttpHandler {
-
-        private int sequence = 0;
-
-        private final XMLBIBLE bible;
-
-        private  ThreadLocalRandom randomizer;
-
-        private final Boolean verseRandom;
-
-        public VersPerDayHandler(XMLBIBLE bible, Boolean verseRandom) {
-            this.bible = bible;
-             randomizer = ThreadLocalRandom.current();
-             this.verseRandom = verseRandom;
-        }
-
-        @Override
-        public void handle(HttpExchange exchange) throws IOException{
-            BibleTextUtils utils = BibleTextUtils.getInstance();
-            BibleTextUtils.BookLink link = getRandomVerse();
-            String htmlText = HTMLRendering.renderLink(
-                    utils, this.bible, Arrays.asList(link));
-            System.out.println(htmlText);
-            getLengthAndSendText(exchange, htmlText);
-        }
-
-        /**
-         * Get a verse either by random or sequential
-         * @return the verse link
-         */
-        public BibleTextUtils.BookLink getRandomVerse() {
-            DayVerses versesObj = DayVerses.getInstance();
-            List<BibleTextUtils.BookLink> linkList = versesObj.loadVerses();
-            BibleTextUtils.BookLink link;
-            if (verseRandom) {
-                Integer index = randomizer.nextInt(linkList.size());
-                link = linkList.get(index);
-            } else {
-                link = linkList.get(sequence);
-            }
-            System.out.println(link);
-            if (sequence == (linkList.size() - 1)) {
-                sequence = 0;
-            } else {
-                sequence++;
-            }
-            return link;
-        }
-    }
-
-    /**
-     * Be careful with changes here.. This method calculates the length in bytes
-     * of a UTF-8 encoded String and sends the String as request answer
-     * @param exchange the exchange context
-     * @param textToSend the text
-     * @throws IOException exception if the data cannot be transmitted
-     */
-    private static void getLengthAndSendText(HttpExchange exchange, String textToSend) throws IOException {
-        int length = textToSend.getBytes(StandardCharsets.UTF_8).length;
-        exchange.sendResponseHeaders(200, length);
-        OutputStream os = exchange.getResponseBody();
-        os.write(textToSend.getBytes(StandardCharsets.UTF_8));
-        os.flush();
-        os.close();
-        exchange.close();
     }
 
 

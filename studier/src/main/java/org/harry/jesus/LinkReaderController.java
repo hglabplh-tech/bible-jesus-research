@@ -54,10 +54,4 @@ public class LinkReaderController {
 
     }
 
-    /**
-     * The type Controller.
-     */
-    public static class Controller {
-
-    }
 }

@@ -5,6 +5,7 @@ import javafx.scene.paint.Color;
 import jesus.harry.org.versnotes._1.Vers;
 import org.harry.jesus.fxutils.LinkHandler;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
+import org.harry.jesus.jesajautils.judaerrmsg.BibleStudyException;
 
 import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
@@ -175,6 +176,20 @@ public class HTMLRendering {
         return htmlContent.toString();
     }
 
+    public static String renderException(Exception ex) {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("<html><body><hr><p><span style=\"font-size: small; font-family: &quot;Times New Roman&quot;;\">");
+        if (ex instanceof BibleStudyException) {
+            buffer.append(ex.getMessage());
+        } else {
+            buffer.append(ex.getMessage());
+            StackTraceElement[] elements = ex.getStackTrace();
+            putStackTraceToBuffer(buffer, elements, true);
+        }
+        buffer.append("</span></p><hr></body></html>");
+        return buffer.toString();
+    }
+
     /**
      * Render full chapter string.
      *
@@ -343,5 +358,21 @@ public class HTMLRendering {
             }
         }
         return buffer.toString();
+    }
+
+    public static void putStackTraceToBuffer(StringBuffer buffer, StackTraceElement[] elements, Boolean htmlText) {
+        int index = 0;
+        for (StackTraceElement element: elements) {
+            if (index < 7) {
+                if (htmlText) {
+                    buffer.append("<br>");
+                } else {
+                    buffer.append("\n");
+                }
+                String eleString = escapeHtml4(element.toString());
+                buffer.append(eleString);
+            }
+            index++;
+        }
     }
 }
