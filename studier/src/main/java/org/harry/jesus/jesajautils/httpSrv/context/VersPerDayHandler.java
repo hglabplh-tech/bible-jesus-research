@@ -33,9 +33,12 @@ public class VersPerDayHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         BibleTextUtils utils = BibleTextUtils.getInstance();
         BibleTextUtils.BookLink link = getRandomVerse();
+        XMLBIBLE oldBible = BibleTextUtils.getInstance().getSelected();
+        BibleTextUtils.getInstance().setSelected(this.bible);
         String htmlText = HTMLRendering.renderLink(
                 utils, this.bible, Arrays.asList(link));
         System.out.println(htmlText);
+        BibleTextUtils.getInstance().setSelected(oldBible);
         HttpSrvUtils.getLengthAndSendText(exchange, htmlText);
     }
 

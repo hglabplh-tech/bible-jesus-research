@@ -9,6 +9,7 @@ import org.harry.jesus.jesajautils.BibleDictUtil;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.Tuple;
 import org.harry.jesus.jesajautils.judaerrmsg.BibleStudyException;
+import org.jetbrains.annotations.NotNull;
 import org.pmw.tinylog.Logger;
 
 import java.io.UnsupportedEncodingException;
@@ -83,22 +84,7 @@ public class LinkHandler {
         String bibleId = parameters.get(BIBLE_PARAM);
         String bookNo = parameters.get(BOOKNO_PARAM);
         if (bookNo == null) {
-            String bookName = parameters.get(BOOK_PARAM);
-            if (bookName == null) {
-                throw new BibleStudyException("Book is not given define either book or bookNo parameter");
-            }
-            Optional<String> bookLabel = BibleTextUtils.getInstance().getBookLabels()
-                    .stream()
-                    .filter(e -> e.contains(bookName)).findFirst();
-            if (bookLabel.isPresent()) {
-                BibleTextUtils.BookLabel label  = BibleTextUtils
-                        .getInstance()
-                        .getBookLabelAsClass(bookLabel.get());
-                bookNo = Integer.toString(label.getBookNumber(), 10);
-            } else {
-                throw new BibleStudyException("The book label: " + bookName + " is not found");
-            }
-
+            bookNo = getBookByName(parameters);
         }
         String chapter = parameters.get(CHAPTERNO_PARAM);
         String verseNo = parameters.get(VERSENO_PARAM);
@@ -130,6 +116,27 @@ public class LinkHandler {
         }
     }
 
+    @NotNull
+    private static String getBookByName(Map<String, String> parameters) throws BibleStudyException {
+        String bookNo;
+        String bookName = parameters.get(BOOK_PARAM);
+        if (bookName == null) {
+            throw new BibleStudyException("Book is not given define either book or bookNo parameter");
+        }
+        Optional<String> bookLabel = BibleTextUtils.getInstance().getBookLabels()
+                .stream()
+                .filter(e -> e.contains(bookName)).findFirst();
+        if (bookLabel.isPresent()) {
+            BibleTextUtils.BookLabel label  = BibleTextUtils
+                    .getInstance()
+                    .getBookLabelAsClass(bookLabel.get());
+            bookNo = Integer.toString(label.getBookNumber(), 10);
+        } else {
+            throw new BibleStudyException("The book label: " + bookName + " is not found");
+        }
+        return bookNo;
+    }
+
     private static BibleTextUtils.BookLink checkBibleLink(XMLBIBLE selected,
                                                           Integer bookNo, Integer chapterNo,
                                                           Integer verseNo
@@ -143,10 +150,10 @@ public class LinkHandler {
                         .findFirst();
         if (optBook.isPresent()) {
             List<CHAPTER> chapters = BibleTextUtils.getInstance().getChapters(optBook.get());
-            if (chapterNo < chapters.size() -1 && chapterNo >= 1) {
+            if (chapterNo <= chapters.size() && chapterNo >= 1) {
                 CHAPTER chapter = chapters.get(chapterNo - 1);
                 List<Integer> verses = BibleTextUtils.getInstance().getVersesForChapterCooked(new Tuple<>(chapterNo, chapter));
-                if (verseNo >= chapters.size() -1 || verseNo < 1) {
+                if (verseNo > verses.size()  || verseNo < 1) {
                     throw new BibleStudyException(BibleStudyException.Code.VERSE_NOT_FOUND,
                             verseNo,
                             chapterNo);
@@ -211,7 +218,7 @@ public class LinkHandler {
             String bibleId = BibleDictUtil
                     .getIdFromBibleInfo(
                             bible.getINFORMATION().getValue());
-            URI uri = new URIBuilder("http://localhost")
+            URI uri = new URIBuilder("http://localhost:8980/retrieveVerse?")
                     .setParameter(BIBLE_PARAM, bibleId)
                     .setParameter(BOOKNO_PARAM, Integer.toString(bookNo))
                     .setParameter(CHAPTERNO_PARAM, Integer.toString(chapter))
