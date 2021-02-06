@@ -8,6 +8,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.harry.jesus.jesajautils.BibleDictUtil;
 import org.harry.jesus.jesajautils.BibleTextUtils;
 import org.harry.jesus.jesajautils.Tuple;
+import org.harry.jesus.jesajautils.httpSrv.BibleHTTPSrv;
 import org.harry.jesus.jesajautils.judaerrmsg.BibleStudyException;
 import org.jetbrains.annotations.NotNull;
 import org.pmw.tinylog.Logger;
@@ -218,7 +219,7 @@ public class LinkHandler {
             String bibleId = BibleDictUtil
                     .getIdFromBibleInfo(
                             bible.getINFORMATION().getValue());
-            URI uri = new URIBuilder("http://localhost:8980/retrieveVerse?")
+            URI uri = new URIBuilder("http://localhost:"+ BibleHTTPSrv.PORT + "/retrieveVerse?")
                     .setParameter(BIBLE_PARAM, bibleId)
                     .setParameter(BOOKNO_PARAM, Integer.toString(bookNo))
                     .setParameter(CHAPTERNO_PARAM, Integer.toString(chapter))

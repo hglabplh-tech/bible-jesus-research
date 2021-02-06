@@ -12,6 +12,7 @@ import org.harry.jesus.jesajautils.configjaxbser.BiblesDictConfig;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 import org.harry.jesus.jesajautils.configjaxbser.DictionaryRef;
 import org.harry.jesus.jesajautils.configjaxbser.BibleRef;
+import org.harry.jesus.jesajautils.judaerrmsg.ExceptionAlert;
 import org.harry.jesus.synchjeremia.BibleThreadPool;
 
 import org.harry.jesus.synchjeremia.SynchThread;
@@ -124,6 +125,8 @@ public class BibleTextUtils {
 
 
         } catch (Exception ex) {
+            ExceptionAlert alert = new ExceptionAlert(ex);
+            alert.showAndWait();
             Logger.trace("Exception occured loading bibles");
         }
     }

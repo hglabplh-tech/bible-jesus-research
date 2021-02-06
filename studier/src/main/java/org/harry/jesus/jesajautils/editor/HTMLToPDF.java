@@ -11,6 +11,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 
 import org.apache.pdfbox.printing.PDFPageable;
 import org.apache.pdfbox.printing.PDFPrintable;
+import org.harry.jesus.jesajautils.judaerrmsg.ExceptionAlert;
 import org.pmw.tinylog.Logger;
 
 import javax.print.*;
@@ -42,6 +43,8 @@ public class HTMLToPDF {
             os.close();
 
         } catch (Exception ex) {
+            ExceptionAlert alert = new ExceptionAlert(ex);
+            alert.showAndWait();
             Logger.trace("Error occured during HTML to PDF" + ex.getMessage());
         }
     }

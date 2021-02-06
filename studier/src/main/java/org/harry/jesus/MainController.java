@@ -44,6 +44,7 @@ import org.harry.jesus.jesajautils.fulltext.StatisticsCollector;
 import org.harry.jesus.jesajautils.graphicsjaxb.VerseImageData;
 import org.harry.jesus.jesajautils.graphicsjaxb.VerseImagePersistence;
 import org.harry.jesus.jesajautils.httpSrv.BibleHTTPSrv;
+import org.harry.jesus.jesajautils.judaerrmsg.ExceptionAlert;
 import org.harry.jesus.synchjeremia.*;
 import org.tinylog.Logger;
 
@@ -937,6 +938,8 @@ public class MainController {
                 os.close();
             }
         } catch(IOException ex) {
+            ExceptionAlert alert = new ExceptionAlert(ex);
+            alert.showAndWait();
             Logger.trace("close html file failed");
         }
     }

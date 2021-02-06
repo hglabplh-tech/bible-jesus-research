@@ -54,6 +54,23 @@ public class BibleStudyException extends Exception {
     @Override
     public String getMessage() {
         StringBuffer buffer = new StringBuffer();
+        buffer.append("Exception code: ");
+        buffer.append(this.theCode.getTheCode());
+        buffer.append("\n");
+        String msg = String.format(theCode.getFmtCode(), this.params);
+        buffer.append(msg);
+        if (this.getCause() != null) {
+            buffer.append("\nCause: Class-Name:").append(getCause().getClass().getName());
+            buffer.append("Message:\n").append(getCause().getMessage());
+            StackTraceElement[] elements = getCause().getStackTrace();
+            HTMLRendering.putStackTraceToBuffer(buffer, elements, false);
+
+        }
+        return buffer.toString();
+    }
+
+    public String getMessageHTML() {
+        StringBuffer buffer = new StringBuffer();
         buffer.append(escapeHtml4("Exception code: "));
         buffer.append(this.theCode.getTheCode());
         buffer.append("<br>");

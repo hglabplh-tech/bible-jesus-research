@@ -180,7 +180,7 @@ public class HTMLRendering {
         StringBuffer buffer = new StringBuffer();
         buffer.append("<html><body><hr><p><span style=\"font-size: small; font-family: &quot;Times New Roman&quot;;\">");
         if (ex instanceof BibleStudyException) {
-            buffer.append(ex.getMessage());
+            buffer.append(((BibleStudyException) ex).getMessageHTML());
         } else {
             buffer.append(ex.getMessage());
             StackTraceElement[] elements = ex.getStackTrace();
@@ -369,7 +369,12 @@ public class HTMLRendering {
                 } else {
                     buffer.append("\n");
                 }
-                String eleString = escapeHtml4(element.toString());
+                String eleString;
+                if (htmlText) {
+                    eleString = escapeHtml4(element.toString());
+                } else {
+                    eleString = element.toString();
+                }
                 buffer.append(eleString);
             }
             index++;
