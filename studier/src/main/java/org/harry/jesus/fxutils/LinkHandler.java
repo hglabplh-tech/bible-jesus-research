@@ -195,8 +195,7 @@ public class LinkHandler {
      * @param htmlBuffer the html buffer
      */
     public static void buildLinkInternal(String link, StringBuffer htmlBuffer) {
-            htmlBuffer.append("http://_self/#"
-                    + link);
+            htmlBuffer.append("#" + link);
     }
 
     /**
@@ -219,12 +218,12 @@ public class LinkHandler {
             String bibleId = BibleDictUtil
                     .getIdFromBibleInfo(
                             bible.getINFORMATION().getValue());
-            URI uri = new URIBuilder("http://localhost:"+ BibleHTTPSrv.PORT + "/retrieveVerse?")
+            URI uri = new URIBuilder("http://localhost:"+ BibleHTTPSrv.PORT + "/retrieveChapter?")
                     .setParameter(BIBLE_PARAM, bibleId)
                     .setParameter(BOOKNO_PARAM, Integer.toString(bookNo))
                     .setParameter(CHAPTERNO_PARAM, Integer.toString(chapter))
                     .setParameter(VERSENO_PARAM, Integer.toString(vers)).build();
-            String linkText = "<a href=\"" + uri.toString() + "\">" + text + "</a>";
+            String linkText = "<a href=\"" + uri.toString() + "\" target=\"_blank\">" + text + "</a>";
             buffer.append(linkText);
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
@@ -235,6 +234,35 @@ public class LinkHandler {
 
         return buffer.toString();
     }
+
+    public static String generateHyperChapterLink(StringBuffer buffer, Integer bookNo
+            , Integer chapter) {
+        try {
+            BibleTextUtils.BookLabel label = BibleTextUtils.getInstance()
+                    .getBookLabMap().get(bookNo);
+            String text = "[" + label.getLongName()
+                    + " " + chapter +  "," + 1 + "]";
+            XMLBIBLE bible = BibleTextUtils.getInstance().getSelected();
+            String bibleId = BibleDictUtil
+                    .getIdFromBibleInfo(
+                            bible.getINFORMATION().getValue());
+            URI uri = new URIBuilder("http://localhost:"+ BibleHTTPSrv.PORT + "/retrieveChapter?")
+                    .setParameter(BIBLE_PARAM, bibleId)
+                    .setParameter(BOOKNO_PARAM, Integer.toString(bookNo))
+                    .setParameter(CHAPTERNO_PARAM, Integer.toString(chapter))
+                    .setParameter(VERSENO_PARAM, "1").build();
+            String linkText = "<a href=\"" + uri.toString() + "\" target=\"_blank\">" + text + "</a>";
+            buffer.append(linkText);
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            ex.printStackTrace();
+            Logger.trace(ex);
+            Logger.trace("cannt create link reason: " + ex.getMessage());
+        }
+
+        return buffer.toString();
+    }
+
 
     /**
      * Split uri query map.
@@ -257,8 +285,9 @@ public class LinkHandler {
      */
     public static Map<String, String> splitQuery(String query)  {
         Map<String, String> query_pairs = new LinkedHashMap<>();
+        String cookedQuery = query.split("#")[0];
         try {
-            String[] pairs = query.split("&");
+            String[] pairs = cookedQuery.split("&");
             for (String pair : pairs) {
                 int idx = pair.indexOf("=");
                 query_pairs.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"),

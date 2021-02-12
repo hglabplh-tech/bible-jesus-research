@@ -110,7 +110,7 @@ public class ViewAccordanceDialog {
         Pane root = (Pane) fxmlLoader.load();
         root.getStylesheets().add(BibleStudy.CSS.BIBLE.getUrl());
         DictionaryViewController controller = (DictionaryViewController)fxmlLoader.getController();
-        controller.setWebViewListener(area, html);
+       controller.setWebViewListener(area, html);
 
 
         return root;

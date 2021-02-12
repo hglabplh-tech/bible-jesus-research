@@ -1,11 +1,14 @@
 package org.harry.jesus.jesajautils;
 
 import generated.*;
+import javafx.scene.control.TreeItem;
 import javafx.scene.paint.Color;
 import jesus.harry.org.versnotes._1.Vers;
 import org.harry.jesus.fxutils.LinkHandler;
 import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
+import org.harry.jesus.jesajautils.httpSrv.BibleHTTPSrv;
 import org.harry.jesus.jesajautils.judaerrmsg.BibleStudyException;
+import org.jetbrains.annotations.NotNull;
 
 import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
@@ -28,47 +31,97 @@ public class HTMLRendering {
         htmlBuffer.append("<!DOCTYPE html>\n" +
                 "<html>\n" +
                 " <head>\n" +
-                " <style>\n" +
-                        "         @media screen\n" +
-                        "         {\n" +
-                        "             p {font-size: 1.0em;\n" +
-                        "                 font-family: \"Times New Roman\";\n" +
-                        "                 fill:azure\n" +
-                        "             }\n" +
-                        "             a {\n" +
-                        "                 font-size: 0.9em;\n" +
-                        "                 font-feature-settings: revert;\n" +
-                        "                 font-family: \"Courier New\";\n" +
-                        "                 fill:green;\n" +
-                        "             }\n" +
-                        "             h5 {\n" +
-                        "                 font-size: 1.2em;\n" +
-                        "                 font-family: \"Arial Rounded MT Bold\";\n" +
-                        "                 fill:blueviolet;\n" +
-                        "             }\n" +
-                        "             h6 {\n" +
-                        "                 font-size: 1.0em;\n" +
-                        "                 font-family: \"Britannic Bold\";\n" +
-                        "                 fill:blueviolet;\n" +
-                        "             }\n" +
-                        "         }\n" +
-                        "\n" +
-                        "         @media print\n" +
-                        "         {\n" +
-                        "             p {font-size: 13pt;\n" +
-                        "                 font-family: \"Times New Roman\";\n" +
-                        "                 fill: azure;\n" +
-                        "             }\n" +
-                        "         }\n" +
-                        "     </style>" +
+                "<style>" +
+                ".sidenav {\n" +
+                        "  height: 100%; \n" +
+                        "  width: 25%; \n" +
+                        "  position: fixed; \n" +
+                        "  z-index: 1; \n" +
+                        "  top: 0; \n" +
+                        "  left: 0;\n" +
+                        "  background-color: #111; \n" +
+                        "  overflow-x: hidden; \n" +
+                        "  padding-top: 60px; \n" +
+                        "  transition: 0.5s; \n" +
+                        "}\n" +
+                        ".sidenav a {\n" +
+                        "  padding: 8px 8px 8px 32px;\n" +
+                        "  text-decoration: none;\n" +
+                        "  font-size: 25px;\n" +
+                        "  color: #818181;\n" +
+                        "  display: block;\n" +
+                        "  transition: 0.3s;\n" +
+                        "}\n" +
+                        ".sidenav a:hover {\n" +
+                        "  color: #f1f1f1;\n" +
+                        "}\n" +
+                        ".sidenav .closebtn {\n" +
+                        "  position: absolute;\n" +
+                        "  top: 0;\n" +
+                        "  right: 25px;\n" +
+                        "  font-size: 36px;\n" +
+                        "  margin-left: 50px;\n" +
+                        "}\n" +
+                        ".main {  \n" +
+                        " height: 100%; \n" +
+                        "  width: 70%; \n" +
+                        "  position: fixed; \n" +
+                        "  z-index: 1; \n" +
+                        "  top: 0; \n" +
+                        "  left: 28%;\n" +
+                        "  background-color: #fff; \n" +
+                        "  overflow-x: hidden; \n" +
+                        "  padding-top: 60px; \n" +
+                        "  transition: 0.5s; \n" +
+                        "}" +
+                "</style>" +
                 "<meta charset=\"utf-8\"/>\n" +
                 "     <script>\n" +
                 "         function scrollTo(elementId) {\n" +
                 "             document.getElementById(elementId).scrollIntoView();\n" +
                 "         }\n" +
-                "     </script>\n" +
-                " </head>\n<body>\n");
+                "     </script>\n");
+        htmlBuffer.append("</head>\n<body>");
+        addNavToBuffer(htmlBuffer);
+        htmlBuffer.append("<div class=\"main\">\n");
+        htmlBuffer.append("\n");
     }
+
+    public static void addNavToBuffer(StringBuffer htmlBuffer) {
+        htmlBuffer.append("<div class=\"sidenav\"><ul>");
+        htmlBuffer.append("<li aria-current=\"page\">" +
+                "<a href=\"http://localhost:" +
+                        BibleHTTPSrv.PORT +
+                "/searchInput\">Search</a></li>");
+        htmlBuffer.append("<li><a href=\"#\">Bible</a> <ul>");
+        buildBooksTree(htmlBuffer);
+        htmlBuffer.append("</ul></li>");
+        htmlBuffer.append("</ul></div>");
+    }
+
+    public static void  buildBooksTree(StringBuffer htmlBuffer) {
+        BibleTextUtils utils = BibleTextUtils.getInstance();
+        if (utils.getSelected() != null) {
+            TreeItem<String> root = new TreeItem<>();
+            root.setValue("The books");
+            List<BIBLEBOOK> theBooks = utils.getBooks(utils.getSelected());
+
+            for (BIBLEBOOK theBook : theBooks) {
+                if (theBook.getBnumber().intValue() >= 1 && theBook.getBnumber().intValue() <= 66) {
+                    String labelString = utils.getBookLabels().get(theBook.getBnumber().intValue() - 1);
+                    BibleTextUtils.BookLabel label = utils.getBookLabelAsClass(labelString);
+                    for (JAXBElement<CHAPTER> chapter : theBook.getCHAPTER()) {
+                        Integer chapterNo = chapter.getValue().getCnumber().intValue();
+                        htmlBuffer.append("<li>\n");
+                        LinkHandler.generateHyperChapterLink(htmlBuffer, label.getBookNumber(), chapterNo);
+                        htmlBuffer.append("</li>\n");
+                    }
+                }
+
+            }
+        }
+    }
+
 
     /**
      * Build foot.
@@ -76,7 +129,7 @@ public class HTMLRendering {
      * @param htmlBuffer the html buffer
      */
     public static void buildFoot(StringBuffer htmlBuffer) {
-        htmlBuffer.append("</body>\n" +
+        htmlBuffer.append("</div></body>\n" +
                 "</html>");
     }
 
@@ -123,10 +176,7 @@ public class HTMLRendering {
                 .getTitleFromBibleInfo(
                         bible.getBible().getINFORMATION()
                                 .getValue());
-        String id = BibleDictUtil
-                .getIdFromBibleInfo(
-                        bible.getBible().getINFORMATION()
-                                .getValue());
+        String id = getActBibleId(bible.getBible());
         buffer.append("<p>" + title + "("+ id + ")</p>");
     }
 
@@ -202,10 +252,11 @@ public class HTMLRendering {
                                     List<BibleTextUtils.BookLink> links) {
         StringBuffer htmlContent = new StringBuffer();
 
+        XMLBIBLE saveBib = utils.getSelected();
+        utils.setSelected(bible);
         buildHead(htmlContent);
         Integer start = 0;
-
-        htmlContent.append("<h4>"+ links.get(0).toString() + " whole chapter</h4>");
+        htmlContent.append("<div class=\"main\"><h4>"+ links.get(0).toString() + " whole chapter</h4>");
         Optional<BIBLEBOOK> book = utils.getBookByLabel(bible, links.get(0).getBookLabel());
         if (book.isPresent()) {
             JAXBElement<CHAPTER> jaxbChapter = book.get().getCHAPTER().get(
@@ -223,24 +274,30 @@ public class HTMLRendering {
                 Integer chapterNo  = links.get(0).getChapter();
                 BibleFulltextEngine.BibleTextKey key =
                         new BibleFulltextEngine.BibleTextKey(bookNo, chapterNo, versNo, null);
-                BibleFulltextEngine.BibleTextKey mapEntry =
-                        utils.getVersEntry(jaxbChapter.getValue(), key);
-                String versText = mapEntry.getVerseText();
-                htmlContent.append("<p/>");
+                htmlContent.append("<br>");
                 htmlContent.append("(" + Integer.toString(versNo) + ")<br>");
+                String bibleId = getActBibleId(BibleTextUtils.getInstance()
+                        .getSelected());
                 if (links.get(0).getVerses().contains(versNo)) {
-                    renderVers(htmlContent, versText, Color.GREEN);
+                    renderVersNew(htmlContent, jaxbChapter.getValue(), bibleId, key, Color.GREEN, true);
                 } else {
-                    renderVers(htmlContent, versText, null);
+                    renderVersNew(htmlContent, jaxbChapter.getValue(), bibleId, key, null, true);
                 }
-
-
-
             }
         }
 
+        htmlContent.append("<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></div>");
         buildFoot(htmlContent);
+        utils.setSelected(saveBib);
         return htmlContent.toString();
+    }
+
+    private static String getActBibleId(XMLBIBLE selected) {
+        return BibleDictUtil
+                .getIdFromBibleInfo(
+                        selected
+                                .getINFORMATION()
+                                .getValue());
     }
 
     /**
@@ -292,6 +349,158 @@ public class HTMLRendering {
                     .append(escapeHtml4(buffer.toString()))
                     .append("</span></p><hr>");
         }
+    }
+
+    /**
+     * render a verse with our parser
+     * @param htmlBuffer the buffer containing html
+     * @param chapter the chapter
+     * @param bibleId the bible id
+     * @param key the verse key
+     * @param color the optional color
+     * @param getAll get also captions and prologs
+     */
+    public static void renderVersNew(StringBuffer htmlBuffer,
+                                     CHAPTER chapter,
+                                     String bibleId,
+                                     BibleFulltextEngine.BibleTextKey key,
+                                     Color color, Boolean getAll) {
+        final boolean[] caption = {false};
+        StringBuffer buffer = new StringBuffer();
+        BibleRenderParser parser = new BibleRenderParser(new RenderParserCallback() {
+            @Override
+            public boolean textCallBack(String text) {
+                buffer.append(escapeHtml4(text));
+                return false;
+            }
+
+            @Override
+            public boolean gramCallback(String prefix, GRAM gram, String text) {
+                String grString = gram.getStr();
+                grString = prefix + grString;
+                buffer.append(text);
+                String rmac = gram.getRmac();
+                buffer.append(" <a href=\""
+                        + buildDictLink(bibleId, grString)
+                        + "\">[" + grString + "]</a> ");
+                return false;
+            }
+
+            @Override
+            public boolean styleCallback(STYLE style, StringBuffer collected) {
+                buffer.append("<span style=\"" + style.getCss() + "\">" + collected.toString() + "</span>");
+                return false;
+            }
+
+            @Override
+            public boolean beforeNoteCallback(NOTE note, Integer verseNo) {
+                TNotesFix type = note.getType();
+                buffer.append(escapeHtml4("Note{"+ type.value() + "} = ("));
+                return false;
+            }
+
+            @Override
+            public boolean afterNoteCallback(NOTE note, Integer verseNo) {
+                buffer.append(")");
+                return false;
+            }
+
+            @Override
+            public boolean beforeDivCallback(DIV div, Integer verseNo) {
+                //buffer.append("<div>");
+                return false;
+            }
+
+            @Override
+            public boolean afterDivCallback(DIV div, Integer verseNo) {
+                //buffer.append("</div>");
+                return false;
+            }
+
+            @Override
+            public boolean breakCallback(BreakType type, Integer count) {
+                String breakString = "<br>";
+                switch(type) {
+                    case X_NL:
+                        breakString = "<br>";
+                        break;
+                    case X_P:
+                        breakString = "<p/>";
+                        break;
+                }
+                if (count != null) {
+                    for (Integer index = 0 ; index <= count; index++) {
+                        buffer.append(breakString);
+                    }
+                } else {
+                    buffer.append(breakString);
+                }
+                return false;
+            }
+
+            @Override
+            public boolean startCaption(CaptionType captionType) {
+                caption[0] = true;
+                String hx = getCaptionTypeHTMLTag(captionType);
+                buffer.append("<" + hx + ">");
+                return false;
+            }
+
+            @Override
+            public boolean endCaption(CaptionType captionType) {
+                String hx = getCaptionTypeHTMLTag(captionType);
+                buffer.append("</" + hx + ">");
+                return false;
+            }
+        });
+        parser.getVersORCaptionOrEntry(chapter, key, getAll);
+        if (color == null && !caption[0]) {
+            htmlBuffer.append("<hr><p><span style=\"font-size: small; font-family: &quot;Times New Roman&quot;;\">");
+        } else if (color != null && !caption[0]){
+            htmlBuffer.append("<hr><p><span style=\"background-color:#ddd;\" style=\"background-color:"
+                    + color
+                    .toString()
+                    .replace("0x", "#")
+                    + ";font-size: small; font-family: &quot;Times New Roman&quot;;\">");
+        }
+        htmlBuffer.append(buffer.toString());
+        if (!caption[0]) {
+            htmlBuffer.append("</span></p><hr>");
+        }
+    }
+
+    @NotNull
+    private static String buildDictLink(String bibleId, String grString) {
+        return "http://localhost:"
+                + BibleHTTPSrv.PORT
+                + "/dictionary?bible="
+                + bibleId + "#" + grString;
+    }
+
+    @NotNull
+    private static String getCaptionTypeHTMLTag(CaptionType captionType) {
+        String hx = "H1";
+        switch(captionType) {
+            case X_H_1:
+                hx = "H1";
+                break;
+            case X_H_2:
+                hx = "H2";
+                break;
+            case X_H_3:
+                hx = "H3";
+                break;
+            case X_H_4:
+                hx = "H4";
+                break;
+            case X_H_5:
+                hx = "H5";
+                break;
+            case X_H_6:
+                hx = "H6";
+                break;
+        }
+        return hx;
     }
 
     /**

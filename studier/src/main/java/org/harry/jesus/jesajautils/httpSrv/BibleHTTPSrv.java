@@ -11,6 +11,7 @@ import com.sun.deploy.net.proxy.SunAutoProxyHandler;
 import com.sun.net.httpserver.HttpServer;
 import generated.XMLBIBLE;
 import org.harry.jesus.jesajautils.httpSrv.context.RetrieveChapterHandler;
+import org.harry.jesus.jesajautils.httpSrv.context.RetrieveDictionaryHandler;
 import org.harry.jesus.jesajautils.httpSrv.context.RetrieveVerseHandler;
 import org.harry.jesus.jesajautils.httpSrv.context.VersPerDayHandler;
 
@@ -64,12 +65,14 @@ public class BibleHTTPSrv {
         server.createContext("/dayVerse", new VersPerDayHandler(bible, verseRandom));
         server.createContext("/retrieveChapter", new RetrieveChapterHandler(bible));
         server.createContext("/retrieveVerse", new RetrieveVerseHandler(bible));
+        server.createContext("/dictionary", new RetrieveDictionaryHandler());
     }
 
     private void removeContextPoints() {
         server.removeContext("/dayVerse");
         server.removeContext("/retrieveChapter");
         server.removeContext("/retrieveVerse");
+        server.removeContext("/dictionary");
     }
 
     public void stopServer() {

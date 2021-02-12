@@ -437,7 +437,7 @@ public class GenDictHTMLScene {
          * @param htmlBuffer the html buffer
          */
         public void buildSeeLink(String seeContent, StringBuffer htmlBuffer) {
-                htmlBuffer.append("<A href=\"http://_self/#"
+                htmlBuffer.append("<A href=\"#"
                         + seeContent
                         + "\">"
                         + seeContent
