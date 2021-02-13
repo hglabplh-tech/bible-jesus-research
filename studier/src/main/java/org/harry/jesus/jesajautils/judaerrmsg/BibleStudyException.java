@@ -4,6 +4,9 @@ import org.harry.jesus.jesajautils.HTMLRendering;
 
 import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
 
+/**
+ * The type Bible study exception.
+ */
 public class BibleStudyException extends Exception {
 
     private final Code theCode;
@@ -12,6 +15,7 @@ public class BibleStudyException extends Exception {
 
     /**
      * Internal Exception
+     *
      * @param message the message
      */
     public BibleStudyException(String message) {
@@ -20,8 +24,9 @@ public class BibleStudyException extends Exception {
 
     /**
      * Internal Exception with code
+     *
      * @param message the message
-     * @param cause the cause
+     * @param cause   the cause
      */
     public BibleStudyException(String message, Throwable cause) {
         this(Code.INTERNAL_ERROR, cause, message);
@@ -29,7 +34,8 @@ public class BibleStudyException extends Exception {
 
     /**
      * Exception with code and message
-     * @param code the exception code
+     *
+     * @param code   the exception code
      * @param params the params for the format message
      */
     public BibleStudyException(Code code, Object ... params) {
@@ -40,8 +46,9 @@ public class BibleStudyException extends Exception {
 
     /**
      * Exception with cause
-     * @param code exception code
-     * @param cause the error cause
+     *
+     * @param code   exception code
+     * @param cause  the error cause
      * @param params the parameters for the format string
      */
     public BibleStudyException(Code code, Throwable cause, Object ... params) {
@@ -69,6 +76,11 @@ public class BibleStudyException extends Exception {
         return buffer.toString();
     }
 
+    /**
+     * Gets message html.
+     *
+     * @return the message html
+     */
     public String getMessageHTML() {
         StringBuffer buffer = new StringBuffer();
         buffer.append(escapeHtml4("Exception code: "));
@@ -91,10 +103,25 @@ public class BibleStudyException extends Exception {
         return this.cause;
     }
 
+    /**
+     * The enum Code.
+     */
     public enum Code {
+        /**
+         * The Bible not found.
+         */
         BIBLE_NOT_FOUND(1, "Bible with Id %s not found"),
+        /**
+         * The Book not found.
+         */
         BOOK_NOT_FOUND(2, "Book with number %d not found in bible %s"),
+        /**
+         * The Chapter not found.
+         */
         CHAPTER_NOT_FOUND(3, "Chapter with number %d not found in book %d"),
+        /**
+         * The Verse not found.
+         */
         VERSE_NOT_FOUND(4, "Verse with number %d not found in chapter %d"),
         /**
          * fill in here
@@ -111,10 +138,20 @@ public class BibleStudyException extends Exception {
             this.fmtCode = fmtCode;
         }
 
+        /**
+         * Gets the code.
+         *
+         * @return the the code
+         */
         public Integer getTheCode() {
             return theCode;
         }
 
+        /**
+         * Gets fmt code.
+         *
+         * @return the fmt code
+         */
         public String getFmtCode() {
             return fmtCode;
         }

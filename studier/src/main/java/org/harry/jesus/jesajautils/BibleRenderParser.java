@@ -6,10 +6,18 @@ import org.harry.jesus.jesajautils.fulltext.BibleFulltextEngine;
 import javax.xml.bind.JAXBElement;
 import java.util.List;
 
+/**
+ * The type Bible render parser.
+ */
 public class BibleRenderParser {
 
     private final RenderParserCallback handler;
 
+    /**
+     * Instantiates a new Bible render parser.
+     *
+     * @param handler the handler
+     */
     public  BibleRenderParser(RenderParserCallback handler) {
         this.handler = handler;
     }
@@ -19,7 +27,7 @@ public class BibleRenderParser {
      *
      * @param chapter the chapter
      * @param key     the key
-     * @param getAll
+     * @param getAll  the get all
      * @return the vers entry
      */
     public void getVersORCaptionOrEntry(CHAPTER chapter, BibleFulltextEngine.BibleTextKey key, Boolean getAll) {

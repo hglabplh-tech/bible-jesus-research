@@ -87,11 +87,16 @@ public class HTMLRendering {
         htmlBuffer.append("\n");
     }
 
+    /**
+     * Add nav to buffer.
+     *
+     * @param htmlBuffer the html buffer
+     */
     public static void addNavToBuffer(StringBuffer htmlBuffer) {
         htmlBuffer.append("<div class=\"sidenav\"><ul>");
         htmlBuffer.append("<li aria-current=\"page\">" +
                 "<a href=\"http://localhost:" +
-                        BibleHTTPSrv.PORT +
+                        BibleHTTPSrv.getPORT() +
                 "/searchInput\">Search</a></li>");
         htmlBuffer.append("<li><a href=\"#\">Bible</a> <ul>");
         buildBooksTree(htmlBuffer);
@@ -99,6 +104,11 @@ public class HTMLRendering {
         htmlBuffer.append("</ul></div>");
     }
 
+    /**
+     * Build books tree.
+     *
+     * @param htmlBuffer the html buffer
+     */
     public static void  buildBooksTree(StringBuffer htmlBuffer) {
         BibleTextUtils utils = BibleTextUtils.getInstance();
         if (utils.getSelected() != null) {
@@ -226,6 +236,12 @@ public class HTMLRendering {
         return htmlContent.toString();
     }
 
+    /**
+     * Render exception string.
+     *
+     * @param ex the ex
+     * @return the string
+     */
     public static String renderException(Exception ex) {
         StringBuffer buffer = new StringBuffer();
         buffer.append("<html><body><hr><p><span style=\"font-size: small; font-family: &quot;Times New Roman&quot;;\">");
@@ -292,6 +308,55 @@ public class HTMLRendering {
         return htmlContent.toString();
     }
 
+    /**
+     * Render full chapter string.
+     *
+     * @param bible   the bible
+     * @param query   the query
+     * @param results the results
+     * @return the string
+     */
+    public static String renderSearchResult(XMLBIBLE bible, String query,
+                                           List<BibleFulltextEngine.BibleTextKey> results) {
+        StringBuffer htmlContent = new StringBuffer();
+
+        BibleTextUtils utils = BibleTextUtils.getInstance();
+        XMLBIBLE saveBib = utils.getSelected();
+        utils.setSelected(bible);
+        buildHead(htmlContent);
+        Integer start = 0;
+        htmlContent.append("<div class=\"main\"><h4>Search result for \""+ query +  "\"</h4>");
+        for (BibleFulltextEngine.BibleTextKey key : results) {
+            BIBLEBOOK book = utils.getBooks(bible).get(key.getBook() - 1);
+            JAXBElement<CHAPTER> jaxbChapter = book.getCHAPTER().get(
+                    key.getChapter() - 1);
+            List<Integer> versesNoList = new ArrayList<>();
+            for (Object obj : jaxbChapter.getValue().getPROLOGOrCAPTIONOrVERS()) {
+                Object value = ((JAXBElement) obj).getValue();
+                if (value instanceof VERS) {
+                    Integer temp = ((VERS) value).getVnumber().intValue();
+                    versesNoList.add(temp);
+                }
+            }
+            String bibleId = getActBibleId(BibleTextUtils.getInstance()
+                        .getSelected());
+            htmlContent.append("<br>");
+            LinkHandler.generateHyperLink(htmlContent,
+                    key.getBook(),
+                    key.getChapter(),
+                    key.getVers());
+            htmlContent.append("<br>");
+            renderVersNew(htmlContent, jaxbChapter.getValue(), bibleId, key, null, true);
+
+        }
+
+        htmlContent.append("<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></div>");
+        buildFoot(htmlContent);
+        utils.setSelected(saveBib);
+        return htmlContent.toString();
+    }
+
+
     private static String getActBibleId(XMLBIBLE selected) {
         return BibleDictUtil
                 .getIdFromBibleInfo(
@@ -353,12 +418,13 @@ public class HTMLRendering {
 
     /**
      * render a verse with our parser
+     *
      * @param htmlBuffer the buffer containing html
-     * @param chapter the chapter
-     * @param bibleId the bible id
-     * @param key the verse key
-     * @param color the optional color
-     * @param getAll get also captions and prologs
+     * @param chapter    the chapter
+     * @param bibleId    the bible id
+     * @param key        the verse key
+     * @param color      the optional color
+     * @param getAll     get also captions and prologs
      */
     public static void renderVersNew(StringBuffer htmlBuffer,
                                      CHAPTER chapter,
@@ -472,7 +538,7 @@ public class HTMLRendering {
     @NotNull
     private static String buildDictLink(String bibleId, String grString) {
         return "http://localhost:"
-                + BibleHTTPSrv.PORT
+                + BibleHTTPSrv.getPORT()
                 + "/dictionary?bible="
                 + bibleId + "#" + grString;
     }
@@ -569,6 +635,13 @@ public class HTMLRendering {
         return buffer.toString();
     }
 
+    /**
+     * Put stack trace to buffer.
+     *
+     * @param buffer   the buffer
+     * @param elements the elements
+     * @param htmlText the html text
+     */
     public static void putStackTraceToBuffer(StringBuffer buffer, StackTraceElement[] elements, Boolean htmlText) {
         int index = 0;
         for (StackTraceElement element: elements) {

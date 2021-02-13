@@ -10,9 +10,17 @@ import javafx.scene.layout.Priority;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+/**
+ * The type Exception alert.
+ */
 public class ExceptionAlert extends Alert {
 
 
+    /**
+     * Instantiates a new Exception alert.
+     *
+     * @param exception the exception
+     */
     public ExceptionAlert(Exception exception) {
         super(AlertType.ERROR);
         initialize(exception);

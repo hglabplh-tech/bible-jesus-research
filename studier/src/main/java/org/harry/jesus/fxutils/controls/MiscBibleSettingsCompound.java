@@ -99,6 +99,11 @@ public class MiscBibleSettingsCompound extends BorderPane  {
         return this.optBible;
     }
 
+    /**
+     * Gets verse random.
+     *
+     * @return the verse random
+     */
     public Boolean getVerseRandom() {
         return verseRandom.isSelected();
     }

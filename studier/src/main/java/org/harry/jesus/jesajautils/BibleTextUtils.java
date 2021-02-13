@@ -349,8 +349,7 @@ public class BibleTextUtils {
     /**
      * Build a verse text entry from a single search result
      *
-     * @param key      the bible text key which was from the search result
-     * @param versText the text of the verse
+     * @param key the bible text key which was from the search result
      * @return The entry as string
      */
     public String generateVersEntry(BibleFulltextEngine.BibleTextKey key) {
@@ -721,6 +720,7 @@ public class BibleTextUtils {
 
     /**
      * Get all books from the given bible
+     *
      * @param selected the bible
      * @return the list of books and display Strings
      */
@@ -741,6 +741,7 @@ public class BibleTextUtils {
 
     /**
      * get the list of chapters from the specified book
+     *
      * @param book the book tuple
      * @return the list of chapters of the book
      */
@@ -755,6 +756,7 @@ public class BibleTextUtils {
 
     /**
      * get the verses for a specific chapter
+     *
      * @param chapter the chapter tuple
      * @return the verses for the chapter
      */
@@ -866,6 +868,11 @@ public class BibleTextUtils {
             return verses;
         }
 
+        /**
+         * Gets book.
+         *
+         * @return the book
+         */
         public Integer getBook() {
             return book;
         }

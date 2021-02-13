@@ -47,7 +47,6 @@ public class LinkHandler {
     /**
      * The constant VERSENO_PARAM.
      */
-
     public static final String VERSENO_PARAM = "versNo";
 
     /**
@@ -55,6 +54,7 @@ public class LinkHandler {
      *
      * @param href the href
      * @return the real bible link
+     * @throws BibleStudyException the bible study exception
      */
     public static Tuple<XMLBIBLE, BibleTextUtils.BookLink> getRealBibleLink(String href) throws BibleStudyException {
         try {
@@ -78,6 +78,7 @@ public class LinkHandler {
      *
      * @param uri the the URI
      * @return the real bible link
+     * @throws BibleStudyException the bible study exception
      */
     public static Tuple<XMLBIBLE, BibleTextUtils.BookLink> getRealBibleLink(URI uri) throws BibleStudyException{
 
@@ -218,7 +219,7 @@ public class LinkHandler {
             String bibleId = BibleDictUtil
                     .getIdFromBibleInfo(
                             bible.getINFORMATION().getValue());
-            URI uri = new URIBuilder("http://localhost:"+ BibleHTTPSrv.PORT + "/retrieveChapter?")
+            URI uri = new URIBuilder("http://localhost:"+ BibleHTTPSrv.getPORT() + "/retrieveChapter?")
                     .setParameter(BIBLE_PARAM, bibleId)
                     .setParameter(BOOKNO_PARAM, Integer.toString(bookNo))
                     .setParameter(CHAPTERNO_PARAM, Integer.toString(chapter))
@@ -235,6 +236,14 @@ public class LinkHandler {
         return buffer.toString();
     }
 
+    /**
+     * Generate hyper chapter link string.
+     *
+     * @param buffer  the buffer
+     * @param bookNo  the book no
+     * @param chapter the chapter
+     * @return the string
+     */
     public static String generateHyperChapterLink(StringBuffer buffer, Integer bookNo
             , Integer chapter) {
         try {
@@ -246,7 +255,7 @@ public class LinkHandler {
             String bibleId = BibleDictUtil
                     .getIdFromBibleInfo(
                             bible.getINFORMATION().getValue());
-            URI uri = new URIBuilder("http://localhost:"+ BibleHTTPSrv.PORT + "/retrieveChapter?")
+            URI uri = new URIBuilder("http://localhost:"+ BibleHTTPSrv.getPORT() + "/retrieveChapter?")
                     .setParameter(BIBLE_PARAM, bibleId)
                     .setParameter(BOOKNO_PARAM, Integer.toString(bookNo))
                     .setParameter(CHAPTERNO_PARAM, Integer.toString(chapter))

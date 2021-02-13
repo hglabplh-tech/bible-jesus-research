@@ -14,10 +14,18 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 
+/**
+ * The type Retrieve verse handler.
+ */
 public class RetrieveVerseHandler implements HttpHandler {
 
     private final XMLBIBLE bible;
 
+    /**
+     * Instantiates a new Retrieve verse handler.
+     *
+     * @param bible the bible
+     */
     public RetrieveVerseHandler(XMLBIBLE bible)  {
         this.bible = bible;
     }

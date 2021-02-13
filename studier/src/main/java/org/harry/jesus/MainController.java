@@ -213,6 +213,9 @@ public class MainController {
 
     private BibleStudyCompoundControl bibleStudy;
 
+    /**
+     * The constant theService.
+     */
     public static BibleHTTPSrv theService = null;
 
     /**
@@ -659,7 +662,6 @@ public class MainController {
     }
 
 
-
     /**
      * Sets .
      *
@@ -893,6 +895,11 @@ public class MainController {
         GenDictHTMLScene.generateDictHTML(utils, new File(dictDir));
     }
 
+    /**
+     * Edit v of days.
+     *
+     * @param event the event
+     */
     @FXML
     public void editVOfDays(ActionEvent event) {
         EditVersesOfDayDialog.showDialog();

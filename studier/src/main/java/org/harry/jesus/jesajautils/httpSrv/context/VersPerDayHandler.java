@@ -13,6 +13,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * The type Vers per day handler.
+ */
 public class VersPerDayHandler implements HttpHandler {
 
     private int sequence = 0;
@@ -23,6 +26,12 @@ public class VersPerDayHandler implements HttpHandler {
 
     private final Boolean verseRandom;
 
+    /**
+     * Instantiates a new Vers per day handler.
+     *
+     * @param bible       the bible
+     * @param verseRandom the verse random
+     */
     public VersPerDayHandler(XMLBIBLE bible, Boolean verseRandom) {
         this.bible = bible;
         randomizer = ThreadLocalRandom.current();

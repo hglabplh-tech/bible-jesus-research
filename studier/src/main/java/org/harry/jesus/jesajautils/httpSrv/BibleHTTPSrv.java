@@ -2,36 +2,39 @@ package org.harry.jesus.jesajautils.httpSrv;
 
 
 import com.github.markusbernhardt.proxy.selector.pac.PacProxySelector;
-import com.github.markusbernhardt.proxy.selector.pac.PacScriptSource;
 import com.github.markusbernhardt.proxy.selector.pac.UrlPacScriptSource;
-import com.sun.deploy.net.proxy.BrowserProxyInfo;
-import com.sun.deploy.net.proxy.ProxyInfo;
-import com.sun.deploy.net.proxy.ProxyType;
-import com.sun.deploy.net.proxy.SunAutoProxyHandler;
 import com.sun.net.httpserver.HttpServer;
 import generated.XMLBIBLE;
-import org.harry.jesus.jesajautils.httpSrv.context.RetrieveChapterHandler;
-import org.harry.jesus.jesajautils.httpSrv.context.RetrieveDictionaryHandler;
-import org.harry.jesus.jesajautils.httpSrv.context.RetrieveVerseHandler;
-import org.harry.jesus.jesajautils.httpSrv.context.VersPerDayHandler;
+import org.harry.jesus.jesajautils.httpSrv.context.*;
 
 
 import java.io.IOException;
 import java.net.*;
-import java.security.AccessControlContext;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
+
+/**
+ * The type Bible http srv.
+ */
 public class BibleHTTPSrv {
 
+    /**
+     * The constant HOST.
+     */
     public static final String HOST = "localhost";
 
-    public static final Integer PORT = 55777;
+
+
+    private static final Integer PORT = 55777;
     private HttpServer server;
 
+    /**
+     * Instantiates a new Bible http srv.
+     *
+     * @param bible       the bible
+     * @param verseRandom the verse random
+     */
     public BibleHTTPSrv(XMLBIBLE bible, Boolean verseRandom) {
         try {
 
@@ -51,7 +54,7 @@ public class BibleHTTPSrv {
             server = HttpServer.create();
             server.bind(new InetSocketAddress(
                     InetAddress.getByName(HOST),
-                    PORT), 0);
+                    getPORT()), 0);
             createContextPoints(bible, verseRandom);
             server.setExecutor(null);
             server.start();
@@ -66,6 +69,8 @@ public class BibleHTTPSrv {
         server.createContext("/retrieveChapter", new RetrieveChapterHandler(bible));
         server.createContext("/retrieveVerse", new RetrieveVerseHandler(bible));
         server.createContext("/dictionary", new RetrieveDictionaryHandler());
+        server.createContext("/searchInput", new SearchHandler.SearchForm());
+        server.createContext("/searchExecute", new SearchHandler.SearchExecute());
     }
 
     private void removeContextPoints() {
@@ -73,18 +78,38 @@ public class BibleHTTPSrv {
         server.removeContext("/retrieveChapter");
         server.removeContext("/retrieveVerse");
         server.removeContext("/dictionary");
+        server.removeContext("/searchInput");
+        server.removeContext("/searchExecute");
     }
 
+    /**
+     * Stop server.
+     */
     public void stopServer() {
         removeContextPoints();
         server.stop(0);
     }
 
+    /**
+     * Proxy select.
+     *
+     * @param url the url
+     * @throws Exception the exception
+     */
     public static void proxySelect(String url) throws  Exception {
         PacProxySelector selector = new PacProxySelector(new UrlPacScriptSource("file:///C:/Users/haral/proxy/proxy.pac"));
         List<Proxy> pList = selector.select(new URI(url));
         System.out.println(pList.get(0).toString());
 
+    }
+
+    /**
+     * Gets port.
+     *
+     * @return the port
+     */
+    public static Integer getPORT() {
+        return PORT;
     }
 
 

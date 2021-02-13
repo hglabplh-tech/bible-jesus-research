@@ -59,6 +59,9 @@ public class BiblesDictConfig {
     @XmlElement( required = false)
     protected Boolean selectBible = Boolean.FALSE;
 
+    /**
+     * The Verse of day random.
+     */
     @XmlElement( required = false)
     protected Boolean verseOfDayRandom = Boolean.TRUE;
 
@@ -72,10 +75,21 @@ public class BiblesDictConfig {
         return dictBibleMap;
     }
 
+    /**
+     * Gets verse of day bible id.
+     *
+     * @return the verse of day bible id
+     */
     public String getVerseOfDayBibleId() {
         return verseOfDayBibleId;
     }
 
+    /**
+     * Sets verse of day bible id.
+     *
+     * @param verseOfDayBibleId the verse of day bible id
+     * @return the verse of day bible id
+     */
     public BiblesDictConfig setVerseOfDayBibleId(String verseOfDayBibleId) {
         this.verseOfDayBibleId = verseOfDayBibleId;
         return this;
@@ -125,6 +139,7 @@ public class BiblesDictConfig {
 
     /**
      * If verse of day is random
+     *
      * @return get the true/false
      */
     public Boolean getVerseOfDayRandom() {
@@ -133,6 +148,7 @@ public class BiblesDictConfig {
 
     /**
      * Set if the verse of the day is selected random
+     *
      * @param verseOfDayRandom set true /false
      * @return the instance of this class
      */

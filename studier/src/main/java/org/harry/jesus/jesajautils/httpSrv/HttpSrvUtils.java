@@ -7,13 +7,17 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * The type Http srv utils.
+ */
 public class HttpSrvUtils {
 
 
     /**
      * Be careful with changes here.. This method calculates the length in bytes
      * of a UTF-8 encoded String and sends the String as request answer
-     * @param exchange the exchange context
+     *
+     * @param exchange   the exchange context
      * @param textToSend the text
      * @throws IOException exception if the data cannot be transmitted
      */
@@ -30,7 +34,8 @@ public class HttpSrvUtils {
     /**
      * Be careful with changes here.. This method calculates the length in bytes
      * of the written exception part
-     * @param exchange the exchange context
+     *
+     * @param exchange  the exchange context
      * @param exception the exception written
      * @throws IOException exception if the data cannot be transmitted
      */

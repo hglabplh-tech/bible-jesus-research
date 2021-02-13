@@ -22,15 +22,23 @@ public class StatisticsCollector {
 
     private int counter = 0;
 
+    /**
+     * The Act chapter stats.
+     */
     ChapterStats actChapterStats = null;
 
+    /**
+     * The Act book stats.
+     */
     BooksStats actBookStats = null;
 
     /**
      * update the book statistics and update the chapters counters
      *
-     * @param book    the book
-     * @param chapter the chapter
+     * @param book     the book
+     * @param chapter  the chapter
+     * @param verse    the verse
+     * @param vContent the v content
      */
     public void callBack(Integer book, Integer chapter, Integer verse, String vContent) {
 
@@ -126,8 +134,9 @@ public class StatisticsCollector {
 
         /**
          * Instantiates a new Chapter stats.
-         *  @param chapter  the chapter
          *
+         * @param book    the book
+         * @param chapter the chapter
          */
         public ChapterStats(int book, int chapter) {
             this.book = book;
@@ -138,6 +147,7 @@ public class StatisticsCollector {
 
         /**
          * Gets the book of the chapter
+         *
          * @return the book
          */
         public int getBook() {
@@ -155,6 +165,7 @@ public class StatisticsCollector {
 
         /**
          * gets the verse list of the chapter
+         *
          * @return the list
          */
         public List<Tuple<Integer, String>> getVerseList() {
@@ -170,10 +181,19 @@ public class StatisticsCollector {
             return hitCount;
         }
 
+        /**
+         * Increment counter.
+         */
         public void incrementCounter() {
             this.hitCount++;
         }
 
+        /**
+         * Add verse to list.
+         *
+         * @param verseNo   the verse no
+         * @param verseText the verse text
+         */
         public void addVerseToList(Integer verseNo, String verseText) {
             Tuple<Integer, String> verseTuple = new Tuple<>(verseNo, verseText);
             this.getVerseList().add(verseTuple);
@@ -203,6 +223,9 @@ public class StatisticsCollector {
         }
     }
 
+    /**
+     * The type Books stats.
+     */
     public static class BooksStats {
 
         private final Integer book;
@@ -213,6 +236,7 @@ public class StatisticsCollector {
 
         /**
          * constructor initializing the final member book
+         *
          * @param book the book number
          */
         public BooksStats(Integer book) {
@@ -221,6 +245,7 @@ public class StatisticsCollector {
 
         /**
          * get the book number
+         *
          * @return the book number
          */
         public Integer getBook() {
@@ -229,6 +254,7 @@ public class StatisticsCollector {
 
         /**
          * get the chabter count
+         *
          * @return the chapter count
          */
         public Integer getChapterCount() {
@@ -237,6 +263,7 @@ public class StatisticsCollector {
 
         /**
          * get the hit count
+         *
          * @return the hit count
          */
         public Integer getHitCount() {

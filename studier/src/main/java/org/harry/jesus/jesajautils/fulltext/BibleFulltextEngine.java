@@ -61,7 +61,8 @@ public class BibleFulltextEngine {
     /**
      * Instantiates a new Bible fulltext engine.
      *
-     * @param bible the bible
+     * @param bible     the bible
+     * @param collector the collector
      */
     public BibleFulltextEngine(XMLBIBLE bible, StatisticsCollector collector) {
         this.bible = bible;
@@ -127,6 +128,7 @@ public class BibleFulltextEngine {
 
     /**
      * Returns the query result in books order
+     *
      * @return the book order result
      */
     public List<BibleTextKey> retrieveResultsByBookOrder() {
@@ -135,6 +137,7 @@ public class BibleFulltextEngine {
 
     /**
      * returns the relkevance ordered result of the query
+     *
      * @return the relevance result of the query
      */
     public List<BibleTextKey> retrieveResultsByRelevanz() {
@@ -266,10 +269,11 @@ public class BibleFulltextEngine {
 
         /**
          * Instantiates a new Bible text key.
-         *  @param book    the book
-         * @param chapter the chapter
-         * @param vers    the vers
-         * @param verseText
+         *
+         * @param book      the book
+         * @param chapter   the chapter
+         * @param vers      the vers
+         * @param verseText the verse text
          */
         public BibleTextKey(Integer book, Integer chapter, Integer vers, String verseText) {
             this.book = book;
@@ -307,6 +311,7 @@ public class BibleFulltextEngine {
 
         /**
          * Get the verse text
+         *
          * @return the verse text
          */
         public String getVerseText() {

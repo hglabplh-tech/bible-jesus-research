@@ -15,6 +15,9 @@ import org.harry.jesus.jesajautils.httpSrv.DayVerses;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type Edit verses of day dialog.
+ */
 public class EditVersesOfDayDialog {
 
     /**
@@ -170,6 +173,11 @@ public class EditVersesOfDayDialog {
         DayVerses.getInstance().storeVersesOfDays();
     }
 
+    /**
+     * Quick store the verses of day.
+     *
+     * @param link the link
+     */
     public static void quickStoreTheVersesOfDay(BibleTextUtils.BookLink link) {
         List<BibleTextUtils.BookLink> toDelete = new ArrayList<>();
         if (!DayVerses.getInstance().loadVerses().contains(link)) {

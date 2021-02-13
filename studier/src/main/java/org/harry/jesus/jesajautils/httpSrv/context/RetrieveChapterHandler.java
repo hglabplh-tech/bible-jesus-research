@@ -17,10 +17,18 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * The type Retrieve chapter handler.
+ */
 public class RetrieveChapterHandler implements HttpHandler {
 
     private final XMLBIBLE bible;
 
+    /**
+     * Instantiates a new Retrieve chapter handler.
+     *
+     * @param bible the bible
+     */
     public RetrieveChapterHandler(XMLBIBLE bible)  {
         this.bible = bible;
     }

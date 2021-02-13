@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * The type Day verses.
+ */
 public class DayVerses {
 
     /**
@@ -37,6 +40,9 @@ public class DayVerses {
 
     }
 
+    /**
+     * The Verses.
+     */
     public  List<BibleTextUtils.BookLink> verses = new ArrayList<>();
 
     /**
@@ -133,6 +139,7 @@ public class DayVerses {
 
     /**
      * return the verses list
+     *
      * @return the verses list
      */
     public List<BibleTextUtils.BookLink> getVerses() {
@@ -141,6 +148,7 @@ public class DayVerses {
 
     /**
      * Return the singleton of this class
+     *
      * @return the singleton instance
      */
     public  List<BibleTextUtils.BookLink> loadVerses() {
@@ -151,6 +159,7 @@ public class DayVerses {
 
     /**
      * Return the singleton of this class
+     *
      * @return the singleton instance
      */
     public static DayVerses getInstance() {

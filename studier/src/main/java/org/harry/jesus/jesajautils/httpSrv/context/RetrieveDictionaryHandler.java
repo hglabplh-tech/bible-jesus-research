@@ -19,6 +19,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * The type Retrieve dictionary handler.
+ */
 public class RetrieveDictionaryHandler  implements HttpHandler  {
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
