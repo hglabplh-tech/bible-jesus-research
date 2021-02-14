@@ -113,7 +113,11 @@ public class BibleRenderParser {
                     handler.afterNoteCallback(note, verse);
             } else if (jaxbClazz.getName().equals(BR.class.getName()) ) {
                     BR br = (BR)((JAXBElement<?>) content).getValue();
-                    handler.breakCallback(br.getArt(), br.getCount().intValue());
+                    Integer count = 1;
+                    if ( br.getCount() != null) {
+                        count = br.getCount().intValue();
+                    }
+                    handler.breakCallback(br.getArt(), count);
 
             }
 

@@ -139,6 +139,7 @@ public class HTMLRendering {
      * @param htmlBuffer the html buffer
      */
     public static void buildFoot(StringBuffer htmlBuffer) {
+        htmlBuffer.append("<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>");
         htmlBuffer.append("</div></body>\n" +
                 "</html>");
     }
@@ -227,7 +228,8 @@ public class HTMLRendering {
                             versNo);
 
                     htmlContent.append("</p>");
-                    renderVers(htmlContent, versText, null);
+                    String bibleId = getActBibleId(bible);
+                    renderVersNew(htmlContent, jaxbChapter.getValue(), bibleId, mapEntry, null, false);
 
 
                 }
