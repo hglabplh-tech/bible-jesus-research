@@ -84,18 +84,25 @@ public class LinkHandler {
 
         Map<String, String> parameters = splitURIQuery(uri);
         String bibleId = parameters.get(BIBLE_PARAM);
+        if (bibleId == null) {
+            throw new BibleStudyException(BibleStudyException.Code.BIBLE_NOT_FOUND, "NONE");
+        }
         String bookNo = parameters.get(BOOKNO_PARAM);
         if (bookNo == null) {
-            bookNo = getBookByName(parameters);
+            bookNo = getBookByName(parameters, bibleId);
         }
         String chapter = parameters.get(CHAPTERNO_PARAM);
+        String chapterNo = chapter;
+        if (chapterNo == null) {
+            chapterNo = "1";
+        }
         String verseNo = parameters.get(VERSENO_PARAM);
         if (verseNo == null) {
             verseNo = "1";
         }
 
         assertNumeric(bookNo);
-        assertNumeric(chapter);
+        assertNumeric(chapterNo);
         assertNumeric(verseNo);
 
 
@@ -108,7 +115,7 @@ public class LinkHandler {
         if (optBible.isPresent()) {
             XMLBIBLE selected = optBible.get().getBible();
             link = checkBibleLink(selected, Integer.parseInt(bookNo),
-                    Integer.parseInt(chapter), Integer.parseInt(verseNo));
+                    Integer.parseInt(chapterNo), Integer.parseInt(verseNo));
             return new Tuple<>(selected, link);
         } else {
             Throwable ex = new UnsatisfiedLinkError(uri.toString());
@@ -119,11 +126,12 @@ public class LinkHandler {
     }
 
     @NotNull
-    private static String getBookByName(Map<String, String> parameters) throws BibleStudyException {
+    private static String getBookByName(Map<String, String> parameters, String bibleId) throws BibleStudyException {
         String bookNo;
         String bookName = parameters.get(BOOK_PARAM);
         if (bookName == null) {
-            throw new BibleStudyException("Book is not given define either book or bookNo parameter");
+            throw new BibleStudyException(BibleStudyException.Code.BOOK_NOT_FOUND, 0,
+                    bibleId);
         }
         Optional<String> bookLabel = BibleTextUtils.getInstance().getBookLabels()
                 .stream()
@@ -294,6 +302,9 @@ public class LinkHandler {
      */
     public static Map<String, String> splitQuery(String query)  {
         Map<String, String> query_pairs = new LinkedHashMap<>();
+        if (query == null) {
+            return query_pairs;
+        }
         String cookedQuery = query.split("#")[0];
         try {
             String[] pairs = cookedQuery.split("&");
@@ -308,5 +319,10 @@ public class LinkHandler {
             Logger.trace("URI parsing failed with: " + ex.getMessage());
         }
         return query_pairs;
+    }
+
+    public enum NotFound {
+        BIBLE_NOT_FOUND,
+        BOOK_NOT_FOUND
     }
 }

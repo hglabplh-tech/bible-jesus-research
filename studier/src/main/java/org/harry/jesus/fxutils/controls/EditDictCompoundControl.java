@@ -244,18 +244,43 @@ public class EditDictCompoundControl extends BorderPane {
             public void handle(ActionEvent event) {
                 Integer index = descrListView.getSelectionModel().getSelectedIndex();
                 if (index >= 0) {
+                    String id = descrListView.getItems().get(index);
+                    deleteParagraphFromDictItem(id);
                     descrListView.getItems().remove(index);
+                    TParagraph paragraph = descriptions.get(index);
+                    descrToItem.values().remove(paragraph);
                     descriptions.remove(index);
                     descrListView.refresh();
+                    loadToFields(dictionary.getItem().get(actItemsIndex));
                 }
             }
         });
         // TODO activate after fixing (Top -> ListBoxNotUpdated) see above
-        /*descrContextMenu.getItems().add(descrItem);
-        descrListView.setContextMenu(descrContextMenu); */
+        descrContextMenu.getItems().add(descrItem);
+        descrListView.setContextMenu(descrContextMenu);
         itemsListView.setContextMenu(itemsListMenu);
         this.setRight(descrListView);
         initLiseners();
+    }
+
+    private void deleteParagraphFromDictItem(String id) {
+        List<Serializable> contList = dictionary.getItem().get(actItemsIndex).getContent();
+        Serializable toDelete = null;
+        for (Serializable content: contList) {
+            if (content instanceof JAXBElement) {
+                JAXBElement jaxbElement = (JAXBElement) content;
+                if (jaxbElement.getName().getLocalPart().equals("description")) {
+                    TParagraph para =  (TParagraph) jaxbElement.getValue();
+                    if (para.getId().equals(id)) {
+                        toDelete = content;
+                    }
+                }
+
+            }
+        }
+        if (toDelete != null) {
+            contList.remove(toDelete);
+        }
     }
 
     /**

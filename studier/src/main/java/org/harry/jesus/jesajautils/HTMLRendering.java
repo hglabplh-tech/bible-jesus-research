@@ -97,6 +97,10 @@ public class HTMLRendering {
         htmlBuffer.append("<li aria-current=\"page\">" +
                 "<a href=\"http://localhost:" +
                         BibleHTTPSrv.getPORT() +
+                "/retrieveChapter\">Lookup Chapter</a></li>");
+        htmlBuffer.append("<li aria-current=\"page\">" +
+                "<a href=\"http://localhost:" +
+                BibleHTTPSrv.getPORT() +
                 "/searchInput\">Search</a></li>");
         htmlBuffer.append("<li><a href=\"#\">Bible</a> <ul>");
         buildBooksTree(htmlBuffer);
@@ -329,27 +333,29 @@ public class HTMLRendering {
         Integer start = 0;
         htmlContent.append("<div class=\"main\"><h4>Search result for \""+ query +  "\"</h4>");
         for (BibleFulltextEngine.BibleTextKey key : results) {
-            BIBLEBOOK book = utils.getBooks(bible).get(key.getBook() - 1);
-            JAXBElement<CHAPTER> jaxbChapter = book.getCHAPTER().get(
-                    key.getChapter() - 1);
-            List<Integer> versesNoList = new ArrayList<>();
-            for (Object obj : jaxbChapter.getValue().getPROLOGOrCAPTIONOrVERS()) {
-                Object value = ((JAXBElement) obj).getValue();
-                if (value instanceof VERS) {
-                    Integer temp = ((VERS) value).getVnumber().intValue();
-                    versesNoList.add(temp);
+            Optional<BIBLEBOOK> bookOpt = utils.getBookByLabel(bible, utils.getBookLabels().get(key.getBook() -1 ));
+            if (bookOpt.isPresent()) {
+                BIBLEBOOK book = bookOpt.get();
+                JAXBElement<CHAPTER> jaxbChapter = book.getCHAPTER().get(
+                        key.getChapter() - 1);
+                List<Integer> versesNoList = new ArrayList<>();
+                for (Object obj : jaxbChapter.getValue().getPROLOGOrCAPTIONOrVERS()) {
+                    Object value = ((JAXBElement) obj).getValue();
+                    if (value instanceof VERS) {
+                        Integer temp = ((VERS) value).getVnumber().intValue();
+                        versesNoList.add(temp);
+                    }
                 }
-            }
-            String bibleId = getActBibleId(BibleTextUtils.getInstance()
+                String bibleId = getActBibleId(BibleTextUtils.getInstance()
                         .getSelected());
-            htmlContent.append("<br>");
-            LinkHandler.generateHyperLink(htmlContent,
-                    key.getBook(),
-                    key.getChapter(),
-                    key.getVers());
-            htmlContent.append("<br>");
-            renderVersNew(htmlContent, jaxbChapter.getValue(), bibleId, key, null, true);
-
+                htmlContent.append("<br>");
+                LinkHandler.generateHyperLink(htmlContent,
+                        key.getBook(),
+                        key.getChapter(),
+                        key.getVers());
+                htmlContent.append("<br>");
+                renderVersNew(htmlContent, jaxbChapter.getValue(), bibleId, key, null, true);
+            }
         }
 
         htmlContent.append("<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br></div>");
@@ -548,25 +554,27 @@ public class HTMLRendering {
     @NotNull
     private static String getCaptionTypeHTMLTag(CaptionType captionType) {
         String hx = "H1";
-        switch(captionType) {
-            case X_H_1:
-                hx = "H1";
-                break;
-            case X_H_2:
-                hx = "H2";
-                break;
-            case X_H_3:
-                hx = "H3";
-                break;
-            case X_H_4:
-                hx = "H4";
-                break;
-            case X_H_5:
-                hx = "H5";
-                break;
-            case X_H_6:
-                hx = "H6";
-                break;
+        if (captionType != null) {
+            switch (captionType) {
+                case X_H_1:
+                    hx = "H1";
+                    break;
+                case X_H_2:
+                    hx = "H2";
+                    break;
+                case X_H_3:
+                    hx = "H3";
+                    break;
+                case X_H_4:
+                    hx = "H4";
+                    break;
+                case X_H_5:
+                    hx = "H5";
+                    break;
+                case X_H_6:
+                    hx = "H6";
+                    break;
+            }
         }
         return hx;
     }

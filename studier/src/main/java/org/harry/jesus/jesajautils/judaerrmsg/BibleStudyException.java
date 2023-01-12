@@ -58,6 +58,10 @@ public class BibleStudyException extends Exception {
         this.cause = cause;
     }
 
+    public Code getCode() {
+        return theCode;
+    }
+
     @Override
     public String getMessage() {
         StringBuffer buffer = new StringBuffer();
